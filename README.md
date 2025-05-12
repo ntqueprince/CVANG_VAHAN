@@ -103,7 +103,7 @@
   </style>
 </head>
 <body>
-  <h2>📷 CVANG_THE_HOSTER</h2>
+  <h2>📷SHIVANG </h2>
   <div class="upload-section">
     <input type="file" id="fileUpload" accept="image/*">
     <input type="text" id="tagInput" placeholder="Enter tag (e.g., Party)">
