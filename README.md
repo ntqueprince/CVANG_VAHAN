@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -52,22 +52,37 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       text-align: center;
       transition: transform 0.2s;
+      max-width: 200px;
     }
     .image-container:hover {
       transform: scale(1.05);
     }
     #gallery img {
       max-width: 100%;
-      height: auto;
+      height: 150px;
+      object-fit: cover;
       border-radius: 5px;
       border: 2px solid #ccc;
     }
-    p {
+    .tag {
       margin: 5px 0;
-      font-size: 14px;
-      color: #555;
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
     }
-    /* मोबाइल के लिए रिस्पॉन्सिव स्टाइल */
+    .download-btn {
+      background-color: #2196F3;
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+    .download-btn:hover {
+      background-color: #1976D2;
+    }
     @media (max-width: 600px) {
       input[type="file"], input[type="text"], button {
         width: 90%;
@@ -79,6 +94,7 @@
       }
       .image-container {
         padding: 8px;
+        max-width: 100%;
       }
       h2, h3 {
         font-size: 1.2em;
@@ -156,6 +172,25 @@
         });
     };
 
+    // डाउनलोड फंक्शन
+    window.downloadImage = async function(url, tag) {
+      try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `${tag || 'image'}.jpg`; // डिफॉल्ट फाइल नाम टैग के आधार पर
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        console.error('Download failed:', err);
+        alert('Failed to download the image.');
+      }
+    };
+
     // Firebase से इमेज लोड और 5 मिनट बाद डिलीट (सिर्फ Firebase से)
     onValue(imagesRef, (snapshot) => {
       const gallery = document.getElementById('gallery');
@@ -170,10 +205,9 @@
             const container = document.createElement('div');
             container.className = 'image-container';
             container.innerHTML = `
-              <a href="${img.url}" target="_blank" download>
-                <img src="${img.url}" alt="uploaded image">
-              </a>
-              <p>Tag: ${img.tag}</p>
+              <p class="tag">Tag: ${img.tag}</p>
+              <img src="${img.url}" alt="uploaded image">
+              <button class="download-btn" onclick="downloadImage('${img.url}', '${img.tag}')">Download</button>
             `;
             gallery.appendChild(container);
           } else {
@@ -184,5 +218,5 @@
       }
     });
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93e6e3b21ce0ed84',t:'MTc0NzAyMTE3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
