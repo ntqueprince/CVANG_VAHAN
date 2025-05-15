@@ -137,7 +137,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       transform: translateY(-2px);
     }
-    /* Popup Styles */
+    /* Popup Styles for Tag Modal */
     .modal {
       display: none;
       position: fixed;
@@ -225,6 +225,144 @@
       font-weight: 400;
       transition: width 0.3s ease;
     }
+    /* CSAT Calculator Modal Styles */
+    .csat-modal {
+      display: none;
+      position: fixed;
+      z-index: 2;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .csat-modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      border: 2px solid #3f51b5;
+    }
+    .csat-modal-content h4 {
+      color: #1a237e;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .csat-modal-content .input-section {
+      margin-bottom: 15px;
+    }
+    .csat-modal-content label {
+      display: block;
+      font-size: 1em;
+      color: #37474f;
+      margin-bottom: 5px;
+    }
+    .csat-modal-content input, .csat-modal-content select {
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #b0bec5;
+      width: 100%;
+      max-width: 200px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    .csat-modal-content input:focus, .csat-modal-content select:focus {
+      border-color: #3f51b5;
+      box-shadow: 0 0 8px rgba(63, 81, 181, 0.3);
+      outline: none;
+    }
+    .csat-modal-content .good-section {
+      background: #c8e6c9;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .csat-modal-content .bad-section {
+      background: #ffcdd2;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .csat-modal-content .result-section {
+      margin-top: 15px;
+      padding: 10px;
+      background: #eceff1;
+      border-radius: 8px;
+    }
+    .csat-modal-content .result-section p {
+      margin: 5px 0;
+      font-size: 0.9em;
+      color: #455a64;
+    }
+    .csat-modal-content .success {
+      color: #2e7d32;
+      font-weight: 500;
+      padding: 5px;
+      border-radius: 4px;
+      background: rgba(200, 230, 201, 0.3);
+    }
+    .csat-modal-content .error {
+      color: #c62828;
+      font-weight: 600;
+      font-size: 1em;
+      padding: 5px;
+      border-radius: 4px;
+      background: rgba(255, 205, 210, 0.3);
+      display: inline-block;
+    }
+    .csat-modal-content .close-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .csat-modal-content .close-btn:hover {
+      background-color: #d32f2f;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .csat-modal-content .calculate-btn {
+      background-color: #3f51b5;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      margin-left: 10px;
+    }
+    .csat-modal-content .calculate-btn:hover {
+      background-color: #303f9f;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    /* CSAT Button */
+    .csat-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background-color: #1b5e20;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+    }
+    .csat-btn:hover {
+      background-color: #2e7d32;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
     @media (max-width: 600px) {
       input[type="file"], input[type="text"], button {
         width: 90%;
@@ -244,15 +382,33 @@
       h2, h3 {
         font-size: 1.2em;
       }
-      .modal-content {
+      .modal-content, .csat-modal-content {
         width: 80%;
         padding: 15px;
+      }
+      .csat-btn {
+        font-size: 0.8em;
+        padding: 8px 15px;
+      }
+      .csat-modal-content .error {
+        font-size: 0.85em;
+        padding: 4px;
+      }
+      .csat-modal-content .success {
+        font-size: 0.85em;
+        padding: 4px;
+      }
+      .csat-modal-content .result-section p {
+        font-size: 0.8em;
       }
     }
   </style>
 </head>
 <body>
-  <h2>📷SHIVANG </h2>
+  <!-- CSAT Calculator Button -->
+  <button class="csat-btn" onclick="openCSATModal()">CSAT Calculator</button>
+
+  <h2 id="mainHeader">📷SHIVANG</h2>
   <div class="upload-section">
     <input type="file" id="fileUpload" accept="image/*">
     <input type="text" id="tagInput" placeholder="Enter tag (e.g., SHIVANG)">
@@ -268,7 +424,7 @@
   <h3>Uploaded Images</h3>
   <div id="gallery"></div>
 
-  <!-- Popup Modal -->
+  <!-- Tag Modal -->
   <div id="tagModal" class="modal">
     <div class="modal-content">
       <h4>Error: Tag is required!</h4>
@@ -280,6 +436,64 @@
           <div class="modal-progress" id="modalProgress">0%</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- CSAT Calculator Modal -->
+  <div id="csatModal" class="csat-modal">
+    <div class="csat-modal-content">
+      <h4>CSAT Calculator</h4>
+      <div class="input-section good-section">
+        <label>Good Count:</label>
+        <input type="number" id="goodCount" min="0" value="0">
+      </div>
+      <div class="input-section bad-section">
+        <label>Bad Count:</label>
+        <input type="number" id="badCount" min="0" value="0">
+      </div>
+      <div class="input-section">
+        <label>Required CSAT (%):</label>
+        <select id="requiredCSAT">
+          <option value="70">70%+</option>
+          <option value="71">71%+</option>
+          <option value="72">72%+</option>
+          <option value="73">73%+</option>
+          <option value="74">74%+</option>
+          <option value="75">75%+</option>
+          <option value="76">76%+</option>
+          <option value="77">77%+</option>
+          <option value="78">78%+</option>
+          <option value="79">79%+</option>
+          <option value="80">80%+</option>
+          <option value="81">81%+</option>
+          <option value="82">82%+</option>
+          <option value="83">83%+</option>
+          <option value="84">84%+</option>
+          <option value="85">85%+</option>
+          <option value="86">86%+</option>
+          <option value="87">87%+</option>
+          <option value="88">88%+</option>
+          <option value="89">89%+</option>
+          <option value="90">90%+</option>
+          <option value="91">91%+</option>
+          <option value="92">92%+</option>
+          <option value="93">93%+</option>
+          <option value="94">94%+</option>
+          <option value="95">95%+</option>
+          <option value="96">96%+</option>
+          <option value="97">97%+</option>
+          <option value="98">98%+</option>
+          <option value="99">99%+</option>
+          <option value="100">100%+</option>
+        </select>
+      </div>
+      <div class="result-section" id="csatResult">
+        <p>Total: 0</p>
+        <p>CSAT: 0%</p>
+        <p id="csatStatus">Enter counts to see status</p>
+      </div>
+      <button class="close-btn" onclick="closeCSATModal()">Close</button>
+      <button class="calculate-btn" id="calculateButton" onclick="calculateCSAT()">Calculate</button>
     </div>
   </div>
 
@@ -305,6 +519,7 @@
     const uploadPreset = 'anonymous_upload';
 
     let selectedFile = null;
+    let hasCalculated = false;
 
     window.uploadImage = function() {
       const file = document.getElementById('fileUpload').files[0];
@@ -457,7 +672,6 @@
       console.log("Firebase Data:", images);
 
       if (images) {
-        // Convert images object to array and sort by timestamp in descending order
         const sortedImages = Object.entries(images)
           .map(([key, img]) => ({ key, ...img }))
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -483,6 +697,77 @@
         console.log("No images in Firebase");
       }
     });
+
+    // CSAT Calculator Functions
+    window.openCSATModal = function() {
+      document.getElementById('csatModal').style.display = 'flex';
+      calculateCSAT();
+    };
+
+    window.closeCSATModal = function() {
+      document.getElementById('csatModal').style.display = 'none';
+      document.getElementById('goodCount').value = '0';
+      document.getElementById('badCount').value = '0';
+      document.getElementById('requiredCSAT').value = '70';
+      document.getElementById('calculateButton').textContent = 'Calculate';
+      hasCalculated = false;
+      calculateCSAT();
+    };
+
+    window.calculateCSAT = function() {
+      const goodCount = parseInt(document.getElementById('goodCount').value) || 0;
+      const badCount = parseInt(document.getElementById('badCount').value) || 0;
+      const requiredCSAT = parseInt(document.getElementById('requiredCSAT').value);
+      const resultSection = document.getElementById('csatResult');
+      const status = document.getElementById('csatStatus');
+      const calculateButton = document.getElementById('calculateButton');
+
+      const total = goodCount + badCount;
+      const csat = total === 0 ? 0 : (goodCount / total) * 100;
+      const formattedCSAT = csat.toFixed(2);
+
+      resultSection.querySelector('p:nth-child(1)').textContent = `Total: ${total}`;
+      resultSection.querySelector('p:nth-child(2)').textContent = `CSAT: ${formattedCSAT}%`;
+
+      if (total === 0) {
+        status.textContent = 'Enter counts to see status';
+        status.className = '';
+        return;
+      }
+
+      // Calculate the number of additional good counts needed to exceed required CSAT
+      let additionalGoodNeeded = 0;
+      let newCSAT = csat;
+      let newGoodCount = goodCount;
+      let newTotal = total;
+
+      // If CSAT is less than or equal to required, calculate how many more good counts are needed
+      if (csat <= requiredCSAT) {
+        while (newCSAT <= requiredCSAT) {
+          additionalGoodNeeded++;
+          newGoodCount = goodCount + additionalGoodNeeded;
+          newTotal = total + additionalGoodNeeded;
+          newCSAT = (newGoodCount / newTotal) * 100;
+        }
+      }
+
+      const exactCSAT = newCSAT;
+
+      const isAboveRequired = csat > requiredCSAT;
+
+      if (isAboveRequired) {
+        status.textContent = `Success! CSAT (${formattedCSAT}%) is above required (${requiredCSAT}%+).`;
+        status.className = 'success';
+      } else {
+        status.textContent = `Need ${additionalGoodNeeded} more good count(s) to achieve ${requiredCSAT}%+ (exact: ${exactCSAT.toFixed(2)}%).`;
+        status.className = 'error';
+      }
+
+      if (!hasCalculated) {
+        hasCalculated = true;
+        calculateButton.textContent = 'Recalculate';
+      }
+    };
   </script>
 </body>
 </html>
