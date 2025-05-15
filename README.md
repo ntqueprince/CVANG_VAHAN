@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CVANG</title>
+  <title>SHIVANG</title> <!-- Changed from CVANG to SHIVANG -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -387,8 +387,7 @@
         padding: 15px;
       }
       .csat-btn {
-        font-size: 0.8em;
-        padding: 8px 15px;
+        display: none; /* Hide CSAT button for mobile users */
       }
       .csat-modal-content .error {
         font-size: 0.85em;
