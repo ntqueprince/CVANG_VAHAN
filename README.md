@@ -452,6 +452,7 @@
       border: 2px solid #b0bec5;
       border-radius: 8px;
       font-size: 0.95em;
+      font-family: Arial, Helvetica, sans-serif; /* Changed to fix BAJAJ rendering */
       background: #fafafa;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
