@@ -2838,17 +2838,17 @@
     "Declaration format (if declaration required)": "Not Possible"
   },
   {
-    "InsurerRequirement": "CPA - DigitPost Issuance Cancellation",
-    "Insurer": "CPA - Digit",
-    "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": "",
-    "Documents or any other requirement": "Within Freelook period: Reason for cancellation\nPost Free look period: Alternate policy & Reason for cancellation",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Deduction",
-    "Inspection": "No",
-    "Any Exception": "Provides freelook period of 15 Days from the policy start date, deductions are done post free look up period",
-    "Declaration format (if declaration required)": ""
-  },{
+  "InsurerRequirement": "CPA - DigitPost Issuance Cancellation",
+  "Insurer": "CPA - Digit",
+  "Requirement": "Post Issuance Cancellation",
+  "Endorsement type": "nill",
+  "Documents or any other requirement": "Alternative Policy",
+  "TAT": "10 Days",
+  "Charges / Deduction": "May be",
+  "Inspection": "",
+  "Any Exception": "",
+  "Declaration format (if declaration required)": ""
+},{
     "InsurerRequirement": "CPA - KotakInsured name",
     "Insurer": "CPA - Kotak",
     "Requirement": "Insured name",
