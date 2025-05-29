@@ -2841,13 +2841,13 @@
   "InsurerRequirement": "CPA - DigitPost Issuance Cancellation",
   "Insurer": "CPA - Digit",
   "Requirement": "Post Issuance Cancellation",
-  "Endorsement type": "nill",
+  "Endorsement type": "Nill",
   "Documents or any other requirement": "Alternative Policy",
-  "TAT": "10 Days",
+  "TAT": "10 days",
   "Charges / Deduction": "May be",
-  "Inspection": "",
-  "Any Exception": "",
-  "Declaration format (if declaration required)": ""
+  "Inspection": "Nill",
+  "Any Exception": "Nill",
+  "Declaration format (if declaration required)": "Nill"
 },{
     "InsurerRequirement": "CPA - KotakInsured name",
     "Insurer": "CPA - Kotak",
