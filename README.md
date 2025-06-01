@@ -7729,10 +7729,10 @@
   {
     "Insurer": "Oriental",
     "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": null,
+    "Endorsement type": na,
     "Documents or any other requirement": "Alternate Policy, Reason and Declaration",
     "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Not Possible",
+    "Charges / Deduction": "yes",
     "Inspection": "No",
     "Any Exception": "To be raised on Mail",
     "Declaration format (if declaration required)": "Complete reason for cancellation from customer's registered email ID along with requested date and time, Declaration :- There is no claim running in the policy"
