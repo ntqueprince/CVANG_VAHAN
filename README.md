@@ -7726,17 +7726,18 @@
     "Any Exception": null,
     "Declaration format (if declaration required)": null
   },
-  {
-    "Insurer": "Oriental",
-    "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": na,
-    "Documents or any other requirement": "Alternate Policy, Reason and Declaration",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "yes",
-    "Inspection": "No",
-    "Any Exception": "To be raised on Mail",
-    "Declaration format (if declaration required)": "Complete reason for cancellation from customer's registered email ID along with requested date and time, Declaration :- There is no claim running in the policy"
-  },
+ {
+  "InsurerRequirement": "OrientalPost Issuance Cancellation",
+  "Insurer": "Oriental",
+  "Requirement": "Post Issuance Cancellation",
+  "Endorsement type": "na",
+  "Documents or any other requirement": "Alternate Policy, Reason and Declaration",
+  "TAT": "10 days",
+  "Charges / Deduction": "yes",
+  "Inspection": "no",
+  "Any Exception": "To be raised on Mail",
+  "Declaration format (if declaration required)": "Complete reason for cancellation from customer's registered email ID along with requested date and time, Declaration :- There is no claim running in the policy"
+},
   {
     "Insurer": "Oriental",
     "Requirement": "Post Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
