@@ -2,21 +2,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SHIVANG</title>
+  <title>Test Vahan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
       padding: 20px;
+      /* Adjust padding to account for external GitHub header if any, or a standard comfortable padding */
+      padding-top: 50px; /* Reduced padding as the app-main-header is removed */
       background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
       text-align: center;
       margin: 0;
       min-height: 100vh;
+      position: relative;
     }
+    /* .app-main-header removed as per user request */
+
     h2, h3 {
       color: #1a237e;
       font-weight: 600;
+      margin-top: 20px;
     }
     h2 {
       font-size: 2em;
@@ -32,7 +39,7 @@
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
-    input[type="file"], input[type="text"], button {
+    input[type="file"], input[type="text"] {
       padding: 12px;
       margin: 8px;
       font-size: 16px;
@@ -49,18 +56,31 @@
       outline: none;
     }
     button {
-      background-color: #3f51b5;
-      color: white;
+      padding: 15px 25px;
+      margin: 8px;
+      font-size: 18px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
+      color: white;
     }
-    button:hover {
-      background-color: #303f9f;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      transform: translateY(-2px);
+
+    .upload-main-btn {
+      background-color: #64b5f6;
+      padding: 18px 30px;
+      font-size: 20px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border: 2px solid #2196f3;
     }
+    .upload-main-btn:hover {
+      background-color: #42a5f5;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transform: translateY(-3px) scale(1.02);
+    }
+
     .progress-container {
       width: 80%;
       max-width: 300px;
@@ -142,7 +162,7 @@
     .modal {
       display: none;
       position: fixed;
-      z-index: 1;
+      z-index: 1001;
       left: 0;
       top: 0;
       width: 100%;
@@ -230,7 +250,7 @@
     .csat-modal {
       display: none;
       position: fixed;
-      z-index: 2;
+      z-index: 1001;
       left: 0;
       top: 0;
       width: 100%;
@@ -248,6 +268,13 @@
       max-width: 400px;
       text-align: center;
       border: 2px solid #3f51b5;
+      transform: scale(0.9);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .csat-modal-content.active {
+      transform: scale(1);
+      opacity: 1;
     }
     .csat-modal-content h4 {
       color: #1a237e;
@@ -315,15 +342,25 @@
       background: rgba(255, 205, 210, 0.3);
       display: inline-block;
     }
-    .csat-modal-content .close-btn {
-      background-color: #f44336;
-      color: white;
-      border: none;
+    .csat-modal-content .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .csat-modal-content .close-btn,
+    .csat-modal-content .calculate-btn {
+      flex: 1;
       padding: 10px 20px;
       border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
+      border: none;
+    }
+    .csat-modal-content .close-btn {
+      background-color: #f44336;
+      color: white;
     }
     .csat-modal-content .close-btn:hover {
       background-color: #d32f2f;
@@ -332,60 +369,53 @@
     .csat-modal-content .calculate-btn {
       background-color: #3f51b5;
       color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      margin-left: 10px;
     }
     .csat-modal-content .calculate-btn:hover {
       background-color: #303f9f;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    /* CSAT Button */
-    .csat-btn {
-      position: fixed;
-      top: 10px;
-      left: 10px;
+    /* Fixed Buttons on Main Page */
+    .fixed-buttons-container {
+        position: fixed;
+        top: 10px; /* Adjusted to be at the very top, below GitHub's header */
+        left: 0;
+        right: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        z-index: 999; /* Higher than normal content, lower than modals */
+        padding: 5px 0;
+        background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .csat-btn,
+    .vi-claim-btn,
+    .endorsement-btn,
+    .manual-vi-btn {
       background-color: #1b5e20;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 15px 25px;
+      font-size: 18px;
       border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
-      font-size: 0.9em;
+      white-space: nowrap;
     }
-    .csat-btn:hover {
+    .csat-btn:hover,
+    .vi-claim-btn:hover,
+    .endorsement-btn:hover,
+    .manual-vi-btn:hover {
       background-color: #2e7d32;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       transform: translateY(-2px);
     }
-    /* ENDORSEMENT Button */
-    .endorsement-btn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background-color: #1b5e20;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      font-size: 0.9em;
-    }
-    .endorsement-btn:hover {
-      background-color: #2e7d32;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      transform: translateY(-2px);
-    }
-    /* ENDORSEMENT Full-Page Widget Styles */
-    .endorsement-page {
+
+    /* Full-Page Widget Styles (for all modes) */
+    .endorsement-page, .vi-claim-page, .manual-vi-page, .csat-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -393,16 +423,19 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
-      z-index: 1000;
-      padding: 0; /* Removed padding to make it truly full-page */
-      margin: 0; /* Ensure no margins */
+      z-index: 1000; /* Adjusted to be higher than fixed buttons but lower than other modals if any */
+      padding: 0;
+      margin: 0;
       box-sizing: border-box;
       font-family: 'Roboto', sans-serif;
+      overflow-y: auto;
+      justify-content: center;
+      align-items: center;
     }
-    .endorsement-container {
+    .endorsement-container, .vi-claim-container, .manual-vi-container, .csat-modal-content {
       width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
+      max-width: 800px;
+      margin: 20px auto;
       background: #ffffff;
       padding: 20px;
       border-radius: 12px;
@@ -411,14 +444,12 @@
       transform: scale(0.9);
       opacity: 0;
       position: relative;
-      top: 50%;
-      transform: translateY(-50%); /* Center vertically */
     }
-    .endorsement-container.active {
-      transform: scale(1) translateY(-50%); /* Adjust transform to include centering */
+    .endorsement-container.active, .vi-claim-container.active, .manual-vi-container.active, .csat-modal-content.active {
+      transform: scale(1);
       opacity: 1;
     }
-    .endorsement-container h1 {
+    .endorsement-container h1, .vi-claim-container h1, .manual-vi-container h1, .csat-modal-content h4 {
       text-align: center;
       color: #1a237e;
       font-size: 1.8em;
@@ -452,15 +483,15 @@
       border: 2px solid #b0bec5;
       border-radius: 8px;
       font-size: 0.95em;
-      font-family: Arial, Helvetica, sans-serif; /* Changed to fix BAJAJ rendering */
+      font-family: Arial, Helvetica, sans-serif;
       background: #fafafa;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
-      height: 40px; /* Fixed height to prevent extra space */
-      appearance: none; /* Remove default browser styling */
+      height: 40px;
+      appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
-      background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Custom dropdown arrow */
+      background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
       background-repeat: no-repeat;
       background-position: right 10px center;
     }
@@ -527,8 +558,103 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       transform: translateY(-2px);
     }
+
+    /* Styles for VI & Claim Count Table */
+    .table-header {
+        cursor: pointer;
+        /* Default background color - a dark blue to ensure visibility */
+        background-color: #1a237e; /* Dark blue background */
+        color: white; /* White text for contrast */
+        transition: background-color 0.3s, transform 0.2s;
+    }
+    .table-header:hover {
+        background-color: #facc15; /* Yellow on hover */
+        color: #1a237e; /* Dark text on yellow hover */
+        transform: scale(1.05);
+    }
+    /* Ensure the sort icons are visible against both default and hover colors */
+    .sort-icon::after, .sort-asc::after, .sort-desc::after {
+        color: white; /* Default white icon */
+        margin-left: 5px;
+        display: inline-block;
+    }
+    .table-header:hover .sort-icon::after,
+    .table-header:hover .sort-asc::after,
+    .table-header:hover .sort-desc::after {
+        color: #1a237e; /* Dark text on yellow hover */
+    }
+    .sort-icon::after {
+        content: '↕';
+    }
+    .sort-asc::after {
+        content: '↑';
+    }
+    .sort-desc::after {
+        content: '↓';
+    }
+    .table-row {
+        transition: background-color 0.3s;
+    }
+    .table-row:hover {
+        background-color: #fefcbf;
+    }
+    .search-input {
+        transition: all 0.3s;
+    }
+    .search-input:focus {
+        border-color: #db2777;
+        box-shadow: 0 0 10px rgba(219, 39, 119, 0.5);
+    }
+    td, th {
+        white-space: normal !important;
+        word-break: break-words !important;
+    }
+    .table-row:nth-child(odd) {
+        background-color: #e0f7fa;
+    }
+    .table-row:nth-child(even) {
+        background-color: #fce4ec;
+    }
+    .table-row:hover {
+        background-color: #fff9c4 !important;
+    }
+
+    .horizontal-scroll-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .horizontal-scroll-buttons button {
+      background-color: #3f51b5;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .horizontal-scroll-buttons button:hover {
+      background-color: #303f9f;
+      transform: translateY(-2px);
+    }
+
+    /* Hide main content when a modal/full-page section is open */
+    body.modal-open > .fixed-buttons-container,
+    body.modal-open > .upload-section,
+    body.modal-open > h3,
+    body.modal-open > #gallery {
+      display: none !important;
+    }
+
     @media (max-width: 600px) {
-      input[type="file"], input[type="text"], button {
+      body {
+        padding-top: 50px;
+      }
+      input[type="file"], input[type="text"] {
         width: 90%;
         font-size: 14px;
         padding: 10px;
@@ -546,37 +672,38 @@
       h2, h3 {
         font-size: 1.2em;
       }
+      /* Hide fixed buttons container on mobile for main page view */
+      body:not(.modal-open) .fixed-buttons-container {
+        display: none !important;
+      }
+      /* Show main upload section by default on mobile when no modal is open */
+      body:not(.modal-open) .upload-section,
+      body:not(.modal-open) h3,
+      body:not(.modal-open) #gallery {
+        display: block !important;
+      }
+
       .modal-content, .csat-modal-content {
         width: 80%;
         padding: 15px;
       }
-      .csat-btn {
-        display: none;
+      .csat-modal-content .close-btn,
+      .csat-modal-content .calculate-btn {
+          padding: 8px 15px;
+          font-size: 16px;
       }
-      .csat-modal-content .error {
-        font-size: 0.85em;
-        padding: 4px;
-      }
-      .csat-modal-content .success {
-        font-size: 0.85em;
-        padding: 4px;
-      }
-      .csat-modal-content .result-section p {
-        font-size: 0.8em;
-      }
-      .endorsement-btn {
-        display: none; /* Hide endorsement button for mobile users */
-      }
-      .endorsement-container {
+
+      .endorsement-container, .vi-claim-container, .manual-vi-container {
         width: 90vw;
         padding: 15px;
+        margin-top: 10px;
       }
-      .endorsement-container h1 {
+      .endorsement-container h1, .vi-claim-container h1, .manual-vi-container h1 {
         font-size: 1.5em;
       }
       .PB_DROPDOWN {
         font-size: 0.9em;
-        height: 36px; /* Adjusted for mobile */
+        height: 36px;
       }
       .output {
         font-size: 0.95em;
@@ -588,17 +715,59 @@
   </style>
 </head>
 <body>
-  <!-- CSAT Calculator Button -->
-  <button class="csat-btn" onclick="openCSATModal()">CSAT Calculator</button>
+  <!-- "TEST VAHAN" header removed as per user request -->
 
-  <!-- ENDORSEMENT Button -->
-  <button class="endorsement-btn" onclick="openEndorsementPage()">ENDORSEMENT</button>
+  <div class="fixed-buttons-container">
+    <!-- CSAT Calculator Button -->
+    <button class="csat-btn" onclick="openCSATModal()">CSAT Calculator</button>
 
-  <h2 id="mainHeader">📷SHIVANG</h2>
+    <!-- VI & Claim Count Button -->
+    <button class="vi-claim-btn" onclick="openVIClaimPage()">VI & Claim_Count</button>
+
+    <!-- ENDORSEMENT Button -->
+    <button class="endorsement-btn" onclick="openEndorsementPage()">ENDORSEMENT</button>
+
+    <!-- MANUAL-VI Button -->
+    <button class="manual-vi-btn" onclick="openManualVIPage()">MANUAL-VI</button>
+  </div>
+
+
+<!-- MANUAL-VI Full-Page Widget -->
+<div class="manual-vi-page" id="manualVIPage">
+  <div class="manual-vi-container">
+    <button class="back-btn" onclick="closeManualVIPage()">Back to Main Page</button>
+    <h1>Manual VI Details</h1>
+    <div class="created-by">Created by Shivang</div>
+    <div class="mb-3 p-3 rounded" style="background-color: #e3f2fd;">
+      <strong>ADP Home Visit Cities: 42</strong>
+      <ul class="mb-0" style="columns: 2;">
+        <li>Aligarh</li><li>Alwar</li><li>Ambala</li><li>Amritsar</li><li>Belgaum</li>
+        <li>Bhiwani</li><li>Bhubaneshwar</li><li>Bilaspur</li><li>Coimbatore</li><li>Dhanbad</li>
+        <li>Guwahati</li><li>Haldwani</li><li>Haridwar</li><li>Indore</li><li>Jalandhar</li>
+        <li>Jamshedpur</li><li>Jhajjar</li><li>Jind</li><li>Jodhpur</li>
+        <li>Kangra</li><li>Madurai</li><li>Mathura</li><li>Moradabad</li><li>Muzaffarnagar</li>
+        <li>Mysore</li><li>Nagpur</li><li>Panipat</li><li>Pondicherry</li><li>Raipur</li>
+        <li>Rajkot</li><li>Rewa</li><li>Rewari</li><li>Rohtak</li><li>Satara</li>
+        <li>Shimla</li><li>Surat</li><li>Thiruvananthapuram</li><li>Thrissur</li><li>Udaipur</li>
+        <li>Varanasi</li><li>Yamuna Nagar</li>
+      </ul>
+    </div>
+    <div class="mb-3 p-3 rounded" style="background-color: #d0f0c0;">
+      <strong>Manual Home Visit Cities: 14</strong>
+      <ul class="mb-0" style="columns: 2;">
+        <li>Ahmedabad</li><li>Bangalore</li><li>Chennai</li><li>Delhi</li><li>Faridabad</li>
+        <li>Ghaziabad</li><li>Gurgaon</li><li>Hyderabad</li><li>Kolkata</li><li>Mumbai</li>
+        <li>Noida & Greater Noida</li><li>Patna</li><li>Pune</li><li>Thane & Navi Mumbai</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+  <!-- Removed h2#mainHeader as it's replaced by app-main-header in previous versions, but now completely removed -->
   <div class="upload-section">
     <input type="file" id="fileUpload" accept="image/*">
-    <input type="text" id="tagInput" placeholder="Enter tag (e.g., SHIVANG)">
-    <button onclick="uploadImage()">Upload</button>
+    <input type="text" id="tagInput" placeholder="Enter tag (e.g., Shivang)">
+    <button class="upload-main-btn" onclick="uploadImage()">Upload</button>
     <div class="progress-container">
       <div class="progress-bar">
         <div class="progress" id="progress">0%</div>
@@ -614,7 +783,7 @@
   <div id="tagModal" class="modal">
     <div class="modal-content">
       <h4>Error: Tag is required!</h4>
-      <input type="text" id="modalTagInput" placeholder="Enter tag (e.g., SHIVANG)">
+      <input type="text" id="modalTagInput" placeholder="Enter tag (e.g., Shivang)">
       <button class="upload-btn" onclick="submitTag()">Upload</button>
       <button class="cancel-btn" onclick="closeModal()">Cancel</button>
       <div class="modal-progress-container" id="modalProgressContainer">
@@ -678,8 +847,10 @@
         <p>CSAT: 0%</p>
         <p id="csatStatus">Enter counts to see status</p>
       </div>
-      <button class="close-btn" onclick="closeCSATModal()">Close</button>
-      <button class="calculate-btn" id="calculateButton" onclick="calculateCSAT()">Calculate</button>
+      <div class="button-group"> <!-- New button group for alignment -->
+        <button class="close-btn" onclick="closeCSATModal()">Close</button>
+        <button class="calculate-btn" id="calculateButton" onclick="calculateCSAT()">Calculate</button>
+      </div>
     </div>
   </div>
 
@@ -698,6 +869,59 @@
         <option disabled selected>Select Requirement</option>
       </select>
       <div id="output" class="output"></div>
+    </div>
+  </div>
+
+  <!-- VI & Claim Count Full-Page Widget -->
+  <div class="vi-claim-page" id="viClaimPage">
+    <div class="vi-claim-container">
+      <!-- Content from ZD.html starts here -->
+      <button class="back-btn" onclick="closeVIClaimPage()">Back to Main Page</button>
+      <div class="container mx-auto p-4 bg-white rounded-2xl shadow-2xl max-w-7xl w-full border-4 border-transparent bg-clip-border bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+        <!-- Horizontal Scroll Buttons -->
+        <div class="horizontal-scroll-buttons">
+          <button onclick="scrollTableHorizontally('left')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left">
+              <path d="M19 12H5"/>
+              <path d="m12 19-7-7 7-7"/>
+            </svg>
+          </button>
+          <button onclick="scrollTableHorizontally('right')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+        <h1 class="text-4xl font-bold text-center mb-6 text-indigo-800 tracking-tight">Insurance Comparison Dashboard</h1>
+        <p class="text-center text-lg text-gray-600 mb-4">Created by Shivang</p>
+        <div class="mb-4">
+            <input type="text" id="searchInput" placeholder="Search by Insurer Name..." class="search-input w-full p-3 text-lg border-2 border-blue-500 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-pink-500 bg-blue-50 text-gray-800 placeholder-gray-500">
+        </div>
+        <div class="overflow-x-auto rounded-lg" id="insuranceTableWrapper">
+            <table id="insuranceTable" class="w-full bg-white border border-gray-300">
+                <thead class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-lg font-semibold">
+                    <tr>
+                        <th class="table-header p-2 text-left" data-column="insurer_name">Insurer Name</th>
+                        <th class="table-header p-2 text-left" data-column="zd_claims_year">ZD Claims/Year</th>
+                        <th class="table-header p-2 text-left" data-column="non_zd_claims_year">Non-ZD Claims/Year</th>
+                        <th class="table-header p-2 text-left" data-column="video_tat">Video TAT</th>
+                        <th class="table-header p-2 text-left" data-column="short_partial">Short Partial</th>
+                        <th class="table-header p-2 text-left" data-column="artificial_low_lighting">Artificial Low Lighting</th>
+                        <th class="table-header p-2 text-left" data-column="scar_declaration">Scar Declaration</th>
+                        <th class="table-header p-2 text-left" data-column="commercial">Commercial</th>
+                        <th class="table-header p-2 text-left" data-column="video_approval">Video Approval</th>
+                        <th class="table-header p-2 text-left" data-column="brand_new_3_3">Brand New 3+3</th>
+                        <th class="table-header p-2 text-left" data-column="old_3_3">Old 3+3</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="text-gray-800 text-base">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <!-- Content from ZD.html ends here -->
     </div>
   </div>
 
@@ -732,7 +956,16 @@
       const status = document.getElementById('status');
 
       if (!file) {
-        alert("कृपया एक फोटो चुनें।");
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+          <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+            <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+              <p>कृपया एक फोटो चुनें।</p>
+              <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
         return;
       }
 
@@ -753,13 +986,22 @@
       const modalProgressContainer = document.getElementById('modalProgressContainer');
 
       if (!modalTag) {
-        alert("कृपया एक टैग डालें।");
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+          <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+            <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+              <p>कृपया एक टैग डालें।</p>
+              <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
         return;
       }
 
       modalProgressContainer.style.display = 'block';
-      document.querySelector('.upload-btn').style.display = 'none';
-      document.querySelector('.cancel-btn').style.display = 'none';
+      document.querySelector('#tagModal .upload-btn').style.display = 'none';
+      document.querySelector('#tagModal .cancel-btn').style.display = 'none';
 
       uploadFile(selectedFile, modalTag, progressBar, status, modalProgress);
     };
@@ -770,8 +1012,8 @@
       document.getElementById('modalProgressContainer').style.display = 'none';
       document.getElementById('modalProgress').style.width = '0%';
       document.getElementById('modalProgress').textContent = '0%';
-      document.querySelector('.upload-btn').style.display = 'inline-block';
-      document.querySelector('.cancel-btn').style.display = 'inline-block';
+      document.querySelector('#tagModal .upload-btn').style.display = 'inline-block';
+      document.querySelector('#tagModal .cancel-btn').style.display = 'inline-block';
       selectedFile = null;
     };
 
@@ -803,7 +1045,16 @@
           console.log("Cloudinary Response:", data);
           if (!data.secure_url) {
             status.textContent = 'Upload failed: No secure URL received';
-            alert('Upload failed: No secure URL received');
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+              <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+                  <p>Upload failed: No secure URL received</p>
+                  <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+                </div>
+              </div>
+            `;
+            document.body.appendChild(modal);
             closeModal();
             return;
           }
@@ -822,26 +1073,62 @@
                 modalProgress.textContent = '100%';
               }
               status.textContent = 'Complete';
-              alert('Uploaded Successfully!');
+              const modal = document.createElement('div');
+              modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+                  <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+                    <p>Uploaded Successfully!</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+                  </div>
+                </div>
+              `;
+              document.body.appendChild(modal);
               closeModal();
             })
             .catch((error) => {
               console.error("Firebase Push Error:", error);
               status.textContent = 'Upload failed: Firebase error';
-              alert('Upload failed: Firebase error');
+              const modal = document.createElement('div');
+              modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+                  <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+                    <p>Upload failed: Firebase error</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+                  </div>
+                </div>
+              `;
+              document.body.appendChild(modal);
               closeModal();
             });
         } else {
           console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
           status.textContent = 'Upload failed!';
-          alert('Upload failed!');
+          const modal = document.createElement('div');
+          modal.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+              <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+                <p>Upload failed!</p>
+                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(modal);
           closeModal();
         }
       };
 
       xhr.onerror = function() {
         status.textContent = 'Upload error occurred!';
-        alert('Upload failed due to an error!');
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+          <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+            <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+              <p>Upload failed due to an error!</p>
+              <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
         closeModal();
       };
 
@@ -863,7 +1150,16 @@
         window.URL.revokeObjectURL(blobUrl);
       } catch (err) {
         console.error('Download failed:', err);
-        alert('Failed to download the image.');
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+          <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+            <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+              <p>Failed to download the image.</p>
+              <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
       }
     };
 
@@ -887,7 +1183,7 @@
             container.className = 'image-container';
             container.innerHTML = `
               <p class="tag">Tag: ${tag}</p>
-              <img src="${url}" alt="uploaded image" onload="console.log('Image loaded:', '${url}')">
+              <img src="${url}" alt="uploaded image" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFF/000?text=Image+Error';" onload="console.log('Image loaded:', '${url}')">
               <button class="download-btn" onclick="downloadImage('${url}', '${tag}')">Download</button>
             `;
             gallery.appendChild(container);
@@ -905,11 +1201,20 @@
     // CSAT Calculator Functions
     window.openCSATModal = function() {
       document.getElementById('csatModal').style.display = 'flex';
+      setTimeout(() => {
+        document.querySelector('#csatModal .csat-modal-content').classList.add('active');
+      }, 10);
+      document.body.classList.add('modal-open');
       calculateCSAT();
     };
 
     window.closeCSATModal = function() {
-      document.getElementById('csatModal').style.display = 'none';
+      document.querySelector('#csatModal .csat-modal-content').classList.remove('active');
+      setTimeout(() => {
+        document.getElementById('csatModal').style.display = 'none';
+        document.body.classList.remove('modal-open');
+      }, 300);
+      
       document.getElementById('goodCount').value = '0';
       document.getElementById('badCount').value = '0';
       document.getElementById('requiredCSAT').value = '70';
@@ -971,7 +1276,6 @@
       }
     };
 
-    // Close CSAT Modal on Outside Click
     document.getElementById('csatModal').addEventListener('click', function(event) {
       if (event.target === this) {
         closeCSATModal();
@@ -984,37 +1288,75 @@
       setTimeout(() => {
         document.querySelector('.endorsement-container').classList.add('active');
       }, 10);
-      document.getElementById('mainHeader').style.display = 'none';
-      document.querySelector('.upload-section').style.display = 'none';
-      document.querySelector('h3').style.display = 'none';
-      document.getElementById('gallery').style.display = 'none';
-      document.querySelector('.csat-btn').style.display = 'none';
-      document.querySelector('.endorsement-btn').style.display = 'none';
+      document.body.classList.add('modal-open');
     };
 
     window.closeEndorsementPage = function() {
-      document.getElementById('endorsementPage').style.display = 'none';
       document.querySelector('.endorsement-container').classList.remove('active');
-      document.getElementById('mainHeader').style.display = 'block';
-      document.querySelector('.upload-section').style.display = 'block';
-      document.querySelector('h3').style.display = 'block';
-      document.getElementById('gallery').style.display = 'grid';
-      document.querySelector('.csat-btn').style.display = 'block';
-      document.querySelector('.endorsement-btn').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('endorsementPage').style.display = 'none';
+        document.body.classList.remove('modal-open');
+      }, 300);
     };
 
-    // Close ENDORSEMENT Page on Outside Click
     document.getElementById('endorsementPage').addEventListener('click', function(event) {
       if (event.target === this) {
         closeEndorsementPage();
       }
     });
 
+    // VI & Claim Count Full-Page Functionality
+    window.openVIClaimPage = function() {
+      document.getElementById('viClaimPage').style.display = 'block';
+      setTimeout(() => {
+        document.querySelector('.vi-claim-container').classList.add('active');
+      }, 10);
+      populateTable(insuranceData);
+      document.body.classList.add('modal-open');
+    };
+
+    window.closeVIClaimPage = function() {
+      document.querySelector('.vi-claim-container').classList.remove('active');
+      setTimeout(() => {
+        document.getElementById('viClaimPage').style.display = 'none';
+        document.body.classList.remove('modal-open');
+      }, 300);
+    };
+
+    document.getElementById('viClaimPage').addEventListener('click', function(event) {
+      if (event.target === this) {
+        closeVIClaimPage();
+      }
+    });
+
+    // MANUAL-VI Full-Page Functionality
+    window.openManualVIPage = function() {
+      document.getElementById('manualVIPage').style.display = 'block';
+      setTimeout(() => {
+        document.querySelector('.manual-vi-container').classList.add('active');
+      }, 10);
+      document.body.classList.add('modal-open');
+    };
+
+    window.closeManualVIPage = function() {
+      document.querySelector('.manual-vi-container').classList.remove('active');
+      setTimeout(() => {
+        document.getElementById('manualVIPage').style.display = 'none';
+        document.body.classList.remove('modal-open');
+      }, 300);
+    };
+
+    document.getElementById('manualVIPage').addEventListener('click', function(event) {
+      if (event.target === this) {
+        closeManualVIPage();
+      }
+    });
+
+
     const insurerDropdown = document.querySelector('.endorsement-page #insurer');
     const requirementDropdown = document.querySelector('.endorsement-page #requirement');
     const outputBox = document.querySelector('.endorsement-page #output');
 
-    // Empty array for you to manually add JSON data
     const data = [{
     "InsurerRequirement": "New India AssuranceAddition of GST No.",
     "Insurer": "New India Assurance",
@@ -2838,17 +3180,17 @@
     "Declaration format (if declaration required)": "Not Possible"
   },
   {
-  "InsurerRequirement": "CPA - DigitPost Issuance Cancellation",
-  "Insurer": "CPA - Digit",
-  "Requirement": "Post Issuance Cancellation",
-  "Endorsement type": "Nill",
-  "Documents or any other requirement": "Alternative Policy",
-  "TAT": "10 days",
-  "Charges / Deduction": "May be",
-  "Inspection": "Nill",
-  "Any Exception": "Nill",
-  "Declaration format (if declaration required)": "Nill"
-},{
+    "InsurerRequirement": "CPA - DigitPost Issuance Cancellation",
+    "Insurer": "CPA - Digit",
+    "Requirement": "Post Issuance Cancellation",
+    "Endorsement type": "",
+    "Documents or any other requirement": "Within Freelook period: Reason for cancellation\nPost Free look period: Alternate policy & Reason for cancellation",
+    "TAT": "SRS / 10 Days",
+    "Charges / Deduction": "Deduction",
+    "Inspection": "No",
+    "Any Exception": "Provides freelook period of 15 Days from the policy start date, deductions are done post free look up period",
+    "Declaration format (if declaration required)": ""
+  },{
     "InsurerRequirement": "CPA - KotakInsured name",
     "Insurer": "CPA - Kotak",
     "Requirement": "Insured name",
@@ -7726,7 +8068,7 @@
     "Any Exception": null,
     "Declaration format (if declaration required)": null
   },
- {
+  {
   "InsurerRequirement": "OrientalPost Issuance Cancellation",
   "Insurer": "Oriental",
   "Requirement": "Post Issuance Cancellation",
@@ -11879,7 +12221,6 @@
   }
 ];
 
-    // Populate insurer dropdown
     try {
       const insurers = [...new Set(data.map(d => d["Insurer"]))].sort();
       insurers.forEach(ins => {
@@ -11889,10 +12230,18 @@
       });
     } catch (error) {
       console.error("Error populating insurers:", error);
-      alert("Error in JSON data. Please check the syntax and paste valid JSON.");
+      const modal = document.createElement('div');
+      modal.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+          <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center;">
+            <p>Error in JSON data. Please check the syntax and paste valid JSON.</p>
+            <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 8px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer;">Ok</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
     }
 
-    // Handle insurer selection
     insurerDropdown.addEventListener("change", () => {
       requirementDropdown.innerHTML = "<option disabled selected>Select Requirement</option>";
       outputBox.style.display = "none";
@@ -11910,7 +12259,6 @@
       requirementDropdown.disabled = false;
     });
 
-    // Handle requirement selection
     requirementDropdown.addEventListener("change", () => {
       const ins = insurerDropdown.value;
       const req = requirementDropdown.value;
@@ -11936,6 +12284,366 @@
         setTimeout(() => outputBox.classList.add("show"), 10);
       }
     });
+
+    const insuranceData = [
+            {
+                "insurer_name": "National",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "24 Hours",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "ZD Plan: 2, ZD+: Unlimited",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "New India Assurance",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "24 Hours",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "Yes",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Oriental",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "24 Hours",
+                "short_partial": "No",
+                "artificial_low_lighting": "Yes",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "United India",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "48 Hours",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "Yes",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "Unlimited",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Tata AIG",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "Yes",
+                "old_3_3": "Yes"
+            },
+            {
+                "insurer_name": "ICICI Lombard",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "Yes",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "Yes",
+                "old_3_3": "Yes"
+            },
+            {
+                "insurer_name": "Zuno General",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Cholamandalam MS",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Future Generali",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "MAGMA",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required (Scar on Driver Side not accepted) within Video TAT",
+                "zd_claims_year": "Unlimited",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Raheja QBE",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Kotak",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "SBI General",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "Unlimited",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Shriram",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required (Shriram format) + Address ID proof within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited till IDV",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Iffco Tokio",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "Unlimited",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Liberty Videocon",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "No",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+                "zd_claims_year": "Unlimited",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "HDFC Ergo",
+                "commercial": "No",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Reliance",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited till IDV",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Bajaj Allianz",
+                "commercial": "Yes",
+                "video_approval": "At U/W end",
+                "video_tat": "2 days",
+                "short_partial": "Yes",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Will Refer to Under Writer",
+                "zd_claims_year": "2",
+                "non_zd_claims_year": "Unlimited",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Royal Sundaram",
+                "commercial": "No",
+                "video_approval": "At U/W end",
+                "video_tat": "2 days",
+                "short_partial": "No",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Will Refer to Under Writer",
+                "zd_claims_year": "Unlimited till IDV",
+                "non_zd_claims_year": "Unlimited till IDV",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Universal Sompo",
+                "commercial": "No",
+                "video_approval": "At U/W end",
+                "video_tat": "2 days",
+                "short_partial": "No",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Will Refer to Under Writer",
+                "zd_claims_year": "Unlimited till IDV",
+                "non_zd_claims_year": "Unlimited till IDV",
+                "brand_new_3_3": "No",
+                "old_3_3": "No"
+            },
+            {
+                "insurer_name": "Digit",
+                "commercial": "Yes",
+                "video_approval": "At PB end",
+                "video_tat": "2 days",
+                "short_partial": "No",
+                "artificial_low_lighting": "No",
+                "scar_declaration": "Declaration Required within Video TAT",
+                "zd_claims_year": "1 or 2 claims (as per selected plan)",
+                "non_zd_claims_year": "Unlimited till IDV",
+                "brand_new_3_3": "Yes",
+                "old_3_3": "Yes"
+            }
+        ];
+
+    function populateTable(data) {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.className = 'table-row border-b';
+            row.innerHTML = `
+                <td class="p-2 font-medium text-indigo-900">${item.insurer_name}</td>
+                <td class="p-2">${item.zd_claims_year}</td>
+                <td class="p-2">${item.non_zd_claims_year}</td>
+                <td class="p-2">${item.video_tat}</td>
+                <td class="p-2 ${item.short_partial === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.short_partial}</td>
+                <td class="p-2 ${item.artificial_low_lighting === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.artificial_low_lighting}</td>
+                <td class="p-2">${item.scar_declaration}</td>
+                <td class="p-2 ${item.commercial === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.commercial}</td>
+                <td class="p-2">${item.video_approval}</td>
+                <td class="p-2 ${item.brand_new_3_3 === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.brand_new_3_3}</td>
+                <td class="p-2 ${item.old_3_3 === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.old_3_3}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function sortTable(column, order) {
+        const sortedData = [...insuranceData].sort((a, b) => {
+            const aValue = String(a[column]).toLowerCase();
+            const bValue = String(b[column]).toLowerCase();
+            if (order === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+        populateTable(sortedData);
+    }
+
+    document.querySelectorAll('.vi-claim-page .table-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const column = header.dataset.column;
+            const currentOrder = header.classList.contains('sort-asc') ? 'desc' : 'asc';
+            
+            document.querySelectorAll('.vi-claim-page .table-header').forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+                h.classList.add('sort-icon'); /* Re-add default icon */
+            });
+            
+            header.classList.remove('sort-icon'); /* Remove default icon from current header */
+            header.classList.add(currentOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+            
+            sortTable(column, currentOrder);
+        });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredData = insuranceData.filter(item => 
+            item.insurer_name.toLowerCase().includes(searchTerm)
+        );
+        populateTable(filteredData);
+    });
+
+    window.scrollTableHorizontally = function(direction) {
+      const tableWrapper = document.getElementById('insuranceTableWrapper');
+      const scrollAmount = 200;
+      if (direction === 'left') {
+        tableWrapper.scrollLeft -= scrollAmount;
+      } else {
+        tableWrapper.scrollLeft += scrollAmount;
+      }
+    };
   </script>
 </body>
 </html>
