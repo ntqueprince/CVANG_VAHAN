@@ -1844,17 +1844,17 @@
     "Declaration format (if declaration required)": ""
   },
   {
-    "InsurerRequirement": "New India AssurancePost Issuance Cancellation",
-    "Insurer": "New India Assurance",
-    "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": "NA",
-    "Documents or any other requirement": "Alternate Policy and Reason for cancellation",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Deduction",
-    "Inspection": "",
-    "Any Exception": "",
-    "Declaration format (if declaration required)": ""
-  },
+  "InsurerRequirement": "New India AssurancePost Issuance Cancellation",
+  "Insurer": "New India Assurance",
+  "Requirement": "Post Issuance Cancellation",
+  "Endorsement type": "NA",
+  "Documents or any other requirement": "Alternate Policy and Reason for cancellation",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Deduction",
+  "Inspection": "NA",
+  "Any Exception": "To cancel a third-party policy, need to provide an alternate policy from the same insurer with the same issuance date.",
+  "Declaration format (if declaration required)": "NA"
+},
   {
     "InsurerRequirement": "New India AssurancePost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
     "Insurer": "New India Assurance",
