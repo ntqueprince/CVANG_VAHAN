@@ -127,19 +127,34 @@
     }
     /* Styles for Download Button (updated to match previous download-btn styles) */
     .download-btn {
-      background-color: #ff5722;
-      color: white;
-      padding: 8px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 5px;
-      font-size: 14px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      display: inline-block; /* Ensure it behaves like a button */
-      text-decoration: none; /* Remove underline for anchor tag */
-    }
+  background-color: #ff5722;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 5px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+  white-space: nowrap;
+  z-index: 2;
+  position: relative;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* ✅ Extra support for small screen (mobile) */
+@media (max-width: 600px) {
+  .download-btn {
+    font-size: 16px;
+    padding: 10px 20px;
+    min-width: 110px;
+    text-align: center;
+  }
+}
     .download-btn:hover {
       background-color: #e64a19;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
