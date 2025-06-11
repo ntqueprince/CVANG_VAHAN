@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -840,8 +841,38 @@
   <!-- New button for Claim_Count & NSTP -->
   <button class="claim-count-nstp-btn-fixed" onclick="openClaimCountNSTPPage()">Claim_Count & NSTP</button>
 
-  <h2 id="mainHeader">📷SHIVANG</h2>
+  <!-- "📷SHIVANG" header ko "Aaj Ki Baat" button se replace kiya gaya hai -->
+  <a id="aaj-ki-baat-button" href="
+
+
+
+
+https://gamma.app/docs/-cqmuvm3zgbidv90
+
+
+
+
+
+
+" target="_blank" style="
+      background-color: #28a745; /* Button ke liye hara rang */
+      color: white;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.5em;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      text-decoration: none; /* Agar anchor tag istemal ho to underline hataye */
+      display: inline-block; /* Padding aur margin ki anumati dene ke liye */
+      margin-top: 20px; /* Upar se jagah */
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  ">Aaj Ki Baat</a>
+
   <div class="upload-section">
+    <h2>Upload Images</h2>
+    <label for="fileUpload">Choose image files to upload:</label>
     <input type="file" id="fileUpload" accept="image/*">
     <input type="text" id="tagInput" placeholder="Enter tag (e.g., SHIVANG)">
     <button onclick="uploadImage()">Upload</button>
@@ -1502,7 +1533,7 @@
 
     // Helper functions to manage visibility
     function hideAllMainContent() {
-      document.getElementById('mainHeader').style.display = 'none';
+      // document.getElementById('mainHeader').style.display = 'none'; // Removed this line
       document.querySelector('.upload-section').style.display = 'none';
       document.querySelector('h3').style.display = 'none'; /* 'Uploaded Images' header */
       document.getElementById('gallery').style.display = 'none';
@@ -1510,10 +1541,12 @@
       document.querySelector('.endorsement-btn').style.display = 'none';
       document.querySelector('.manual-vi-btn-fixed').style.display = 'none';
       document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'none';
+      // Do not hide #aaj-ki-baat-button as it should always be visible
+      document.getElementById('aaj-ki-baat-button').style.display = 'none'; /* Hide Aaj Ki Baat button */
     }
 
     function showAllMainContent() {
-      document.getElementById('mainHeader').style.display = 'block';
+      // document.getElementById('mainHeader').style.display = 'block'; // Removed this line
       document.querySelector('.upload-section').style.display = 'block';
       document.querySelector('h3').style.display = 'block'; /* 'Uploaded Images' header */
       document.getElementById('gallery').style.display = 'grid'; /* grid for gallery */
@@ -1526,6 +1559,7 @@
         document.querySelector('.manual-vi-btn-fixed').style.display = 'block';
         document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'block';
       }
+      document.getElementById('aaj-ki-baat-button').style.display = 'inline-block'; /* Show Aaj Ki Baat button */
     }
 
     // Endorsement Data and Logic
@@ -12802,10 +12836,10 @@
 
                 document.querySelectorAll('#insuranceTable .table-header').forEach(h => {
                     h.classList.remove('sort-asc', 'sort-desc');
-                    h.classList.add('sort-icon'); /* Add back default icon */
+                    h.classList.add('sort-icon'); /* Default icon wapas add karein */
                 });
 
-                header.classList.remove('sort-icon'); /* Remove default icon from current header */
+                header.classList.remove('sort-icon'); /* Current header se default icon hatayen */
                 header.classList.add(currentOrder === 'asc' ? 'sort-asc' : 'sort-desc');
 
                 sortTable(column, currentOrder);
@@ -12814,7 +12848,7 @@
 
         // Remove existing listener for search input and re-add
         const searchInput = document.getElementById('searchInput');
-        // Check if searchInput exists before cloning
+        // searchInput maujood hai ya nahi, check karein clone karne se pehle
         if (searchInput) {
             const newSearchInput = searchInput.cloneNode(true);
             searchInput.parentNode.replaceChild(newSearchInput, searchInput);
@@ -12830,7 +12864,7 @@
     }
 
 
-    // Initial load of images when the page loads
+    // Page load hone par images ko shuruat mein load karein
     loadImages();
 
   </script>
