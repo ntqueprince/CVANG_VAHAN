@@ -1,4 +1,3 @@
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -127,34 +126,34 @@
     }
     /* Styles for Download Button (updated to match previous download-btn styles) */
     .download-btn {
-  background-color: #ff5722;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 5px;
-  font-size: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  display: inline-block;
-  text-decoration: none;
-  white-space: nowrap;
-  z-index: 2;
-  position: relative;
-  min-width: 100px;
-  text-align: center;
-}
+      background-color: #ff5722;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 5px;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-decoration: none;
+      white-space: nowrap;
+      z-index: 2;
+      position: relative;
+      min-width: 100px;
+      text-align: center;
+    }
 
-/* ✅ Extra support for small screen (mobile) */
-@media (max-width: 600px) {
-  .download-btn {
-    font-size: 16px;
-    padding: 10px 20px;
-    min-width: 110px;
-    text-align: center;
-  }
-}
+    /* ✅ Extra support for small screen (mobile) */
+    @media (max-width: 600px) {
+      .download-btn {
+        font-size: 16px;
+        padding: 10px 20px;
+        min-width: 110px;
+        text-align: center;
+      }
+    }
     .download-btn:hover {
       background-color: #e64a19;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -623,6 +622,63 @@
       text-align: left; /* Align text to the left within the lists */
       padding-top: 20px; /* Add padding to the top of the list */
     }
+    /* Styles for Claim Coverage Overlay */
+    .claim-coverage-overlay {
+      display: none; /* Hidden by default */
+      position: absolute; /* Position relative to .manual-vi-page */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
+      z-index: 1001; /* Above other content in manual-vi-page */
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: left; /* Align text to the left within the overlay */
+      overflow-y: auto;
+    }
+
+    .claim-coverage-content {
+      background-color: #f0f8ff; /* Light blue background for content */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      max-width: 500px; /* Max width for readability */
+      width: 100%;
+      border: 2px solid #5c6bc0; /* Blue border */
+    }
+
+    .claim-coverage-content h4 {
+      color: #1a237e;
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .claim-coverage-content ul {
+      list-style-type: disc;
+      padding-left: 25px;
+      color: #37474f;
+      line-height: 1.8;
+      font-size: 1.1em;
+    }
+
+    .claim-coverage-content ul li strong {
+      color: #3f51b5; /* Blue for strong text */
+    }
+
+    /* Green color for Claim Coverage button */
+    .claim-coverage-btn-green {
+        background-color: #4CAF50; /* Green */
+    }
+    .claim-coverage-btn-green:hover {
+        background-color: #45a049; /* Darker green on hover */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+    }
 
     /* Styles for Claim_Count & NSTP Page (Insurance Comparison Dashboard) */
     .claim-count-nstp-page {
@@ -752,13 +808,23 @@
       }
       /* Ensure back buttons within active full-page sections are visible on mobile */
       .endorsement-page .back-btn,
-      .manual-vi-page .back-to-home-btn, /* Re-added for consistency if needed, but display: none in HTML */
+      .manual-vi-page .back-btn, /* This is the "Back to Main Page" button */
+      .manual-vi-page .claim-coverage-btn, /* New button for Claim Coverage */
       .claim-count-nstp-page .back-btn {
-        display: block; /* Make sure back buttons are visible within their pages on mobile */
+        display: block; /* Make sure these buttons are visible within their pages on mobile */
         position: absolute; /* Changed to absolute to be relative to the page div */
         top: 20px;
         left: 20px;
         z-index: 1001; /* Ensure it's above other content */
+      }
+      /* Adjust position for the new Claim Coverage button on mobile */
+      .manual-vi-page .claim-coverage-btn {
+        top: 60px; /* Position below Back to Main Page button */
+      }
+
+      /* On mobile, when the claim coverage overlay is active, the regular card should be hidden */
+      .manual-vi-page.claim-coverage-active .card {
+          display: none;
       }
     }
   </style>
@@ -768,7 +834,8 @@
 
   <button class="endorsement-btn" onclick="openEndorsementPage()">ENDORSEMENT</button>
 
-  <button class="manual-vi-btn-fixed" onclick="openManualVIPage()">MANUAL-VI</button>
+  <!-- Renamed Manual VI button -->
+  <button class="manual-vi-btn-fixed" onclick="openManualVIPage()">MANUAL-VI & Claim Coverage</button>
 
   <!-- New button for Claim_Count & NSTP -->
   <button class="claim-count-nstp-btn-fixed" onclick="openClaimCountNSTPPage()">Claim_Count & NSTP</button>
@@ -882,9 +949,11 @@
 
   <div class="manual-vi-page" id="manualVIPage">
     <button class="back-btn" onclick="closeManualVIPage()">Back to Main Page</button>
-    <div class="card mt-4">
+    <!-- New "Claim Coverage" button with green color -->
+    <button class="claim-coverage-btn back-btn claim-coverage-btn-green" onclick="toggleClaimCoverage()">Claim Coverage</button>
+    <div class="card mt-4" id="manualVICardContent">
       <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-        </div>
+      </div>
       <div class="card-body">
         <div class="mb-3 p-3 rounded" style="background-color: #e3f2fd;">
           <strong>ADP Home Visit Cities: 42</strong>
@@ -909,6 +978,21 @@
           </ul>
         </div>
       </div>
+    </div>
+
+    <!-- Claim Coverage Overlay -->
+    <div class="claim-coverage-overlay" id="claimCoverageOverlay">
+        <div class="claim-coverage-content">
+            <h4>Claim Coverage Details</h4>
+            <ul>
+                <li><strong>Plastic Nylon Rubber:</strong> 50%</li>
+                <li><strong>Tyre tube Batteries:</strong> 50%</li>
+                <li><strong>Denting Painting:</strong> 87.5%</li>
+                <li><strong>Fiberglass:</strong> 70%</li>
+                <li><strong>Windshield glass:</strong> 100%</li>
+                <li><strong>Metal, Wooden fiber and other parts:</strong> As per car age</li>
+            </ul>
+        </div>
     </div>
   </div>
 
@@ -1332,6 +1416,10 @@
     // MANUAL-VI Full-Page Functionality
     window.openManualVIPage = function() {
       document.getElementById('manualVIPage').style.display = 'block';
+      // Ensure the manual VI card content is visible by default when opening this page
+      document.getElementById('manualVICardContent').style.display = 'block';
+      document.getElementById('claimCoverageOverlay').style.display = 'none'; // Hide overlay initially
+      document.getElementById('manualVIPage').classList.remove('claim-coverage-active'); // Remove class if present
       hideAllMainContent();
       // Ensure all other full-page views are hidden
       document.getElementById('csatModal').style.display = 'none';
@@ -1342,14 +1430,46 @@
     window.closeManualVIPage = function() {
       document.getElementById('manualVIPage').style.display = 'none';
       showAllMainContent();
+      // Also hide the claim coverage overlay when going back to home
+      document.getElementById('claimCoverageOverlay').style.display = 'none';
+      document.getElementById('manualVIPage').classList.remove('claim-coverage-active');
     };
 
-    // Close Manual VI Page on Outside Click (optional, but good for consistency)
+    // Toggle Claim Coverage Overlay within Manual VI Page
+    window.toggleClaimCoverage = function() {
+        const manualVICardContent = document.getElementById('manualVICardContent');
+        const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
+        const manualVIPage = document.getElementById('manualVIPage');
+
+        if (claimCoverageOverlay.style.display === 'flex') {
+            // If overlay is visible, hide it and show main card content
+            claimCoverageOverlay.style.display = 'none';
+            manualVICardContent.style.display = 'block';
+            manualVIPage.classList.remove('claim-coverage-active'); // Remove class
+        } else {
+            // If overlay is hidden, show it and hide main card content
+            claimCoverageOverlay.style.display = 'flex';
+            manualVICardContent.style.display = 'none';
+            manualVIPage.classList.add('claim-coverage-active'); // Add class for styling
+        }
+    };
+
+    // Close Manual VI Page OR Claim Coverage Overlay on Outside Click
     document.getElementById('manualVIPage').addEventListener('click', function(event) {
+      // If the click is directly on the manual-vi-page (background),
+      // regardless of which sub-section is open, close the entire page.
       if (event.target === this) {
         closeManualVIPage();
       }
     });
+
+    // New: Add click listener to the claimCoverageOverlay to close the entire manualVIPage
+    document.getElementById('claimCoverageOverlay').addEventListener('click', function(event) {
+        if (event.target === this) { // Only if the click is directly on the overlay's background
+            closeManualVIPage(); // Go back to the main page
+        }
+    });
+
 
     // New Claim_Count & NSTP Page Functionality
     window.openClaimCountNSTPPage = function() {
