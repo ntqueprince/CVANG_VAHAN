@@ -9,6 +9,9 @@
   <!-- Tailwind CSS CDN for Insurance Comparison Dashboard styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* * IMPORTANT: All existing styles from the user's provided structure.html are preserved.
+     * ONLY new styles required for the "UPDATES" button and modal are added below this line.
+     */
     body {
       font-family: 'Poppins', sans-serif;
       padding: 20px;
@@ -828,6 +831,233 @@
           display: none;
       }
     }
+
+    /* --- NEW STYLES FOR UPDATES BUTTON AND MODAL --- */
+    /* These styles are added to blend with the existing design */
+    #companyUpdatesButton {
+        background-color: #28a745; /* Matching the 'Aaj Ki Baat' green */
+        color: white;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.5em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+        display: flex; /* Changed from inline-block to flex */
+        flex-direction: column; /* Stack text and snippet */
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        position: relative; /* For the new update indicator */
+        width: 80%; /* Match existing input/button width */
+        max-width: 300px; /* Match existing input/button max-width */
+        margin-left: auto; /* Center the button */
+        margin-right: auto; /* Center the button */
+        overflow: hidden; /* Hide anything overflowing, especially for snippet */
+    }
+
+    #companyUpdatesButton:hover {
+        background-color: #218838; /* Darker green on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    #latestUpdateSnippet {
+        font-size: 0.6em; /* Smaller font for snippet */
+        color: rgba(255, 255, 255, 0.8); /* Slightly faded white for readability */
+        margin-top: 5px;
+        text-align: center;
+        max-width: 90%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+    }
+
+    #newUpdateIndicator {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 12px;
+        height: 12px;
+        background-color: #ffc107; /* Yellow for "New" highlight */
+        border-radius: 50%;
+        display: none; /* Hidden by default */
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+        100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+    }
+
+    /* Modal Overlay (for updates section) */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent dark overlay */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: white;
+        padding: 25px;
+        border-radius: 15px; /* Matching other modals */
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 600px; /* Adjusted max-width for better readability of updates */
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        border: 2px solid #3f51b5; /* Matching other modals' border color */
+        animation: fadeInScale 0.3s ease-out;
+    }
+
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content h2 {
+        color: #1a237e; /* Matching existing h2 color */
+        font-weight: 600;
+        font-size: 1.8em; /* Adjusted for modal h2 */
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        text-align: center; /* Center align title */
+    }
+
+    .modal-close-button {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 1.8em;
+        cursor: pointer;
+        color: #888;
+        transition: color 0.2s;
+    }
+
+    .modal-close-button:hover {
+        color: #333;
+    }
+
+    /* Accordion Styles for Updates */
+    .accordion-item {
+        border: 1px solid #b0bec5; /* Matching input/button border */
+        border-radius: 8px; /* Matching input/button border-radius */
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+    .accordion-header {
+        background-color: #eceff1; /* Light grey, blending with progress bar / modal inputs */
+        color: #37474f; /* Matching tag/label color */
+        padding: 12px 15px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 500; /* Matching existing font-weights */
+        font-size: 1.1em;
+        transition: background-color 0.2s;
+    }
+
+    .accordion-header:hover {
+        background-color: #cfd8dc; /* Slightly darker grey on hover */
+    }
+
+    .accordion-header::after {
+        content: '+';
+        font-size: 1.2em;
+        transition: transform 0.3s ease;
+    }
+
+    .accordion-header.active::after {
+        content: '-';
+        transform: rotate(0deg);
+    }
+
+    .accordion-content {
+        padding: 0 15px;
+        background-color: #f9f9f9; /* Lighter background for content area */
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    }
+
+    .accordion-content.active {
+        max-height: 500px; /* Sufficient height for updates */
+        padding: 15px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .accordion-content ul {
+        list-style: none; /* No bullets */
+        padding: 0;
+        margin: 0;
+        text-align: left;
+    }
+
+    .accordion-content ul li {
+        margin-bottom: 8px;
+        line-height: 1.4;
+        color: #455a64; /* Matching status text color */
+        font-size: 0.95em;
+    }
+
+    .accordion-content ul li strong {
+        color: #3f51b5; /* Matching button/border blue */
+        margin-right: 5px;
+    }
+
+    /* Mobile adjustments for the new button and modal */
+    @media (max-width: 600px) {
+        #companyUpdatesButton {
+            font-size: 1.2em;
+            padding: 8px 15px;
+            width: 90%; /* Adjust width for mobile */
+            max-width: none; /* Remove max-width on mobile */
+        }
+        #latestUpdateSnippet {
+            font-size: 0.55em;
+        }
+        .modal-content {
+            padding: 15px;
+            max-width: 95%; /* Make modal wider on very small screens */
+        }
+        .modal-content h2 {
+            font-size: 1.4em;
+        }
+        .accordion-header {
+            font-size: 1em;
+            padding: 10px;
+        }
+        .accordion-content ul li {
+            font-size: 0.9em;
+        }
+    }
   </style>
 </head>
 <body>
@@ -842,32 +1072,12 @@
   <button class="claim-count-nstp-btn-fixed" onclick="openClaimCountNSTPPage()">Claim_Count & NSTP</button>
 
   <!-- "📷SHIVANG" header ko "Aaj Ki Baat" button se replace kiya gaya hai -->
-  <a id="aaj-ki-baat-button" href="
-
-
-
- https://gamma.app/docs/-jyflx0ivfm1fbug
-
-
-
-
-
-
-" target="_blank" style="
-      background-color: #28a745; /* Button ke liye hara rang */
-      color: white;
-      padding: 10px 25px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.5em;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      text-decoration: none; /* Agar anchor tag istemal ho to underline hataye */
-      display: inline-block; /* Padding aur margin ki anumati dene ke liye */
-      margin-top: 20px; /* Upar se jagah */
-      font-weight: 600;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  ">Aaj Ki Baat</a>
+  <!-- REPLACED: Aaj Ki Baat button will now be the UPDATES button -->
+  <div id="companyUpdatesButton">
+      <span>UPDATES</span>
+      <span id="latestUpdateSnippet"></span>
+      <span id="newUpdateIndicator"></span>
+  </div>
 
   <div class="upload-section">
     <h2>Upload Images</h2>
@@ -956,6 +1166,16 @@
       <div class="button-container">
         <button class="close-btn" onclick="closeCSATModal()">Close</button>
         <button class="calculate-btn" id="calculateButton" onclick="calculateCSAT()">Calculate</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="updatesModal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="modal-close-button" id="closeModalButton">&times;</span>
+      <h2>Company Updates</h2>
+      <div id="updatesContainer">
+        <!-- Updates will be populated here by JavaScript -->
       </div>
     </div>
   </div>
@@ -1540,8 +1760,8 @@
       document.querySelector('.endorsement-btn').style.display = 'none';
       document.querySelector('.manual-vi-btn-fixed').style.display = 'none';
       document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'none';
-      // Do not hide #aaj-ki-baat-button as it should always be visible
-      document.getElementById('aaj-ki-baat-button').style.display = 'none'; /* Hide Aaj Ki Baat button */
+      // document.getElementById('aaj-ki-baat-button').style.display = 'none'; /* This element is already replaced, no need to hide */
+      document.getElementById('companyUpdatesButton').style.display = 'none'; /* Hide the new updates button when another page is open */
     }
 
     function showAllMainContent() {
@@ -1558,7 +1778,9 @@
         document.querySelector('.manual-vi-btn-fixed').style.display = 'block';
         document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'block';
       }
-      document.getElementById('aaj-ki-baat-button').style.display = 'inline-block'; /* Show Aaj Ki Baat button */
+      // Explicitly control visibility of the new updates button
+      document.getElementById('companyUpdatesButton').style.display = 'flex'; /* Show the new updates button */
+      // The original 'Aaj Ki Baat' button is gone, so no need to manage its display here.
     }
 
     // Endorsement Data and Logic
@@ -12490,8 +12712,8 @@
     });
 
     // Insurance Comparison Dashboard Data and Logic (from index (4).html)
-    const insuranceData = [
-        {
+    // IMPORTANT: User requested to remove this data and will add it later.
+    const insuranceData = [{
             "insurer_name": "National",
             "commercial": "Yes",
             "video_approval": "At PB end",
@@ -12777,17 +12999,40 @@
             "brand_new_3_3": "Yes",
             "old_3_3": "Yes"
         }
+]; 
+    // You will need to add your insurance data here in the future
+    /*
+    const insuranceData = [
+        {
+            "insurer_name": "National",
+            "commercial": "Yes",
+            "video_approval": "At PB end",
+            "video_tat": "24 Hours",
+            "short_partial": "Yes",
+            "artificial_low_lighting": "No",
+            "scar_declaration": "Declaration Required within Video TAT",
+            "zd_claims_year": "ZD Plan: 2, ZD+: Unlimited",
+            "non_zd_claims_year": "Unlimited",
+            "brand_new_3_3": "No",
+            "old_3_3": "No"
+        },
+        // ... all other 27 companies if needed
     ];
+    */
 
     function populateTable(data) {
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = ''; // Clear existing rows
+        if (data.length === 0) {
+            // Display a message if no data is available
+            tableBody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-gray-500">No insurance data available. Please add data to the "insuranceData" array in the script.</td></tr>';
+            return;
+        }
         data.forEach(item => {
             const row = document.createElement('tr');
             row.className = 'table-row border-b';
             row.innerHTML = `
                 <td class="p-2 font-medium text-indigo-900">${item.insurer_name}</td>
-                <!-- Reordered columns in the tbody -->
                 <td class="p-2">${item.zd_claims_year}</td>
                 <td class="p-2">${item.non_zd_claims_year}</td>
                 <td class="p-2 ${item.commercial === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.commercial}</td>
@@ -12866,6 +13111,187 @@
     // Page load hone par images ko shuruat mein load karein
     loadImages();
 
+    // --- NEW JAVASCRIPT FOR UPDATES BUTTON AND MODAL ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const updatesButton = document.getElementById('companyUpdatesButton');
+        const updatesModal = document.getElementById('updatesModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const updatesContainer = document.getElementById('updatesContainer');
+        const latestUpdateSnippetElem = document.getElementById('latestUpdateSnippet');
+        const newUpdateIndicator = document.getElementById('newUpdateIndicator');
+
+        // --- IMPORTANT: DAILY UPDATES DATA SECTION (दैनिक अपडेट डेटा सेक्शन) ---
+        // YAHAN AAP APNE DAILY UPDATES DALEIN. (यहां आप अपने दैनिक अपडेट डालें।)
+        // Har company ke liye, updates ko array ke andar dalien. (हर कंपनी के लिए, अपडेट को एरे के अंदर डालें।)
+        // Naye updates ko array ke shuruat (top) mein dalien, taaki woh pehle dikhein. (नए अपडेट को एरे की शुरुआत (शीर्ष) में डालें, ताकि वह पहले दिखें।)
+        // Format: { date: "YYYY-MM-DD", update: "Your update text here" } (फॉर्मेट: { date: "YYYY-MM-DD", update: "आपका अपडेट टेक्स्ट यहां" })
+        const companyUpdates = {
+            "National": [],
+            "New India Assurance": [],
+            "Oriental": [],
+            "United India": [],
+            "Tata AIG": [],
+            "ICICI Lombard": [],
+            "Zuno General": [],
+            "Cholamandalam MS": [],
+            "Future Generali": [],
+            "Magma": [],
+            "Raheja QBE": [],
+            "Kotak": [],
+            "SBI General": [],
+            "Shriram": [],
+            "IFFCO Tokio": [],
+            "Liberty Videocon": [],
+            "HDFC Ergo": [],
+            "Reliance": [
+                { date: "2025-06-12", update: "Unmasked KYC documents (Aadhar and PAN card) are needed for KYC in Reliance. Please ask the CX to share Aadhar card through Email." }
+            ],
+            "Bajaj Allianz": [],
+            "Royal Sundaram": [],
+            "Universal Sompo": [],
+            "Digit": [],
+            "BAJAJ CPA": [],
+            "DIGIT CPA": [],
+            "CHOLA CPA": [],
+            "KOTAK CPA": [],
+            "RELIENCE CPA": [],
+            "LIBERTY CPA": []
+        };
+        // --- END OF DAILY UPDATES DATA SECTION ---
+
+
+        // This variable will hold the snippet for display on the button.
+        let latestUpdateSnippetText = "";
+        let hasNewUpdate = false;
+
+        // Find the most recent update among all companies for the button snippet
+        // This will pick the first company in the list that has an update.
+        // If no updates are present in any company, hasNewUpdate will remain false.
+        // Sort all updates by date in descending order to get the latest one
+        const allUpdates = [];
+        for (const company in companyUpdates) {
+            if (companyUpdates.hasOwnProperty(company)) {
+                companyUpdates[company].forEach(updateItem => {
+                    allUpdates.push({ company: company, date: updateItem.date, update: updateItem.update });
+                });
+            }
+        }
+
+        allUpdates.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (allUpdates.length > 0) {
+            const mostRecentUpdate = allUpdates[0];
+            latestUpdateSnippetText = `${mostRecentUpdate.company}: ${mostRecentUpdate.update}`;
+            hasNewUpdate = true;
+        }
+
+
+        // Function to display the modal
+        function showUpdatesModal() {
+            updatesModal.classList.add('active');
+            populateUpdates(); // Populate updates when modal opens
+            // After showing, mark as seen for this session
+            sessionStorage.setItem('updatesSeen', 'true');
+            hideNewUpdateIndicatorAndSnippet(); // Hide indicator once modal is opened
+            hideAllMainContent(); // Hide other main content when updates modal is open
+        }
+
+        // Function to hide the modal
+        function closeUpdatesModal() {
+            updatesModal.classList.remove('active');
+            showAllMainContent(); // Show other main content when updates modal is closed
+        }
+
+        // Function to populate the updates in an accordion style
+        function populateUpdates() {
+            updatesContainer.innerHTML = ''; // Clear previous content
+            // Dynamically add all company names as accordion headers
+            const allCompanies = [
+                "National", "New India Assurance", "Oriental", "United India", "Tata AIG",
+                "ICICI Lombard", "Zuno General", "Cholamandalam MS", "Future Generali",
+                "Magma", "Raheja QBE", "Kotak", "SBI General", "Shriram", "IFFCO Tokio",
+                "Liberty Videocon", "HDFC Ergo", "Reliance", "Bajaj Allianz", "Royal Sundaram",
+                "Universal Sompo", "Digit", "BAJAJ CPA", "DIGIT CPA", "CHOLA CPA",
+                "KOTAK CPA", "RELIENCE CPA", "LIBERTY CPA"
+            ];
+
+            allCompanies.forEach(company => {
+                const companyUpdatesList = companyUpdates[company] || []; // Use empty array if company not in data
+                // Sort updates for each company by date descending
+                companyUpdatesList.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                const accordionItem = document.createElement('div');
+                accordionItem.classList.add('accordion-item');
+
+                const accordionHeader = document.createElement('div');
+                accordionHeader.classList.add('accordion-header');
+                accordionHeader.textContent = company; // Company name is always set
+                accordionHeader.dataset.company = company; // Store company name for identifier
+
+                const accordionContent = document.createElement('div');
+                accordionContent.classList.add('accordion-content');
+                const ul = document.createElement('ul');
+
+                if (companyUpdatesList.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = "No updates available yet."; // This text is added if no updates
+                    ul.appendChild(li);
+                } else {
+                    companyUpdatesList.forEach(updateItem => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<strong>${updateItem.date}:</strong> ${updateItem.update}`;
+                        ul.appendChild(li);
+                    });
+                }
+                
+                accordionContent.appendChild(ul);
+                accordionItem.appendChild(accordionHeader);
+                accordionItem.appendChild(accordionContent);
+                updatesContainer.appendChild(accordionItem);
+            });
+
+            // Add event listeners to all accordion headers
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    // Toggle active class on header
+                    this.classList.toggle('active');
+                    // Toggle active class on content to control max-height and padding
+                    content.classList.toggle('active');
+                });
+            });
+        }
+
+        // --- New Update Indicator Logic ---
+        function showNewUpdateIndicatorAndSnippet() {
+            // If there's an update and it hasn't been seen in this session
+            if (hasNewUpdate && !sessionStorage.getItem('updatesSeen')) {
+                latestUpdateSnippetElem.textContent = latestUpdateSnippetText;
+                newUpdateIndicator.style.display = 'block'; // Show the pulsating dot
+            } else {
+                latestUpdateSnippetElem.textContent = ''; // Clear snippet
+                newUpdateIndicator.style.display = 'none'; // Hide the pulsating dot
+            }
+        }
+
+        function hideNewUpdateIndicatorAndSnippet() {
+            latestUpdateSnippetElem.textContent = '';
+            newUpdateIndicator.style.display = 'none';
+        }
+
+        // --- Event Listeners for the New Updates Feature ---
+        updatesButton.addEventListener('click', showUpdatesModal);
+        closeModalButton.addEventListener('click', closeUpdatesModal);
+        // Close modal if clicked directly on the overlay background
+        updatesModal.addEventListener('click', function(event) {
+            if (event.target === updatesModal) { // Only closes if clicked on the dark background
+                closeUpdatesModal();
+            }
+        });
+
+        // Initial call to display new update indicator/snippet on page load
+        showNewUpdateIndicatorAndSnippet();
+    });
   </script>
 </body>
 </html>
