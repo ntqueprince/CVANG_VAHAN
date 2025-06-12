@@ -13149,12 +13149,7 @@
             "Bajaj Allianz": [],
             "Royal Sundaram": [],
             "Universal Sompo": [],
-            "Digit": [{ date: "2025-06-12", update: "For odometere update-THese 4 things needs to be captured 
-
-odomeret reading
-engraved chasis number
-360  degree view
-Engiene compartment" }],
+            "Digit": [],
             "BAJAJ CPA": [],
             "DIGIT CPA": [],
             "CHOLA CPA": [],
