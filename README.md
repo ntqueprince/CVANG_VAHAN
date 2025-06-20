@@ -9384,7 +9384,7 @@
   {
     "Insurer": "Reliance",
     "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": "Not Possible",
+    "Endorsement type": "NA",
     "Documents or any other requirement": "Alternate Policy",
     "TAT": "SRS / 10 Days",
     "Charges / Deduction": "Yes",
