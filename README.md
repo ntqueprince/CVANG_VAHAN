@@ -12877,7 +12877,7 @@
             "short_partial": "Yes",
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required within Video TAT",
-            "zd_claims_year": "Unlimited",
+            "zd_claims_year": "2",
             "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "No",
             "old_3_3": "No"
