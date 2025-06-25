@@ -12778,19 +12778,20 @@
             "brand_new_3_3": "Yes",
             "old_3_3": "Yes"
         },
-        {
-            "insurer_name": "ICICI Lombard",
-            "commercial": "Yes",
-            "video_approval": "At PB end",
-            "video_tat": "2 days",
-            "short_partial": "Yes",
-            "artificial_low_lighting": "Yes",
-            "scar_declaration": "Declaration Required within Video TAT",
-            "zd_claims_year": "2",
-            "non_zd_claims_year": "Unlimited",
-            "brand_new_3_3": "Yes",
-            "old_3_3": "Yes"
-        },
+       {
+    "insurer_name": "ICICI Lombard",
+    "commercial": "Yes",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "artificial_low_lighting": "Yes",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2 per year\n(Unlimited for Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford)",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "Yes",
+    "old_3_3": "Yes"
+}
+,
         {
             "insurer_name": "Zuno General",
             "commercial": "No",
