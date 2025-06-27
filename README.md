@@ -1,4 +1,3 @@
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -384,7 +383,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
     /* Fixed Buttons */
-    .csat-btn, .endorsement-btn, .manual-vi-btn-fixed, .claim-count-nstp-btn-fixed {
+    .csat-btn, .endorsement-btn, .manual-vi-btn-fixed, .claim-count-nstp-btn-fixed, .inspection-waiver-btn-fixed, .rsa-contact-btn-fixed {
       position: fixed;
       color: white;
       border: none;
@@ -439,6 +438,30 @@
     }
     .claim-count-nstp-btn-fixed:hover {
         background-color: #303f9f;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    /* New Inspection Waiver Button */
+    .inspection-waiver-btn-fixed {
+        top: 110px; /* Positioned below Claim Count & NSTP button */
+        left: 10px; /* Aligned with CSAT and Claim Count buttons */
+        background-color: #ff9800; /* Light Orange */
+    }
+    .inspection-waiver-btn-fixed:hover {
+        background-color: #fb8c00; /* Darker orange on hover */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* New RSA & Contact Button */
+    .rsa-contact-btn-fixed {
+        top: 110px; /* Positioned below Manual VI & Claim Coverage button */
+        right: 10px; /* Aligned with Manual VI & Claim Coverage button */
+        background-color: #ff9800; /* Light Orange, same as Inspection Waiver */
+    }
+    .rsa-contact-btn-fixed:hover {
+        background-color: #fb8c00; /* Darker orange on hover */
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         transform: translateY(-2px);
     }
@@ -751,13 +774,207 @@
     .claim-count-nstp-page .table-row:hover {
         background-color: #fff9c4 !important; /* Bright yellow on hover */
     }
+    
+    /* Styles for Inspection Waiver Page */
+    .inspection-waiver-page {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+    }
+    .inspection-waiver-container {
+      max-width: 700px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 3px solid #ff9800; /* Orange border */
+      position: relative;
+      animation: slideInFromTop 0.5s ease-out;
+    }
+    @keyframes slideInFromTop {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .inspection-waiver-container h1 {
+      color: #e65100; /* Darker orange for title */
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .inspection-waiver-container .created-by {
+      font-size: 0.7em;
+      color: #616161;
+      margin-bottom: 20px;
+      background: none; /* Remove gradient from global .created-by */
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      color: #616161; /* Specific color for this section */
+      text-align: center;
+      animation: none; /* Remove animation from global .created-by */
+    }
+    .inspection-waiver-table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .inspection-waiver-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: #fff;
+      border-radius: 15px;
+      overflow: hidden; /* Ensures rounded corners apply to content */
+    }
+    .inspection-waiver-table th, .inspection-waiver-table td {
+      padding: 15px;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: left;
+      font-size: 1em;
+    }
+    .inspection-waiver-table th {
+      background-color: #ffcc80; /* Lighter orange for header */
+      color: #8d4000; /* Dark orange text */
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .inspection-waiver-table tbody tr:nth-child(odd) {
+      background-color: #fff3e0; /* Very light orange for odd rows */
+    }
+    .inspection-waiver-table tbody tr:nth-child(even) {
+      background-color: #ffe0b2; /* Slightly darker light orange for even rows */
+    }
+    .inspection-waiver-table tbody tr:hover {
+      background-color: #ffd54f; /* Yellowish orange on hover */
+      transition: background-color 0.2s ease;
+    }
+    .inspection-waiver-table td:first-child {
+      font-weight: 500;
+      color: #e65100; /* Insurer Name in dark orange */
+    }
+    .policy-waiver-column {
+        color: #37474f; /* Default text color */
+    }
+    .policy-waiver-column.no-waiver {
+        color: #d32f2f; /* Red for "No Waiver" */
+        font-weight: 600;
+    }
+    .policy-waiver-column.days-waiver {
+        color: #1b5e20; /* Green for waiver with days */
+        font-weight: 600;
+    }
+
+    /* Styles for RSA & Contact Page */
+    .rsa-contact-page {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+    }
+    .rsa-contact-container {
+      max-width: 900px; /* Wider for more content */
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 3px solid #ff9800; /* Orange border, same as inspection waiver */
+      position: relative;
+      animation: slideInFromTop 0.5s ease-out;
+    }
+    .rsa-contact-container h1 {
+      color: #e65100; /* Darker orange for title, same as inspection waiver */
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .rsa-contact-container .created-by {
+      font-size: 0.7em;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #ff9800, #ff5722); /* Orange gradient for text */
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent; /* Makes the gradient visible */
+      animation: fadeIn 1.5s ease-in-out;
+    }
+    .rsa-contact-table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .rsa-contact-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .rsa-contact-table th, .rsa-contact-table td {
+      padding: 12px 15px; /* Slightly less padding for more content */
+      border-bottom: 1px solid #f0f0f0;
+      text-align: left;
+      font-size: 0.95em;
+    }
+    .rsa-contact-table th {
+      background-color: #ffcc80; /* Lighter orange for header */
+      color: #8d4000; /* Dark orange text */
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .rsa-contact-table tbody tr:nth-child(odd) {
+      background-color: #fff3e0; /* Very light orange for odd rows */
+    }
+    .rsa-contact-table tbody tr:nth-child(even) {
+      background-color: #ffe0b2; /* Slightly darker light orange for even rows */
+    }
+    .rsa-contact-table tbody tr:hover {
+      background-color: #ffd54f; /* Yellowish orange on hover */
+      transition: background-color 0.2s ease;
+    }
+    .rsa-contact-table td:first-child {
+      font-weight: 500;
+      color: #e65100; /* Insurer Name in dark orange */
+    }
+    .rsa-contact-table td {
+        white-space: normal; /* Allow text to wrap */
+        word-break: break-word;
+    }
+
 
     @media (max-width: 600px) {
       /* Hide all fixed buttons on main page view for mobile */
       .csat-btn,
       .endorsement-btn,
       .manual-vi-btn-fixed,
-      .claim-count-nstp-btn-fixed {
+      .claim-count-nstp-btn-fixed,
+      .inspection-waiver-btn-fixed,
+      .rsa-contact-btn-fixed { /* New button added here */
         display: none;
       }
 
@@ -804,17 +1021,19 @@
         font-size: 0.7em;
       }
       /* Ensure the mobile page content has enough margin to clear any top elements */
-      .manual-vi-page .card, .claim-count-nstp-page .container {
+      .manual-vi-page .card, .claim-count-nstp-page .container, .inspection-waiver-page .inspection-waiver-container, .rsa-contact-page .rsa-contact-container {
         margin-top: 60px; /* Adjusted for mobile to account for back buttons */
       }
-      .claim-count-nstp-page h1 {
+      .claim-count-nstp-page h1, .inspection-waiver-page h1, .rsa-contact-page h1 {
         font-size: 1.8em; /* Adjust font size for mobile view */
       }
       /* Ensure back buttons within active full-page sections are visible on mobile */
       .endorsement-page .back-btn,
       .manual-vi-page .back-btn, /* This is the "Back to Main Page" button */
       .manual-vi-page .claim-coverage-btn, /* New button for Claim Coverage */
-      .claim-count-nstp-page .back-btn {
+      .claim-count-nstp-page .back-btn,
+      .inspection-waiver-page .back-btn,
+      .rsa-contact-page .back-btn { /* New button for RSA Contact */
         display: block; /* Make sure these buttons are visible within their pages on mobile */
         position: absolute; /* Changed to absolute to be relative to the page div */
         top: 20px;
@@ -825,6 +1044,8 @@
       .manual-vi-page .claim-coverage-btn {
         top: 60px; /* Position below Back to Main Page button */
       }
+      /* Adjust position for the new Inspection Waiver button on mobile */
+      /* No specific adjustment needed here, general .back-btn styles should apply */
 
       /* On mobile, when the claim coverage overlay is active, the regular card should be hidden */
       .manual-vi-page.claim-coverage-active .card {
@@ -891,7 +1112,7 @@
     }
 
     @keyframes pulse {
-        0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+        0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
         70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
         100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
     }
@@ -1070,6 +1291,12 @@
 
   <!-- New button for Claim_Count & NSTP -->
   <button class="claim-count-nstp-btn-fixed" onclick="openClaimCountNSTPPage()">Claim_Count & NSTP</button>
+
+  <!-- New button for Inspection Waiver -->
+  <button class="inspection-waiver-btn-fixed" onclick="openInspectionWaiverPage()">Inspection Waiver</button>
+
+  <!-- New button for RSA & Contact -->
+  <button class="rsa-contact-btn-fixed" onclick="openRSAPage()">RSA & CONTACT</button>
 
   <!-- "📷SHIVANG" header ko "Aaj Ki Baat" button se replace kiya gaya hai -->
   <!-- REPLACED: Aaj Ki Baat button will now be the UPDATES button -->
@@ -1278,6 +1505,55 @@
         </div>
     </div>
     <button class="back-btn" onclick="closeClaimCountNSTPPage()">Back to Main Page</button>
+  </div>
+
+  <!-- New Inspection Waiver Page -->
+  <div class="inspection-waiver-page" id="inspectionWaiverPage">
+    <div class="inspection-waiver-container">
+        <h1>Inspection Waiver</h1>
+        <div class="created-by">Created by Shivang</div>
+        <div class="inspection-waiver-table-container">
+            <table class="inspection-waiver-table">
+                <thead>
+                    <tr>
+                        <th>Insurer Name</th>
+                        <th>Policy Waiver</th>
+                    </tr>
+                </thead>
+                <tbody id="inspectionWaiverTableBody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <button class="back-btn" onclick="closeInspectionWaiverPage()">Back to Main Page</button>
+    </div>
+  </div>
+
+  <!-- New RSA & Contact Page -->
+  <div class="rsa-contact-page" id="rsaContactPage">
+    <div class="rsa-contact-container">
+        <h1>RSA & CONTACT</h1>
+        <div class="created-by">Created by Shivang</div>
+        <div class="mb-4">
+            <input type="text" id="rsaSearchInput" placeholder="Search by Insurer Name..." class="search-input w-full p-3 text-lg border-2 border-purple-500 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-pink-500 bg-purple-50 text-gray-800 placeholder-gray-500">
+        </div>
+        <div class="rsa-contact-table-container">
+            <table class="rsa-contact-table">
+                <thead>
+                    <tr>
+                        <th>Sr.</th>
+                        <th>Insurer Name</th>
+                        <th>RSA and Toll Free Number</th>
+                        <th>Claim No.</th>
+                    </tr>
+                </thead>
+                <tbody id="rsaContactTableBody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <button class="back-btn" onclick="closeRSAPage()">Back to Main Page</button>
+    </div>
   </div>
 
 
@@ -1563,6 +1839,8 @@
       document.getElementById('endorsementPage').style.display = 'none';
       document.getElementById('manualVIPage').style.display = 'none';
       document.getElementById('claimCountNSTPPage').style.display = 'none';
+      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
+      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
       calculateCSAT();
     };
 
@@ -1648,6 +1926,8 @@
       document.getElementById('csatModal').style.display = 'none';
       document.getElementById('manualVIPage').style.display = 'none';
       document.getElementById('claimCountNSTPPage').style.display = 'none';
+      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
+      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
     };
 
     window.closeEndorsementPage = function() {
@@ -1675,6 +1955,8 @@
       document.getElementById('csatModal').style.display = 'none';
       document.getElementById('endorsementPage').style.display = 'none';
       document.getElementById('claimCountNSTPPage').style.display = 'none';
+      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
+      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
     };
 
     window.closeManualVIPage = function() {
@@ -1729,6 +2011,8 @@
       document.getElementById('csatModal').style.display = 'none';
       document.getElementById('endorsementPage').style.display = 'none';
       document.getElementById('manualVIPage').style.display = 'none';
+      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
+      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
       // Populate the table when the page is opened
       populateTable(insuranceData);
       // Re-apply sort/search listeners as content is dynamic
@@ -1749,6 +2033,57 @@
         }
       }
     });
+    
+    // New Inspection Waiver Page Functionality
+    window.openInspectionWaiverPage = function() {
+        document.getElementById('inspectionWaiverPage').style.display = 'block';
+        hideAllMainContent();
+        // Ensure all other full-page views are hidden
+        document.getElementById('csatModal').style.display = 'none';
+        document.getElementById('endorsementPage').style.display = 'none';
+        document.getElementById('manualVIPage').style.display = 'none';
+        document.getElementById('claimCountNSTPPage').style.display = 'none';
+        document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
+        populateInspectionWaiverTable(inspectionWaiverData);
+    };
+
+    window.closeInspectionWaiverPage = function() {
+        document.getElementById('inspectionWaiverPage').style.display = 'none';
+        showAllMainContent();
+    };
+
+    // Close Inspection Waiver Page on Outside Click
+    document.getElementById('inspectionWaiverPage').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeInspectionWaiverPage();
+        }
+    });
+
+    // New RSA & Contact Page Functionality
+    window.openRSAPage = function() {
+        document.getElementById('rsaContactPage').style.display = 'block';
+        hideAllMainContent();
+        // Ensure all other full-page views are hidden
+        document.getElementById('csatModal').style.display = 'none';
+        document.getElementById('endorsementPage').style.display = 'none';
+        document.getElementById('manualVIPage').style.display = 'none';
+        document.getElementById('claimCountNSTPPage').style.display = 'none';
+        document.getElementById('inspectionWaiverPage').style.display = 'none';
+        populateRSATable(rsaContactData);
+        setupRSADashboardListeners();
+    };
+
+    window.closeRSAPage = function() {
+        document.getElementById('rsaContactPage').style.display = 'none';
+        showAllMainContent();
+    };
+
+    // Close RSA & Contact Page on Outside Click
+    document.getElementById('rsaContactPage').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeRSAPage();
+        }
+    });
 
     // Helper functions to manage visibility
     function hideAllMainContent() {
@@ -1760,6 +2095,8 @@
       document.querySelector('.endorsement-btn').style.display = 'none';
       document.querySelector('.manual-vi-btn-fixed').style.display = 'none';
       document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'none';
+      document.querySelector('.inspection-waiver-btn-fixed').style.display = 'none'; // Hide new button
+      document.querySelector('.rsa-contact-btn-fixed').style.display = 'none'; // Hide new button
       // document.getElementById('aaj-ki-baat-button').style.display = 'none'; /* This element is already replaced, no need to hide */
       document.getElementById('companyUpdatesButton').style.display = 'none'; /* Hide the new updates button when another page is open */
     }
@@ -1777,6 +2114,8 @@
         document.querySelector('.endorsement-btn').style.display = 'block';
         document.querySelector('.manual-vi-btn-fixed').style.display = 'block';
         document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'block';
+        document.querySelector('.inspection-waiver-btn-fixed').style.display = 'block'; // Show new button
+        document.querySelector('.rsa-contact-btn-fixed').style.display = 'block'; // Show new button
       }
       // Explicitly control visibility of the new updates button
       document.getElementById('companyUpdatesButton').style.display = 'flex'; /* Show the new updates button */
@@ -12650,8 +12989,7 @@
     "Inspection": "No",
     "Any Exception": "For ticketing associates: Feedfile required while raising the case if Policy number starts with 52 series",
     "Declaration format (if declaration required)": null
-  }
-];
+  }];
 
     // Populate insurer dropdown for Endorsement
     try {
@@ -12999,8 +13337,7 @@
             "non_zd_claims_year": "Unlimited till IDV",
             "brand_new_3_3": "Yes",
             "old_3_3": "Yes"
-        }
-]; 
+        }]; 
     // You will need to add your insurance data here in the future
     /*
     const insuranceData = [
@@ -13104,6 +13441,117 @@
                     item.insurer_name.toLowerCase().includes(searchTerm)
                 );
                 populateTable(filteredData);
+            });
+        }
+    }
+
+    // Data for Inspection Waiver
+    const inspectionWaiverData = [
+        { "Insurer Name": "Bajaj Allianz", "Policy Waiver": "Only Fresh Cases. 3 Days" },
+        { "Insurer Name": "Cholamandalam", "Policy Waiver": "5 Days" },
+        { "Insurer Name": "Digit", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Future Generali", "Policy Waiver": "5 Days" },
+        { "Insurer Name": "Hdfc Ergo", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Icici Lombard", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Iffco Tokio", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Kotak General Insurance", "Policy Waiver": "5 Days" },
+        { "Insurer Name": "Liberty General Insurance", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Magma Hdi", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "National Insurance", "Policy Waiver": "5 Days" },
+        { "Insurer Name": "New India Assurance", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Oriental", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Raheja Qbe", "Policy Waiver": "5 Days" },
+        { "Insurer Name": "Reliance", "Policy Waiver": "1 Day" },
+        { "Insurer Name": "Royal Sundaram", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "SBI", "Policy Waiver": "Only In Pb Renewal 5 Days" },
+        { "Insurer Name": "Shriram General Insurance", "Policy Waiver": "5 Days" },
+        { "Insurer Name": "United Insurance", "Policy Waiver": "10 Days" },
+        { "Insurer Name": "Universal Sompo", "Policy Waiver": "No Waiver" },
+        { "Insurer Name": "Zuno", "Policy Waiver": "5 Days" }
+    ];
+
+    function populateInspectionWaiverTable(data) {
+        const tableBody = document.getElementById('inspectionWaiverTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            const waiverText = item["Policy Waiver"].toLowerCase();
+            let waiverClass = '';
+            if (waiverText.includes("no waiver")) {
+                waiverClass = 'no-waiver';
+            } else if (waiverText.includes("days") || waiverText.includes("day")) {
+                waiverClass = 'days-waiver';
+            }
+
+            row.innerHTML = `
+                <td>${item["Insurer Name"]}</td>
+                <td class="policy-waiver-column ${waiverClass}">${item["Policy Waiver"]}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Data for RSA & Contact
+    // Function to clean numbers and replace commas with slashes
+    function cleanAndFormatNumber(numberString) {
+        if (!numberString) return "";
+        return numberString.replace(/,/g, '/').trim();
+    }
+
+    const rsaContactData = [
+        { "Sr.": "1", "Insurer Name": "Bajaj Allianz", "RSA and Toll Free Number": "1800 209 5858 / 1800 209 0144 / 1800 103 5858", "Claim No.": "1800 209 0144 / 1800-209-5858" },
+        { "Sr.": "2", "Insurer Name": "United Insurance", "RSA and Toll Free Number": "7042113114 (Roadzen)", "Claim No.": "" },
+        { "Sr.": "3", "Insurer Name": "Digit General", "RSA and Toll Free Number": "1800 258 5956 / 1800 103 4448", "Claim No.": "1800 103 4448" },
+        { "Sr.": "4", "Insurer Name": "Edelweiss (Zuno)", "RSA and Toll Free Number": "22 4231 2000 / 1800 12 000", "Claim No.": "" },
+        { "Sr.": "5", "Insurer Name": "Future Generali", "RSA and Toll Free Number": "1860 500 3333 / 1800 220 233 / 022 67837800", "Claim No.": "" },
+        { "Sr.": "6", "Insurer Name": "HDFC Ergo", "RSA and Toll Free Number": "022 6234 6234 / 0120 6234 6234", "Claim No.": "" },
+        { "Sr.": "7", "Insurer Name": "Iffco Tokio", "RSA and Toll Free Number": "1800 103 5499", "Claim No.": "" },
+        { "Sr.": "8", "Insurer Name": "Kotak General Insurance", "RSA and Toll Free Number": "1800 266 4545", "Claim No.": "" },
+        { "Sr.": "9", "Insurer Name": "Magma HDI", "RSA and Toll Free Number": "1800 266 3202", "Claim No.": "" },
+        { "Sr.": "10", "Insurer Name": "Reliance General Insurance", "RSA and Toll Free Number": "022 4890 3009 / 1800 3009 / 022 48947020", "Claim No.": "" },
+        { "Sr.": "11", "Insurer Name": "Royal Sundaram", "RSA and Toll Free Number": "1800 568 9999", "Claim No.": "" },
+        { "Sr.": "12", "Insurer Name": "SBI General Insurance", "RSA and Toll Free Number": "1800 22 1111 / 1800 102 1111", "Claim No.": "" },
+        { "Sr.": "13", "Insurer Name": "Shriram General Insurance", "RSA and Toll Free Number": "1800 300 30000 / 1800 103 3009", "Claim No.": "" },
+        { "Sr.": "14", "Insurer Name": "TATA AIG", "RSA and Toll Free Number": "1800 266 7780", "Claim No.": "" },
+        { "Sr.": "15", "Insurer Name": "Universal Sompo", "RSA and Toll Free Number": "1800 22 4030 / 1800 200 5142 / 022 27639800 / 1800 22 4090 / 1800 200 4030", "Claim No.": "" },
+        { "Sr.": "16", "Insurer Name": "Raheja QBE", "RSA and Toll Free Number": "1800 102 7723", "Claim No.": "18001027723" },
+        { "Sr.": "17", "Insurer Name": "Oriental Insurance", "RSA and Toll Free Number": "1800 309 1209", "Claim No.": "1800118485 / 011-33208485" }
+    ];
+
+    function populateRSATable(data) {
+        const tableBody = document.getElementById('rsaContactTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+        if (data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No RSA & Contact data available.</td></tr>';
+            return;
+        }
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item["Sr."]}</td>
+                <td>${item["Insurer Name"]}</td>
+                <td>${cleanAndFormatNumber(item["RSA and Toll Free Number"])}</td>
+                <td>${cleanAndFormatNumber(item["Claim No."])}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function setupRSADashboardListeners() {
+        // Remove existing listener for search input and re-add
+        const rsaSearchInput = document.getElementById('rsaSearchInput');
+        if (rsaSearchInput) {
+            const newRSASearchInput = rsaSearchInput.cloneNode(true);
+            rsaSearchInput.parentNode.replaceChild(newRSASearchInput, rsaSearchInput);
+
+            newRSASearchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredData = rsaContactData.filter(item =>
+                    item["Insurer Name"].toLowerCase().includes(searchTerm) ||
+                    cleanAndFormatNumber(item["RSA and Toll Free Number"]).toLowerCase().includes(searchTerm) ||
+                    cleanAndFormatNumber(item["Claim No."]).toLowerCase().includes(searchTerm)
+                );
+                populateRSATable(filteredData);
             });
         }
     }
@@ -13271,7 +13719,7 @@
                 newUpdateIndicator.style.display = 'block'; // Show the pulsating dot
             } else {
                 latestUpdateSnippetElem.textContent = ''; // Clear snippet
-                newUpdateIndicator.style.display = 'none'; // Hide the pulsating dot
+                newUpdateIndicator.style.display = 'none';
             }
         }
 
