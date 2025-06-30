@@ -13579,8 +13579,16 @@
             "New India Assurance": [],
             "Oriental": [],
             "United India": [],
-            "Tata AIG": [],
-            "ICICI Lombard": [],
+            "Tata AIG": [{
+  "date": "2025-06-30",
+  "update": "TATA AIG Battery Protection Cover 1. Applicable for EV vehicles 2. Covers damage to battery, drive motor/electric motor, and includes chargers & cables as well (up to the IDV) 3. Provides coverage for water ingression, short circuit, or damages from accidental external factors 4. Counted as a claim 5. Allowed 2 times in a policy year"
+}
+],
+            "ICICI Lombard": [{
+  "date": "2025-06-30",
+  "update": "ICICI Lombard Battery Protection 1. Provides coverage for damages arising from water ingression or short circuits, resulting in loss or damage to the battery, drive motor/electric motor, and HEV (Hybrid Electric Vehicle) system 2. Coverage extends up to the Insured Declared Value (IDV) 3. Counted as a claim with a limit of 1 time per policy year 4. Charging cables and chargers are not included under this protection cover 5. Applicable for both Hybrid and EV vehicles"
+}
+],
             "Zuno General": [],
             "Cholamandalam MS": [],
             "Future Generali": [],
@@ -13598,7 +13606,10 @@
             "Bajaj Allianz": [],
             "Royal Sundaram": [],
             "Universal Sompo": [],
-            "Digit": [{ date: "2025-06-12", update: "if cx comes for odometere update in DIGIT , THese 4 things needs to be captured:- odomeret reading, engraved, chasis number, 360 degree view and Engiene compartment" }],
+            "Digit": [{ date: "2025-06-12", update: "if cx comes for odometere update in DIGIT , THese 4 things needs to be captured:- odomeret reading, engraved, chasis number, 360 degree view and Engiene compartment" },{
+  "date": "2025-06-30",
+  "update": "Digit Battery Protection Add-on 1. Applicable for both Hybrid and EV vehicles 2. Covers damage to battery, drive motor/electric motor, and Hybrid Electric Vehicle (HEV), including chargers and cables as well (up to the IDV) 3. Provides coverage for water ingression, short circuit, or damages from accidental external factors 4. Counted as a claim 5. Allowed 2 times in a policy year"
+}],
             "BAJAJ CPA": [],
             "DIGIT CPA": [],
             "CHOLA CPA": [],
