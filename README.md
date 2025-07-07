@@ -1279,6 +1279,45 @@
             font-size: 0.9em;
         }
     }
+
+    /* New styles for the Notebook button */
+    #notebookButton {
+        background-color: #673ab7; /* Purple color */
+        color: white;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.5em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px; /* Adjust margin to be below UPDATES button */
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        width: 80%;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #notebookButton:hover {
+        background-color: #512da8; /* Darker purple on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 600px) {
+        #notebookButton {
+            font-size: 1.2em;
+            padding: 8px 15px;
+            width: 90%;
+            max-width: none;
+        }
+    }
   </style>
 </head>
 <body>
@@ -1305,6 +1344,9 @@
       <span id="latestUpdateSnippet"></span>
       <span id="newUpdateIndicator"></span>
   </div>
+
+  <!-- New Notebook button added here -->
+  <button id="notebookButton" onclick="window.open('https://ntqueprince.github.io/notebook/', '_blank')">NOTEBOOK</button>
 
   <div class="upload-section">
     <h2>Upload Images</h2>
@@ -2099,6 +2141,7 @@
       document.querySelector('.rsa-contact-btn-fixed').style.display = 'none'; // Hide new button
       // document.getElementById('aaj-ki-baat-button').style.display = 'none'; /* This element is already replaced, no need to hide */
       document.getElementById('companyUpdatesButton').style.display = 'none'; /* Hide the new updates button when another page is open */
+      document.getElementById('notebookButton').style.display = 'none'; // Hide Notebook button
     }
 
     function showAllMainContent() {
@@ -2119,6 +2162,7 @@
       }
       // Explicitly control visibility of the new updates button
       document.getElementById('companyUpdatesButton').style.display = 'flex'; /* Show the new updates button */
+      document.getElementById('notebookButton').style.display = 'flex'; // Show Notebook button
       // The original 'Aaj Ki Baat' button is gone, so no need to manage its display here.
     }
 
@@ -13354,8 +13398,7 @@
             "brand_new_3_3": "No",
             "old_3_3": "No"
         },
-        // ... all other 27 companies if needed
-    ];
+        // ... all other 27 companies if needed];
     */
 
     function populateTable(data) {
