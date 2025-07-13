@@ -2625,7 +2625,7 @@
   "TAT": "SRS / 10 Days",
   "Charges / Deduction": "Deduction",
   "Inspection": "NA",
-  "Any Exception": "To cancel a third-party policy, need to provide an alternate policy from the same insurer with the same issuance date.",
+  "Any Exception": "To cancel a third-party policy, need to provide an alternate policy from the same insurer with the same issuance date(POI).",
   "Declaration format (if declaration required)": "NA"
 },
   {
