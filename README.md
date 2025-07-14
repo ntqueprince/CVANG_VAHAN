@@ -1,13 +1,13 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SHIVANG</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS CDN for Insurance Comparison Dashboard styles -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SHIVANG</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN for Insurance Comparison Dashboard styles -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
     /* * IMPORTANT: All existing styles from the user's provided structure.html are preserved.
      * ONLY new styles required for the "UPDATES" button and modal are added below this line.
      */
@@ -717,7 +717,7 @@
       height: 100%;
       background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
       z-index: 1000;
-      padding: 20px; /* Add padding to match the general app styling */
+      padding: 20px;
       box-sizing: border-box;
       overflow-y: auto; /* Make content scrollable */
       font-family: 'Poppins', sans-serif; /* Use Poppins font for consistency */
@@ -1318,288 +1318,303 @@
             max-width: none;
         }
     }
-  </style>
+  
+.animated-btn {
+  position: relative;
+  overflow: hidden;
+  padding: 12px 24px;
+  border-radius: 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  z-index: 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.animated-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.animated-btn::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 200%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+  z-index: -1;
+}
+.animated-btn:hover::after {
+  left: 100%;
+}
+</style>
 </head>
 <body>
-  <button class="csat-btn" onclick="openCSATModal()">CSAT Calculator</button>
+<!-- Main button group - hidden on mobile, flex on desktop -->
+<div class="flex flex-wrap gap-4 justify-center p-10 bg-gradient-to-tr from-blue-100 to-purple-100 hidden sm:flex">
+<button class="animated-btn bg-gradient-to-r from-blue-500 to-blue-700" onclick="openCSATModal()">CSAT Calculator</button>
+<button class="animated-btn bg-gradient-to-r from-green-500 to-green-700" onclick="openEndorsementPage()">ENDORSEMENT</button>
+<button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700" onclick="openManualVIPage()">MANUAL-VI &amp; Claim Coverage</button>
+<button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700" onclick="openClaimCountNSTPPage()">Claim_Count &amp; NSTP</button>
+<button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" onclick="openInspectionWaiverPage()">Inspection Waiver</button>
+<button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" onclick="openRSAPage()">RSA &amp; CONTACT</button>
+<button class="animated-btn bg-gradient-to-r from-purple-500 to-purple-700" onclick="window.open('https://ntqueprince.github.io/notebook/', '_blank')">NOTEBOOK</button>
+</div>
+<!-- Renamed Manual VI button -->
+<!-- New button for Claim_Count & NSTP -->
+<!-- New button for Inspection Waiver -->
+<!-- New button for RSA & Contact -->
+<!-- "📷SHIVANG" header ko "Aaj Ki Baat" button se replace kiya gaya hai -->
+<!-- REPLACED: Aaj Ki Baat button will now be the UPDATES button -->
+<!-- New Notebook button added here -->
 
-  <button class="endorsement-btn" onclick="openEndorsementPage()">ENDORSEMENT</button>
+<!-- "UPDATES" button moved here, above the upload-section -->
+<div id="companyUpdatesButton">
+<span>UPDATES</span>
+<span id="latestUpdateSnippet"></span>
+<span id="newUpdateIndicator"></span>
+</div>
 
-  <!-- Renamed Manual VI button -->
-  <button class="manual-vi-btn-fixed" onclick="openManualVIPage()">MANUAL-VI & Claim Coverage</button>
-
-  <!-- New button for Claim_Count & NSTP -->
-  <button class="claim-count-nstp-btn-fixed" onclick="openClaimCountNSTPPage()">Claim_Count & NSTP</button>
-
-  <!-- New button for Inspection Waiver -->
-  <button class="inspection-waiver-btn-fixed" onclick="openInspectionWaiverPage()">Inspection Waiver</button>
-
-  <!-- New button for RSA & Contact -->
-  <button class="rsa-contact-btn-fixed" onclick="openRSAPage()">RSA & CONTACT</button>
-
-  <!-- "📷SHIVANG" header ko "Aaj Ki Baat" button se replace kiya gaya hai -->
-  <!-- REPLACED: Aaj Ki Baat button will now be the UPDATES button -->
-  <div id="companyUpdatesButton">
-      <span>UPDATES</span>
-      <span id="latestUpdateSnippet"></span>
-      <span id="newUpdateIndicator"></span>
-  </div>
-
-  <!-- New Notebook button added here -->
-  <button id="notebookButton" onclick="window.open('https://ntqueprince.github.io/notebook/', '_blank')">NOTEBOOK</button>
-
-  <div class="upload-section">
-    <h2>Upload Images</h2>
-    <label for="fileUpload">Choose image files to upload:</label>
-    <input type="file" id="fileUpload" accept="image/*">
-    <input type="text" id="tagInput" placeholder="Enter tag (e.g., SHIVANG)">
-    <button onclick="uploadImage()">Upload</button>
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div class="progress" id="progress">0%</div>
-      </div>
-      <div class="status" id="status">Ready</div>
-    </div>
-  </div>
-
-  <h3>Uploaded Images</h3>
-  <div id="gallery"></div>
-
-  <div id="tagModal" class="modal">
-    <div class="modal-content">
-      <h4>Error: Tag is required!</h4>
-      <input type="text" id="modalTagInput" placeholder="Enter tag (e.g., SHIVANG)">
-      <button class="upload-btn" onclick="submitTag()">Upload</button>
-      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
-      <div class="modal-progress-container" id="modalProgressContainer">
-        <div class="modal-progress-bar">
-          <div class="modal-progress" id="modalProgress">0%</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="csatModal" class="csat-modal">
-    <div class="csat-modal-content">
-      <h4>CSAT Calculator</h4>
-      <div class="input-section good-section">
-        <label>Good Count:</label>
-        <input type="number" id="goodCount" min="0" value="0">
-      </div>
-      <div class="input-section bad-section">
-        <label>Bad Count:</label>
-        <input type="number" id="badCount" min="0" value="0">
-      </div>
-      <div class="input-section">
-        <label>Required CSAT (%):</label>
-        <select id="requiredCSAT">
-          <option value="70">70%+</option>
-          <option value="71">71%+</option>
-          <option value="72">72%+</option>
-          <option value="73">73%+</option>
-          <option value="74">74%+</option>
-          <option value="75">75%+</option>
-          <option value="76">76%+</option>
-          <option value="77">77%+</option>
-          <option value="78">78%+</option>
-          <option value="79">79%+</option>
-          <option value="80">80%+</option>
-          <option value="81">81%+</option>
-          <option value="82">82%+</option>
-          <option value="83">83%+</option>
-          <option value="84">84%+</option>
-          <option value="85">85%+</option>
-          <option value="86">86%+</option>
-          <option value="87">87%+</option>
-          <option value="88">88%+</option>
-          <option value="89">89%+</option>
-          <option value="90">90%+</option>
-          <option value="91">91%+</option>
-          <option value="92">92%+</option>
-          <option value="93">93%+</option>
-          <option value="94">94%+</option>
-          <option value="95">95%+</option>
-          <option value="96">96%+</option>
-          <option value="97">97%+</option>
-          <option value="98">98%+</option>
-          <option value="99">99%+</option>
-          <option value="100">100%+</option>
-        </select>
-      </div>
-      <div class="result-section" id="csatResult">
-        <p>Total: 0</p>
-        <p>CSAT: 0%</p>
-        <p id="csatStatus">Enter counts to see status</p>
-      </div>
-      <!-- New button container for alignment -->
-      <div class="button-container">
-        <button class="close-btn" onclick="closeCSATModal()">Close</button>
-        <button class="calculate-btn" id="calculateButton" onclick="calculateCSAT()">Calculate</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="updatesModal" class="modal-overlay">
-    <div class="modal-content">
-      <span class="modal-close-button" id="closeModalButton">&times;</span>
-      <h2>Company Updates</h2>
-      <div id="updatesContainer">
-        <!-- Updates will be populated here by JavaScript -->
-      </div>
-    </div>
-  </div>
-
-  <div class="endorsement-page" id="endorsementPage">
-    <div class="endorsement-container">
-      <h1>ENDORSEMENT</h1>
-      <div class="created-by">Created by Shivang</div>
-      <button class="back-btn" onclick="closeEndorsementPage()">Back to Main Page</button>
-      <label for="insurer">Select Insurance Company:</label>
-      <select id="insurer" class="PB_DROPDOWN">
-        <option disabled selected>Select Insurer</option>
-      </select>
-      <label for="requirement">Select Requirement:</label>
-      <select id="requirement" class="PB_DROPDOWN" disabled>
-        <option disabled selected>Select Requirement</option>
-      </select>
-      <div id="output" class="output"></div>
-    </div>
-  </div>
-
-  <div class="manual-vi-page" id="manualVIPage">
-    <button class="back-btn" onclick="closeManualVIPage()">Back to Main Page</button>
-    <!-- New "Claim Coverage" button with green color -->
-    <button class="claim-coverage-btn back-btn claim-coverage-btn-green" onclick="toggleClaimCoverage()">Claim Coverage</button>
-    <div class="card mt-4" id="manualVICardContent">
-      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-      </div>
-      <div class="card-body">
-        <div class="mb-3 p-3 rounded" style="background-color: #e3f2fd;">
-          <strong>ADP Home Visit Cities: 42</strong>
-          <ul class="mb-0" style="columns: 2;">
-            <li>Aligarh</li><li>Alwar</li><li>Ambala</li><li>Amritsar</li><li>Belgaum</li>
-            <li>Bhiwani</li><li>Bhubaneshwar</li><li>Bilaspur</li><li>Coimbatore</li><li>Dhanbad</li>
-            <li>Guwahati</li><li>Haldwani</li><li>Haridwar</li><li>Indore</li><li>Jalandhar</li>
-            <li>Jamshedpur</li><li>Jhajjar</li><li>Jhansi</li><li>Jind</li><li>Jodhpur</li>
-            <li>Kangra</li><li>Madurai</li><li>Mathura</li><li>Moradabad</li><li>Muzaffarnagar</li>
-            <li>Mysore</li><li>Nagpur</li><li>Panipat</li><li>Pondicherry</li><li>Raipur</li>
-            <li>Rajkot</li><li>Rewa</li><li>Rewari</li><li>Rohtak</li><li>Satara</li>
-            <li>Shimla</li><li>Ludhiana</li><li>Surat</li><li>Thiruvananthapuram</li><li>Thrissur</li><li>Udaipur</li>
-            <li>Varanasi</li><li>Yamuna Nagar</li>
-          </ul>
-        </div>
-        <div class="mb-3 p-3 rounded" style="background-color: #d0f0c0;">
-          <strong>Manual Home Visit Cities: 14</strong>
-          <ul class="mb-0" style="columns: 2;">
-            <li>Ahmedabad</li><li>Bangalore</li><li>Chennai</li><li>Delhi</li><li>Faridabad</li>
-            <li>Ghaziabad</li><li>Gurgaon</li><li>Hyderabad</li><li>Kolkata</li><li>Mumbai</li>
-            <li>Noida & Greater Noida</li><li>Patna</li><li>Pune</li><li>Thane & Navi Mumbai</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Claim Coverage Overlay -->
-    <div class="claim-coverage-overlay" id="claimCoverageOverlay">
-        <div class="claim-coverage-content">
-            <h4>Claim Coverage Details</h4>
-            <ul>
-                <li><strong>Plastic Nylon Rubber:</strong> 50%</li>
-                <li><strong>Tyre tube Batteries:</strong> 50%</li>
-                <li><strong>Denting Painting:</strong> 87.5%</li>
-                <li><strong>Fiberglass:</strong> 70%</li>
-                <li><strong>Windshield glass:</strong> 100%</li>
-                <li><strong>Metal, Wooden fiber and other parts:</strong> As per car age</li>
-            </ul>
-        </div>
-    </div>
-  </div>
-
-  <!-- New Claim_Count & NSTP Section (Insurance Comparison Dashboard) -->
-  <div class="claim-count-nstp-page" id="claimCountNSTPPage">
-    <div class="container mx-auto p-4 bg-white rounded-2xl shadow-2xl max-w-7xl w-full border-4 border-transparent bg-clip-border bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" style="margin-top: 20px;">
-        <h1 class="text-4xl font-bold text-center mb-6 text-indigo-800 tracking-tight">Insurance Comparison Dashboard</h1>
-        <div class="mb-4">
-            <input type="text" id="searchInput" placeholder="Search by Insurer Name..." class="search-input w-full p-3 text-lg border-2 border-blue-500 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-pink-500 bg-blue-50 text-gray-800 placeholder-gray-500">
-        </div>
-        <div class="overflow-x-auto rounded-lg">
-            <table id="insuranceTable" class="w-full bg-white border border-gray-300">
-                <thead class="bg-gray-900 text-white text-lg font-semibold">
-                    <tr>
-                        <th class="table-header p-2 text-left" data-column="insurer_name">Insurer Name</th>
-                        <!-- Reordered columns: ZD Claims/Year and Non-ZD Claims/Year moved up -->
-                        <th class="table-header p-2 text-left" data-column="zd_claims_year">ZD Claims/Year</th>
-                        <th class="table-header p-2 text-left" data-column="non_zd_claims_year">Non-ZD Claims/Year</th>
-                        <th class="table-header p-2 text-left" data-column="commercial">Commercial</th>
-                        <th class="table-header p-2 text-left" data-column="video_approval">Video Approval</th>
-                        <th class="table-header p-2 text-left" data-column="video_tat">Video TAT</th>
-                        <th class="table-header p-2 text-left" data-column="short_partial">Short Partial</th>
-                        <th class="table-header p-2 text-left" data-column="artificial_low_lighting">Artificial Low Lighting</th>
-                        <th class="table-header p-2 text-left" data-column="scar_declaration">Scar Declaration</th>
-                        <th class="table-header p-2 text-left" data-column="brand_new_3_3">Brand New 3+3</th>
-                        <th class="table-header p-2 text-left" data-column="old_3_3">Old 3+3</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody" class="text-gray-800 text-base">
-                    <!-- Data will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <button class="back-btn" onclick="closeClaimCountNSTPPage()">Back to Main Page</button>
-  </div>
-
-  <!-- New Inspection Waiver Page -->
-  <div class="inspection-waiver-page" id="inspectionWaiverPage">
-    <div class="inspection-waiver-container">
-        <h1>Inspection Waiver</h1>
-        <div class="created-by">Created by Shivang</div>
-        <div class="inspection-waiver-table-container">
-            <table class="inspection-waiver-table">
-                <thead>
-                    <tr>
-                        <th>Insurer Name</th>
-                        <th>Policy Waiver</th>
-                    </tr>
-                </thead>
-                <tbody id="inspectionWaiverTableBody">
-                    <!-- Data will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-        <button class="back-btn" onclick="closeInspectionWaiverPage()">Back to Main Page</button>
-    </div>
-  </div>
-
-  <!-- New RSA & Contact Page -->
-  <div class="rsa-contact-page" id="rsaContactPage">
-    <div class="rsa-contact-container">
-        <h1>RSA & CONTACT</h1>
-        <div class="created-by">Created by Shivang</div>
-        <div class="mb-4">
-            <input type="text" id="rsaSearchInput" placeholder="Search by Insurer Name..." class="search-input w-full p-3 text-lg border-2 border-purple-500 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-pink-500 bg-purple-50 text-gray-800 placeholder-gray-500">
-        </div>
-        <div class="rsa-contact-table-container">
-            <table class="rsa-contact-table">
-                <thead>
-                    <tr>
-                        <th>Sr.</th>
-                        <th>Insurer Name</th>
-                        <th>RSA and Toll Free Number</th>
-                        <th>Claim No.</th>
-                    </tr>
-                </thead>
-                <tbody id="rsaContactTableBody">
-                    <!-- Data will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-        <button class="back-btn" onclick="closeRSAPage()">Back to Main Page</button>
-    </div>
-  </div>
-
-
-  <script type="module">
+<div class="upload-section">
+<h2>Upload Images</h2>
+<label for="fileUpload">Choose image files to upload:</label>
+<input accept="image/*" id="fileUpload" type="file"/>
+<input id="tagInput" placeholder="Enter tag (e.g., SHIVANG)" type="text"/>
+<button onclick="uploadImage()">Upload</button>
+<div class="progress-container">
+<div class="progress-bar">
+<div class="progress" id="progress">0%</div>
+</div>
+<div class="status" id="status">Ready</div>
+</div>
+</div>
+<h3>Uploaded Images</h3>
+<div id="gallery"></div>
+<div class="modal" id="tagModal">
+<div class="modal-content">
+<h4>Error: Tag is required!</h4>
+<input id="modalTagInput" placeholder="Enter tag (e.g., SHIVANG)" type="text"/>
+<button class="upload-btn" onclick="submitTag()">Upload</button>
+<button class="cancel-btn" onclick="closeModal()">Cancel</button>
+<div class="modal-progress-container" id="modalProgressContainer">
+<div class="modal-progress-bar">
+<div class="modal-progress" id="modalProgress">0%</div>
+</div>
+</div>
+</div>
+</div>
+<div class="csat-modal" id="csatModal">
+<div class="csat-modal-content">
+<h4>CSAT Calculator</h4>
+<div class="input-section good-section">
+<label>Good Count:</label>
+<input id="goodCount" min="0" type="number" value="0"/>
+</div>
+<div class="input-section bad-section">
+<label>Bad Count:</label>
+<input id="badCount" min="0" type="number" value="0"/>
+</div>
+<div class="input-section">
+<label>Required CSAT (%):</label>
+<select id="requiredCSAT">
+<option value="70">70%+</option>
+<option value="71">71%+</option>
+<option value="72">72%+</option>
+<option value="73">73%+</option>
+<option value="74">74%+</option>
+<option value="75">75%+</option>
+<option value="76">76%+</option>
+<option value="77">77%+</option>
+<option value="78">78%+</option>
+<option value="79">79%+</option>
+<option value="80">80%+</option>
+<option value="81">81%+</option>
+<option value="82">82%+</option>
+<option value="83">83%+</option>
+<option value="84">84%+</option>
+<option value="85">85%+</option>
+<option value="86">86%+</option>
+<option value="87">87%+</option>
+<option value="88">88%+</option>
+<option value="89">89%+</option>
+<option value="90">90%+</option>
+<option value="91">91%+</option>
+<option value="92">92%+</option>
+<option value="93">93%+</option>
+<option value="94">94%+</option>
+<option value="95">95%+</option>
+<option value="96">96%+</option>
+<option value="97">97%+</option>
+<option value="98">98%+</option>
+<option value="99">99%+</option>
+<option value="100">100%+</option>
+</select>
+</div>
+<div class="result-section" id="csatResult">
+<p>Total: 0</p>
+<p>CSAT: 0%</p>
+<p id="csatStatus">Enter counts to see status</p>
+</div>
+<!-- New button container for alignment -->
+<div class="button-container">
+<button class="close-btn" onclick="closeCSATModal()">Close</button>
+<button class="calculate-btn" id="calculateButton" onclick="calculateCSAT()">Calculate</button>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="updatesModal">
+<div class="modal-content">
+<span class="modal-close-button" id="closeModalButton">×</span>
+<h2>Company Updates</h2>
+<div id="updatesContainer">
+<!-- Updates will be populated here by JavaScript -->
+</div>
+</div>
+</div>
+<div class="endorsement-page" id="endorsementPage">
+<div class="endorsement-container">
+<h1>ENDORSEMENT</h1>
+<div class="created-by">Created by Shivang</div>
+<button class="back-btn" onclick="closeEndorsementPage()">Back to Main Page</button>
+<label for="insurer">Select Insurance Company:</label>
+<select class="PB_DROPDOWN" id="insurer">
+<option disabled="" selected="">Select Insurer</option>
+</select>
+<label for="requirement">Select Requirement:</label>
+<select class="PB_DROPDOWN" disabled="" id="requirement">
+<option disabled="" selected="">Select Requirement</option>
+</select>
+<div class="output" id="output"></div>
+</div>
+</div>
+<div class="manual-vi-page" id="manualVIPage">
+<button class="back-btn" onclick="closeManualVIPage()">Back to Main Page</button>
+<!-- New "Claim Coverage" button with green color -->
+<button class="claim-coverage-btn back-btn claim-coverage-btn-green" onclick="toggleClaimCoverage()">Claim Coverage</button>
+<div class="card mt-4" id="manualVICardContent">
+<div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+</div>
+<div class="card-body">
+<div class="mb-3 p-3 rounded" style="background-color: #e3f2fd;">
+<strong>ADP Home Visit Cities: 42</strong>
+<ul class="mb-0" style="columns: 2;">
+<li>Aligarh</li><li>Alwar</li><li>Ambala</li><li>Amritsar</li><li>Belgaum</li>
+<li>Bhiwani</li><li>Bhubaneshwar</li><li>Bilaspur</li><li>Coimbatore</li><li>Dhanbad</li>
+<li>Guwahati</li><li>Haldwani</li><li>Haridwar</li><li>Indore</li><li>Jalandhar</li>
+<li>Jamshedpur</li><li>Jhajjar</li><li>Jhansi</li><li>Jind</li><li>Jodhpur</li>
+<li>Kangra</li><li>Madurai</li><li>Mathura</li><li>Moradabad</li><li>Muzaffarnagar</li>
+<li>Mysore</li><li>Nagpur</li><li>Panipat</li><li>Pondicherry</li><li>Raipur</li>
+<li>Rajkot</li><li>Rewa</li><li>Rewari</li><li>Rohtak</li><li>Satara</li>
+<li>Shimla</li><li>Ludhiana</li><li>Surat</li><li>Thiruvananthapuram</li><li>Thrissur</li><li>Udaipur</li>
+<li>Varanasi</li><li>Yamuna Nagar</li>
+</ul>
+</div>
+<div class="mb-3 p-3 rounded" style="background-color: #d0f0c0;">
+<strong>Manual Home Visit Cities: 14</strong>
+<ul class="mb-0" style="columns: 2;">
+<li>Ahmedabad</li><li>Bangalore</li><li>Chennai</li><li>Delhi</li><li>Faridabad</li>
+<li>Ghaziabad</li><li>Gurgaon</li><li>Hyderabad</li><li>Kolkata</li><li>Mumbai</li>
+<li>Noida &amp; Greater Noida</li><li>Patna</li><li>Pune</li><li>Thane &amp; Navi Mumbai</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Claim Coverage Overlay -->
+<div class="claim-coverage-overlay" id="claimCoverageOverlay">
+<div class="claim-coverage-content">
+<h4>Claim Coverage Details</h4>
+<ul>
+<li><strong>Plastic Nylon Rubber:</strong> 50%</li>
+<li><strong>Tyre tube Batteries:</strong> 50%</li>
+<li><strong>Denting Painting:</strong> 87.5%</li>
+<li><strong>Fiberglass:</strong> 70%</li>
+<li><strong>Windshield glass:</strong> 100%</li>
+<li><strong>Metal, Wooden fiber and other parts:</strong> As per car age</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- New Claim_Count & NSTP Section (Insurance Comparison Dashboard) -->
+<div class="claim-count-nstp-page" id="claimCountNSTPPage">
+<div class="container mx-auto p-4 bg-white rounded-2xl shadow-2xl max-w-7xl w-full border-4 border-transparent bg-clip-border bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" style="margin-top: 20px;">
+<h1 class="text-4xl font-bold text-center mb-6 text-indigo-800 tracking-tight">Insurance Comparison Dashboard</h1>
+<div class="mb-4">
+<input class="search-input w-full p-3 text-lg border-2 border-blue-500 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-pink-500 bg-blue-50 text-gray-800 placeholder-gray-500" id="searchInput" placeholder="Search by Insurer Name..." type="text"/>
+</div>
+<div class="overflow-x-auto rounded-lg">
+<table class="w-full bg-white border border-gray-300" id="insuranceTable">
+<thead class="bg-gray-900 text-white text-lg font-semibold">
+<tr>
+<th class="table-header p-2 text-left" data-column="insurer_name">Insurer Name</th>
+<!-- Reordered columns: ZD Claims/Year and Non-ZD Claims/Year moved up -->
+<th class="table-header p-2 text-left" data-column="zd_claims_year">ZD Claims/Year</th>
+<th class="table-header p-2 text-left" data-column="non_zd_claims_year">Non-ZD Claims/Year</th>
+<th class="table-header p-2 text-left" data-column="commercial">Commercial</th>
+<th class="table-header p-2 text-left" data-column="video_approval">Video Approval</th>
+<th class="table-header p-2 text-left" data-column="video_tat">Video TAT</th>
+<th class="table-header p-2 text-left" data-column="short_partial">Short Partial</th>
+<th class="table-header p-2 text-left" data-column="artificial_low_lighting">Artificial Low Lighting</th>
+<th class="table-header p-2 text-left" data-column="scar_declaration">Scar Declaration</th>
+<th class="table-header p-2 text-left" data-column="brand_new_3_3">Brand New 3+3</th>
+<th class="table-header p-2 text-left" data-column="old_3_3">Old 3+3</th>
+</tr>
+</thead>
+<tbody class="text-gray-800 text-base" id="tableBody">
+<!-- Data will be populated by JavaScript -->
+</tbody>
+</table>
+</div>
+</div>
+<button class="back-btn" onclick="closeClaimCountNSTPPage()">Back to Main Page</button>
+</div>
+<!-- New Inspection Waiver Page -->
+<div class="inspection-waiver-page" id="inspectionWaiverPage">
+<div class="inspection-waiver-container">
+<h1>Inspection Waiver</h1>
+<div class="created-by">Created by Shivang</div>
+<div class="inspection-waiver-table-container">
+<table class="inspection-waiver-table">
+<thead>
+<tr>
+<th>Insurer Name</th>
+<th>Policy Waiver</th>
+</tr>
+</thead>
+<tbody id="inspectionWaiverTableBody">
+<!-- Data will be populated by JavaScript -->
+</tbody>
+</table>
+</div>
+<button class="back-btn" onclick="closeInspectionWaiverPage()">Back to Main Page</button>
+</div>
+</div>
+<!-- New RSA & Contact Page -->
+<div class="rsa-contact-page" id="rsaContactPage">
+<div class="rsa-contact-container">
+<h1>RSA &amp; CONTACT</h1>
+<div class="created-by">Created by Shivang</div>
+<div class="mb-4">
+<input class="search-input w-full p-3 text-lg border-2 border-purple-500 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-pink-500 bg-purple-50 text-gray-800 placeholder-gray-500" id="rsaSearchInput" placeholder="Search by Insurer Name..." type="text"/>
+</div>
+<div class="rsa-contact-table-container">
+<table class="rsa-contact-table">
+<thead>
+<tr>
+<th>Sr.</th>
+<th>Insurer Name</th>
+<th>RSA and Toll Free Number</th>
+<th>Claim No.</th>
+</tr>
+</thead>
+<tbody id="rsaContactTableBody">
+<!-- Data will be populated by JavaScript -->
+</tbody>
+</table>
+</div>
+<button class="back-btn" onclick="closeRSAPage()">Back to Main Page</button>
+</div>
+</div>
+<script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getDatabase, ref as dbRef, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
@@ -1878,11 +1893,16 @@
       document.getElementById('csatModal').style.display = 'flex';
       hideAllMainContent();
       // Ensure all other full-page views are hidden
-      document.getElementById('endorsementPage').style.display = 'none';
-      document.getElementById('manualVIPage').style.display = 'none';
-      document.getElementById('claimCountNSTPPage').style.display = 'none';
-      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
-      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
+      const endorsementPage = document.getElementById('endorsementPage');
+      if (endorsementPage) endorsementPage.style.display = 'none';
+      const manualVIPage = document.getElementById('manualVIPage');
+      if (manualVIPage) manualVIPage.style.display = 'none';
+      const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+      if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+      const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+      if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+      const rsaContactPage = document.getElementById('rsaContactPage');
+      if (rsaContactPage) rsaContactPage.style.display = 'none';
       calculateCSAT();
     };
 
@@ -1961,20 +1981,28 @@
     window.openEndorsementPage = function() {
       document.getElementById('endorsementPage').style.display = 'block';
       setTimeout(() => {
-        document.querySelector('.endorsement-container').classList.add('active');
+        const endorsementContainer = document.querySelector('.endorsement-container');
+        if (endorsementContainer) endorsementContainer.classList.add('active');
       }, 10);
       hideAllMainContent();
       // Ensure all other full-page views are hidden
-      document.getElementById('csatModal').style.display = 'none';
-      document.getElementById('manualVIPage').style.display = 'none';
-      document.getElementById('claimCountNSTPPage').style.display = 'none';
-      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
-      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
+      const csatModal = document.getElementById('csatModal');
+      if (csatModal) csatModal.style.display = 'none';
+      const manualVIPage = document.getElementById('manualVIPage');
+      if (manualVIPage) manualVIPage.style.display = 'none';
+      const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+      if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+      const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+      if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+      const rsaContactPage = document.getElementById('rsaContactPage');
+      if (rsaContactPage) rsaContactPage.style.display = 'none';
     };
 
     window.closeEndorsementPage = function() {
-      document.getElementById('endorsementPage').style.display = 'none';
-      document.querySelector('.endorsement-container').classList.remove('active');
+      const endorsementPage = document.getElementById('endorsementPage');
+      if (endorsementPage) endorsementPage.style.display = 'none';
+      const endorsementContainer = document.querySelector('.endorsement-container');
+      if (endorsementContainer) endorsementContainer.classList.remove('active');
       showAllMainContent();
     };
 
@@ -1989,24 +2017,35 @@
     window.openManualVIPage = function() {
       document.getElementById('manualVIPage').style.display = 'block';
       // Ensure the manual VI card content is visible by default when opening this page
-      document.getElementById('manualVICardContent').style.display = 'block';
-      document.getElementById('claimCoverageOverlay').style.display = 'none'; // Hide overlay initially
-      document.getElementById('manualVIPage').classList.remove('claim-coverage-active'); // Remove class if present
+      const manualVICardContent = document.getElementById('manualVICardContent');
+      if (manualVICardContent) manualVICardContent.style.display = 'block';
+      const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
+      if (claimCoverageOverlay) claimCoverageOverlay.style.display = 'none'; // Hide overlay initially
+      const manualVIPage = document.getElementById('manualVIPage');
+      if (manualVIPage) manualVIPage.classList.remove('claim-coverage-active'); // Remove class if present
       hideAllMainContent();
       // Ensure all other full-page views are hidden
-      document.getElementById('csatModal').style.display = 'none';
-      document.getElementById('endorsementPage').style.display = 'none';
-      document.getElementById('claimCountNSTPPage').style.display = 'none';
-      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
-      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
+      const csatModal = document.getElementById('csatModal');
+      if (csatModal) csatModal.style.display = 'none';
+      const endorsementPage = document.getElementById('endorsementPage');
+      if (endorsementPage) endorsementPage.style.display = 'none';
+      const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+      if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+      const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+      if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+      const rsaContactPage = document.getElementById('rsaContactPage');
+      if (rsaContactPage) rsaContactPage.style.display = 'none';
     };
 
     window.closeManualVIPage = function() {
-      document.getElementById('manualVIPage').style.display = 'none';
+      const manualVIPage = document.getElementById('manualVIPage');
+      if (manualVIPage) manualVIPage.style.display = 'none';
       showAllMainContent();
       // Also hide the claim coverage overlay when going back to home
-      document.getElementById('claimCoverageOverlay').style.display = 'none';
-      document.getElementById('manualVIPage').classList.remove('claim-coverage-active');
+      const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
+      if (claimCoverageOverlay) claimCoverageOverlay.style.display = 'none';
+      const manualVIPageClassList = document.getElementById('manualVIPage');
+      if (manualVIPageClassList) manualVIPageClassList.classList.remove('claim-coverage-active');
     };
 
     // Toggle Claim Coverage Overlay within Manual VI Page
@@ -2015,16 +2054,18 @@
         const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
         const manualVIPage = document.getElementById('manualVIPage');
 
-        if (claimCoverageOverlay.style.display === 'flex') {
-            // If overlay is visible, hide it and show main card content
-            claimCoverageOverlay.style.display = 'none';
-            manualVICardContent.style.display = 'block';
-            manualVIPage.classList.remove('claim-coverage-active'); // Remove class
-        } else {
-            // If overlay is hidden, show it and hide main card content
-            claimCoverageOverlay.style.display = 'flex';
-            manualVICardContent.style.display = 'none';
-            manualVIPage.classList.add('claim-coverage-active'); // Add class for styling
+        if (claimCoverageOverlay && manualVICardContent && manualVIPage) {
+            if (claimCoverageOverlay.style.display === 'flex') {
+                // If overlay is visible, hide it and show main card content
+                claimCoverageOverlay.style.display = 'none';
+                manualVICardContent.style.display = 'block';
+                manualVIPage.classList.remove('claim-coverage-active'); // Remove class
+            } else {
+                // If overlay is hidden, show it and hide main card content
+                claimCoverageOverlay.style.display = 'flex';
+                manualVICardContent.style.display = 'none';
+                manualVIPage.classList.add('claim-coverage-active'); // Add class for styling
+            }
         }
     };
 
@@ -2050,11 +2091,16 @@
       document.getElementById('claimCountNSTPPage').style.display = 'block';
       hideAllMainContent();
       // Ensure all other full-page views are hidden
-      document.getElementById('csatModal').style.display = 'none';
-      document.getElementById('endorsementPage').style.display = 'none';
-      document.getElementById('manualVIPage').style.display = 'none';
-      document.getElementById('inspectionWaiverPage').style.display = 'none'; // Hide Inspection Waiver Page
-      document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
+      const csatModal = document.getElementById('csatModal');
+      if (csatModal) csatModal.style.display = 'none';
+      const endorsementPage = document.getElementById('endorsementPage');
+      if (endorsementPage) endorsementPage.style.display = 'none';
+      const manualVIPage = document.getElementById('manualVIPage');
+      if (manualVIPage) manualVIPage.style.display = 'none';
+      const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+      if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+      const rsaContactPage = document.getElementById('rsaContactPage');
+      if (rsaContactPage) rsaContactPage.style.display = 'none';
       // Populate the table when the page is opened
       populateTable(insuranceData);
       // Re-apply sort/search listeners as content is dynamic
@@ -2062,7 +2108,8 @@
     };
 
     window.closeClaimCountNSTPPage = function() {
-        document.getElementById('claimCountNSTPPage').style.display = 'none';
+        const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+        if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
         showAllMainContent();
     };
 
@@ -2081,16 +2128,26 @@
         document.getElementById('inspectionWaiverPage').style.display = 'block';
         hideAllMainContent();
         // Ensure all other full-page views are hidden
-        document.getElementById('csatModal').style.display = 'none';
-        document.getElementById('endorsementPage').style.display = 'none';
-        document.getElementById('manualVIPage').style.display = 'none';
-        document.getElementById('claimCountNSTPPage').style.display = 'none';
-        document.getElementById('rsaContactPage').style.display = 'none'; // Hide RSA & Contact Page
-        populateInspectionWaiverTable(inspectionWaiverData);
+        const csatModal = document.getElementById('csatModal');
+        if (csatModal) csatModal.style.display = 'none';
+        const endorsementPage = document.getElementById('endorsementPage');
+        if (endorsementPage) endorsementPage.style.display = 'none';
+        const manualVIPage = document.getElementById('manualVIPage');
+        if (manualVIPage) manualVIPage.style.display = 'none';
+        const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+        if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+        const rsaContactPage = document.getElementById('rsaContactPage');
+        if (rsaContactPage) rsaContactPage.style.display = 'none';
+        // Add a small delay to ensure the page is fully rendered before populating
+        setTimeout(() => {
+            populateInspectionWaiverTable(inspectionWaiverData);
+            console.log("Inspection Waiver table populated with data:", inspectionWaiverData); // Debugging log
+        }, 0);
     };
 
     window.closeInspectionWaiverPage = function() {
-        document.getElementById('inspectionWaiverPage').style.display = 'none';
+        const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+        if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
         showAllMainContent();
     };
 
@@ -2106,17 +2163,27 @@
         document.getElementById('rsaContactPage').style.display = 'block';
         hideAllMainContent();
         // Ensure all other full-page views are hidden
-        document.getElementById('csatModal').style.display = 'none';
-        document.getElementById('endorsementPage').style.display = 'none';
-        document.getElementById('manualVIPage').style.display = 'none';
-        document.getElementById('claimCountNSTPPage').style.display = 'none';
-        document.getElementById('inspectionWaiverPage').style.display = 'none';
-        populateRSATable(rsaContactData);
+        const csatModal = document.getElementById('csatModal');
+        if (csatModal) csatModal.style.display = 'none';
+        const endorsementPage = document.getElementById('endorsementPage');
+        if (endorsementPage) endorsementPage.style.display = 'none';
+        const manualVIPage = document.getElementById('manualVIPage');
+        if (manualVIPage) manualVIPage.style.display = 'none';
+        const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+        if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+        const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+        if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+        // Add a small delay to ensure the page is fully rendered before populating
+        setTimeout(() => {
+            populateRSATable(rsaContactData);
+            console.log("RSA & Contact table populated with data:", rsaContactData); // Debugging log
+        }, 0);
         setupRSADashboardListeners();
     };
 
     window.closeRSAPage = function() {
-        document.getElementById('rsaContactPage').style.display = 'none';
+        const rsaContactPage = document.getElementById('rsaContactPage');
+        if (rsaContactPage) rsaContactPage.style.display = 'none';
         showAllMainContent();
     };
 
@@ -2129,41 +2196,77 @@
 
     // Helper functions to manage visibility
     function hideAllMainContent() {
-      // document.getElementById('mainHeader').style.display = 'none'; // Removed this line
-      document.querySelector('.upload-section').style.display = 'none';
-      document.querySelector('h3').style.display = 'none'; /* 'Uploaded Images' header */
-      document.getElementById('gallery').style.display = 'none';
-      document.querySelector('.csat-btn').style.display = 'none';
-      document.querySelector('.endorsement-btn').style.display = 'none';
-      document.querySelector('.manual-vi-btn-fixed').style.display = 'none';
-      document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'none';
-      document.querySelector('.inspection-waiver-btn-fixed').style.display = 'none'; // Hide new button
-      document.querySelector('.rsa-contact-btn-fixed').style.display = 'none'; // Hide new button
-      // document.getElementById('aaj-ki-baat-button').style.display = 'none'; /* This element is already replaced, no need to hide */
-      document.getElementById('companyUpdatesButton').style.display = 'none'; /* Hide the new updates button when another page is open */
-      document.getElementById('notebookButton').style.display = 'none'; // Hide Notebook button
+      const uploadSection = document.querySelector('.upload-section');
+      if (uploadSection) uploadSection.style.display = 'none';
+      const h3Element = document.querySelector('h3'); /* 'Uploaded Images' header */
+      if (h3Element) h3Element.style.display = 'none';
+      const gallery = document.getElementById('gallery');
+      if (gallery) gallery.style.display = 'none';
+      // Hide the main button group
+      const mainButtonGroup = document.querySelector('.flex.flex-wrap.gap-4.justify-center.p-10');
+      if (mainButtonGroup) mainButtonGroup.style.display = 'none';
+
+      // Keep fixed buttons hidden on mobile, but manage their visibility via JS on desktop
+      const isMobile = window.matchMedia("(max-width: 600px)").matches;
+      if (!isMobile) { // Only hide fixed buttons if not on mobile
+        const csatBtn = document.querySelector('.csat-btn');
+        if (csatBtn) csatBtn.style.display = 'none';
+        const endorsementBtn = document.querySelector('.endorsement-btn');
+        if (endorsementBtn) endorsementBtn.style.display = 'none';
+        const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
+        if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'none';
+        const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
+        if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'none';
+        const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
+        if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'none';
+        const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
+        if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'none';
+      }
+
+      // Explicitly control visibility of the new updates button
+      const companyUpdatesButton = document.getElementById('companyUpdatesButton');
+      if (companyUpdatesButton) companyUpdatesButton.style.display = 'none';
+      const notebookButton = document.getElementById('notebookButton');
+      if (notebookButton) notebookButton.style.display = 'none';
     }
 
     function showAllMainContent() {
-      // document.getElementById('mainHeader').style.display = 'block'; // Removed this line
-      document.querySelector('.upload-section').style.display = 'block';
-      document.querySelector('h3').style.display = 'block'; /* 'Uploaded Images' header */
-      document.getElementById('gallery').style.display = 'grid'; /* grid for gallery */
+      const uploadSection = document.querySelector('.upload-section');
+      if (uploadSection) uploadSection.style.display = 'block';
+      const h3Element = document.querySelector('h3'); /* 'Uploaded Images' header */
+      if (h3Element) h3Element.style.display = 'block';
+      const gallery = document.getElementById('gallery');
+      if (gallery) gallery.style.display = 'grid'; /* grid for gallery */
 
-      // Only show fixed buttons if not on mobile (based on media query)
+      // Show the main button group on desktop
+      const mainButtonGroup = document.querySelector('.flex.flex-wrap.gap-4.justify-center.p-10');
       const isMobile = window.matchMedia("(max-width: 600px)").matches;
+
       if (!isMobile) {
-        document.querySelector('.csat-btn').style.display = 'block';
-        document.querySelector('.endorsement-btn').style.display = 'block';
-        document.querySelector('.manual-vi-btn-fixed').style.display = 'block';
-        document.querySelector('.claim-count-nstp-btn-fixed').style.display = 'block';
-        document.querySelector('.inspection-waiver-btn-fixed').style.display = 'block'; // Show new button
-        document.querySelector('.rsa-contact-btn-fixed').style.display = 'block'; // Show new button
+        if (mainButtonGroup) mainButtonGroup.style.display = 'flex';
+        // Also show fixed buttons on desktop
+        const csatBtn = document.querySelector('.csat-btn');
+        if (csatBtn) csatBtn.style.display = 'block';
+        const endorsementBtn = document.querySelector('.endorsement-btn');
+        if (endorsementBtn) endorsementBtn.style.display = 'block';
+        const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
+        if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'block';
+        const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
+        if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'block';
+        const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
+        if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'block';
+        const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
+        if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'block';
+      } else {
+        // Ensure main button group is hidden on mobile
+        if (mainButtonGroup) mainButtonGroup.style.display = 'none';
       }
+
       // Explicitly control visibility of the new updates button
-      document.getElementById('companyUpdatesButton').style.display = 'flex'; /* Show the new updates button */
-      document.getElementById('notebookButton').style.display = 'flex'; // Show Notebook button
-      // The original 'Aaj Ki Baat' button is gone, so no need to manage its display here.
+      const companyUpdatesButton = document.getElementById('companyUpdatesButton');
+      if (companyUpdatesButton) companyUpdatesButton.style.display = 'flex';
+      const notebookButton = document.getElementById('notebookButton');
+      if (notebookButton) notebookButton.style.display = 'flex';
     }
 
     // Endorsement Data and Logic
@@ -13033,9 +13136,8 @@
     "Inspection": "No",
     "Any Exception": "For ticketing associates: Feedfile required while raising the case if Policy number starts with 52 series",
     "Declaration format (if declaration required)": null
-  }];
-
-    // Populate insurer dropdown for Endorsement
+  }
+];  // Populate insurer dropdown for Endorsement
     try {
       const insurers = [...new Set(endorsementData.map(d => d["Insurer"]))].sort();
       insurers.forEach(ins => {
@@ -13384,6 +13486,9 @@
         }]; 
     // You will need to add your insurance data here in the future
     /*
+    const insuranceData =
+    // You will need to add your insurance data here in the future
+    /*
     const insuranceData = [
         {
             "insurer_name": "National",
@@ -13403,6 +13508,10 @@
 
     function populateTable(data) {
         const tableBody = document.getElementById('tableBody');
+        if (!tableBody) {
+            console.error("Error: tableBody element not found for insuranceTable.");
+            return;
+        }
         tableBody.innerHTML = ''; // Clear existing rows
         if (data.length === 0) {
             // Display a message if no data is available
@@ -13515,6 +13624,11 @@
 
     function populateInspectionWaiverTable(data) {
         const tableBody = document.getElementById('inspectionWaiverTableBody');
+        // Check if tableBody exists before proceeding
+        if (!tableBody) {
+            console.error("Error: inspectionWaiverTableBody element not found.");
+            return;
+        }
         tableBody.innerHTML = ''; // Clear existing rows
         data.forEach(item => {
             const row = document.createElement('tr');
@@ -13563,6 +13677,11 @@
 
     function populateRSATable(data) {
         const tableBody = document.getElementById('rsaContactTableBody');
+        // Check if tableBody exists before proceeding
+        if (!tableBody) {
+            console.error("Error: rsaContactTableBody element not found.");
+            return;
+        }
         tableBody.innerHTML = ''; // Clear existing rows
         if (data.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No RSA & Contact data available.</td></tr>';
@@ -13691,7 +13810,7 @@
 
         // Function to display the modal
         function showUpdatesModal() {
-            updatesModal.classList.add('active');
+            if (updatesModal) updatesModal.classList.add('active');
             populateUpdates(); // Populate updates when modal opens
             // After showing, mark as seen for this session
             sessionStorage.setItem('updatesSeen', 'true');
@@ -13701,12 +13820,16 @@
 
         // Function to hide the modal
         function closeUpdatesModal() {
-            updatesModal.classList.remove('active');
+            if (updatesModal) updatesModal.classList.remove('active');
             showAllMainContent(); // Show other main content when updates modal is closed
         }
 
         // Function to populate the updates in an accordion style
         function populateUpdates() {
+            if (!updatesContainer) {
+                console.error("Error: updatesContainer element not found.");
+                return;
+            }
             updatesContainer.innerHTML = ''; // Clear previous content
             // Dynamically add all company names as accordion headers
             const allCompanies = [
@@ -13769,32 +13892,33 @@
         function showNewUpdateIndicatorAndSnippet() {
             // If there's an update and it hasn't been seen in this session
             if (hasNewUpdate && !sessionStorage.getItem('updatesSeen')) {
-                latestUpdateSnippetElem.textContent = latestUpdateSnippetText;
-                newUpdateIndicator.style.display = 'block'; // Show the pulsating dot
+                if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = latestUpdateSnippetText;
+                if (newUpdateIndicator) newUpdateIndicator.style.display = 'block'; // Show the pulsating dot
             } else {
-                latestUpdateSnippetElem.textContent = ''; // Clear snippet
-                newUpdateIndicator.style.display = 'none';
+                if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = ''; // Clear snippet
+                if (newUpdateIndicator) newUpdateIndicator.style.display = 'none';
             }
         }
 
         function hideNewUpdateIndicatorAndSnippet() {
-            latestUpdateSnippetElem.textContent = '';
-            newUpdateIndicator.style.display = 'none';
+            if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = '';
+            if (newUpdateIndicator) newUpdateIndicator.style.display = 'none';
         }
 
         // --- Event Listeners for the New Updates Feature ---
-        updatesButton.addEventListener('click', showUpdatesModal);
-        closeModalButton.addEventListener('click', closeUpdatesModal);
+        if (updatesButton) updatesButton.addEventListener('click', showUpdatesModal);
+        if (closeModalButton) closeModalButton.addEventListener('click', closeUpdatesModal);
         // Close modal if clicked directly on the overlay background
-        updatesModal.addEventListener('click', function(event) {
-            if (event.target === updatesModal) { // Only closes if clicked on the dark background
-                closeUpdatesModal();
-            }
-        });
+        if (updatesModal) {
+            updatesModal.addEventListener('click', function(event) {
+                if (event.target === updatesModal) { // Only closes if clicked on the dark background
+                    closeUpdatesModal();
+                }
+            });
+        }
 
         // Initial call to display new update indicator/snippet on page load
         showNewUpdateIndicatorAndSnippet();
     });
-  </script>
-</body>
+  </script></body>
 </html>
