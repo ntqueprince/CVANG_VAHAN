@@ -1350,8 +1350,7 @@
 </style>
 </head>
 <body>
-<!-- Main button group - hidden on mobile, flex on desktop -->
-<div class="flex flex-wrap gap-4 justify-center p-10 bg-gradient-to-tr from-blue-100 to-purple-100 hidden sm:flex">
+<div class="flex flex-wrap gap-4 justify-center p-10 bg-gradient-to-tr from-blue-100 to-purple-100">
 <button class="animated-btn bg-gradient-to-r from-blue-500 to-blue-700" onclick="openCSATModal()">CSAT Calculator</button>
 <button class="animated-btn bg-gradient-to-r from-green-500 to-green-700" onclick="openEndorsementPage()">ENDORSEMENT</button>
 <button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700" onclick="openManualVIPage()">MANUAL-VI &amp; Claim Coverage</button>
@@ -1636,7 +1635,7 @@
     const imagesRef = dbRef(db, 'images');
 
     // Cloudinary configuration (from structure.html)
-    const cloudName = 'di83mshki'; // Replace with your Cloudinary cloud name
+    const cloudName    = 'dfajanvsi'; // Replace with your Cloudinary cloud name
     const uploadPreset = 'anonymous_upload'; // Replace with your Cloudinary upload preset
 
     // Global variables
@@ -2202,28 +2201,18 @@
       if (h3Element) h3Element.style.display = 'none';
       const gallery = document.getElementById('gallery');
       if (gallery) gallery.style.display = 'none';
-      // Hide the main button group
-      const mainButtonGroup = document.querySelector('.flex.flex-wrap.gap-4.justify-center.p-10');
-      if (mainButtonGroup) mainButtonGroup.style.display = 'none';
-
-      // Keep fixed buttons hidden on mobile, but manage their visibility via JS on desktop
-      const isMobile = window.matchMedia("(max-width: 600px)").matches;
-      if (!isMobile) { // Only hide fixed buttons if not on mobile
-        const csatBtn = document.querySelector('.csat-btn');
-        if (csatBtn) csatBtn.style.display = 'none';
-        const endorsementBtn = document.querySelector('.endorsement-btn');
-        if (endorsementBtn) endorsementBtn.style.display = 'none';
-        const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
-        if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'none';
-        const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
-        if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'none';
-        const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
-        if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'none';
-        const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
-        if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'none';
-      }
-
-      // Explicitly control visibility of the new updates button
+      const csatBtn = document.querySelector('.csat-btn');
+      if (csatBtn) csatBtn.style.display = 'none';
+      const endorsementBtn = document.querySelector('.endorsement-btn');
+      if (endorsementBtn) endorsementBtn.style.display = 'none';
+      const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
+      if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'none';
+      const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
+      if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'none';
+      const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
+      if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'none';
+      const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
+      if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'none';
       const companyUpdatesButton = document.getElementById('companyUpdatesButton');
       if (companyUpdatesButton) companyUpdatesButton.style.display = 'none';
       const notebookButton = document.getElementById('notebookButton');
@@ -2238,13 +2227,9 @@
       const gallery = document.getElementById('gallery');
       if (gallery) gallery.style.display = 'grid'; /* grid for gallery */
 
-      // Show the main button group on desktop
-      const mainButtonGroup = document.querySelector('.flex.flex-wrap.gap-4.justify-center.p-10');
+      // Only show fixed buttons if not on mobile (based on media query)
       const isMobile = window.matchMedia("(max-width: 600px)").matches;
-
       if (!isMobile) {
-        if (mainButtonGroup) mainButtonGroup.style.display = 'flex';
-        // Also show fixed buttons on desktop
         const csatBtn = document.querySelector('.csat-btn');
         if (csatBtn) csatBtn.style.display = 'block';
         const endorsementBtn = document.querySelector('.endorsement-btn');
@@ -2257,11 +2242,7 @@
         if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'block';
         const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
         if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'block';
-      } else {
-        // Ensure main button group is hidden on mobile
-        if (mainButtonGroup) mainButtonGroup.style.display = 'none';
       }
-
       // Explicitly control visibility of the new updates button
       const companyUpdatesButton = document.getElementById('companyUpdatesButton');
       if (companyUpdatesButton) companyUpdatesButton.style.display = 'flex';
