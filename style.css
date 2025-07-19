@@ -1373,24 +1373,6 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-.welcome-shree {
-  font-size: 36px;
-  font-weight: 800;
-  text-transform: uppercase;
-  background: linear-gradient(270deg, #ff0080, #7928ca, #2af598, #00ffff, #ffcb52, #ff0080);
-  background-size: 1200% 1200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: rainbowText 8s ease infinite;
-  margin-top: 20px;
-  font-family: 'Poppins', sans-serif;
-  text-align: center;
-}
 
-@keyframes rainbowText {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
 
 
