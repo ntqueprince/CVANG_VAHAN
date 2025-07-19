@@ -27,7 +27,9 @@
     let hasCalculated = false;
 
     // Expose functions to window object
-    window.uploadImage = function() {
+    window.uploadImage = function() {const uploadBtn = document.querySelector(".colorful-upload-btn");
+uploadBtn.style.display = "none";    // Upload button ko hide kar do
+
       const fileInput = document.getElementById('fileUpload');
       const tagInput = document.getElementById('tagInput');
       const file = fileInput.files[0];
