@@ -7893,17 +7893,18 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Any Exception": null,
     "Declaration format (if declaration required)": null
   },
-  {
-    "Insurer": "Reliance",
-    "Requirement": "Hypothecation Change",
-    "Endorsement type": "Self Endt",
-    "Documents or any other requirement": "RC and Previous Bank NOC",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "No",
-    "Inspection": "No",
-    "Any Exception": null,
-    "Declaration format (if declaration required)": null
-  },
+ {
+  "InsurerRequirement": "RelianceHypothecation Change",
+  "Insurer": "Reliance",
+  "Requirement": "Hypothecation Change",
+  "Endorsement type": "self endts",
+  "Documents or any other requirement": "\"Customer Request Letter\n  Endorsed RC Copy / Financier letter / Sanction Letter from Financial Institute\"\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "no",
+  "Inspection": "no",
+  "Any Exception": "0",
+  "Declaration format (if declaration required)": "0"
+}
   {
     "Insurer": "Reliance",
     "Requirement": "Insured name",
