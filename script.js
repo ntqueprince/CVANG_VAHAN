@@ -3134,30 +3134,32 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Any Exception": "",
     "Declaration format (if declaration required)": ""
   },
+ {
+  "InsurerRequirement": "DigitOwner Driver Personal Accident",
+  "Insurer": "Digit",
+  "Requirement": "Owner Driver Personal Accident",
+  "Endorsement type": "Financial Endt",
+  "Documents or any other requirement": "Nominee Details & Customer Consent\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Yes",
+  "Inspection": "no",
+  "Any Exception": "Correction possible before policy start date",
+  "Declaration format (if declaration required)": "0\n"
+}
+,
   {
-    "InsurerRequirement": "DigitOwner Driver Personal Accident",
-    "Insurer": "Digit",
-    "Requirement": "Owner Driver Personal Accident",
-    "Endorsement type": "Financial Endt",
-    "Documents or any other requirement": "RC, DL, Nominee Details",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Yes",
-    "Inspection": "No",
-    "Any Exception": "Correction possible before policy start date",
-    "Declaration format (if declaration required)": ""
-  },
-  {
-    "InsurerRequirement": "DigitPaid Driver",
-    "Insurer": "Digit",
-    "Requirement": "Paid Driver",
-    "Endorsement type": "Financial Endt",
-    "Documents or any other requirement": "RC, Salary slip of last 3 months, DL of the driver",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Yes",
-    "Inspection": "No",
-    "Any Exception": "Correction possible before policy start date",
-    "Declaration format (if declaration required)": ""
-  },
+  "InsurerRequirement": "DigitPaid Driver",
+  "Insurer": "Digit",
+  "Requirement": "Paid Driver",
+  "Endorsement type": "Financial Endt",
+  "Documents or any other requirement": "RC Only\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Yes",
+  "Inspection": "No",
+  "Any Exception": "Correction possible before policy start date",
+  "Declaration format (if declaration required)": "0\n"
+}
+,
   {
     "InsurerRequirement": "DigitUn Named Passanger Cover",
     "Insurer": "Digit",
@@ -3291,17 +3293,17 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Declaration format (if declaration required)": ""
   },
   {
-    "InsurerRequirement": "DigitTop Up (PAYD plan)",
-    "Insurer": "Digit",
-    "Requirement": "Top Up (PAYD plan)",
-    "Endorsement type": "Not Possible",
-    "Documents or any other requirement": "Not Possible",
-    "TAT": "Not Possible",
-    "Charges / Deduction": "Not Possible",
-    "Inspection": "Not Possible",
-    "Any Exception": "",
-    "Declaration format (if declaration required)": ""
-  },
+  "InsurerRequirement": "DigitTop Up (PAYD plan)",
+  "Insurer": "Digit",
+  "Requirement": "Top Up (PAYD plan)",
+  "Endorsement type": "Financial Endt",
+  "Documents or any other requirement": "Customer consent for Top up Limit\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Yes",
+  "Inspection": "No",
+  "Any Exception": "0",
+  "Declaration format (if declaration required)": "0\n"
+},
   {
     "InsurerRequirement": "DigitMultiple Mismatch (Reg no, chassis no & Engine no mismatch)",
     "Insurer": "Digit",
@@ -3793,18 +3795,19 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Any Exception": "",
     "Declaration format (if declaration required)": ""
   },
-  {
-    "InsurerRequirement": "Future GeneraliPost Issuance Cancellation",
-    "Insurer": "Future Generali",
-    "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": "",
-    "Documents or any other requirement": "Alternate Policy",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Yes",
-    "Inspection": "",
-    "Any Exception": "For Ticketing Associates: Raise cancellation to insurer & meanwhile XML Sheet to tech",
-    "Declaration format (if declaration required)": ""
-  },
+ {
+  "InsurerRequirement": "Future GeneraliPost Issuance Cancellation",
+  "Insurer": "Future Generali",
+  "Requirement": "Post Issuance Cancellation",
+  "Endorsement type": "0",
+  "Documents or any other requirement": "\"Alternate Policy\n\nWritten declaration with signature on KYC Xerox paper (Either PAN or Driving Licence)\nDeclaration wordings - I want to cancel my policy wide <<policy no.>> and proceed the refund.\"\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Yes",
+  "Inspection": "0",
+  "Any Exception": "For Ticketing Associates: Raise cancellation to insurer & meanwhile XML Sheet to tech",
+  "Declaration format (if declaration required)": "0\n"
+}
+,
   {
     "InsurerRequirement": "Future GeneraliPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
     "Insurer": "Future Generali",
@@ -4704,17 +4707,18 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Any Exception": "Customer request for endorsement mandatory - Please ask the customer to share written consent",
     "Declaration format (if declaration required)": null
   },
-  {
-    "Insurer": "ICICI",
-    "Requirement": "Multiple Mismatch (Reg no, chassis no & Engine no mismatch)",
-    "Endorsement type": "Non Financial Endt",
-    "Documents or any other requirement": "Reg. date and MMV needs to be correct, then only correction is possible - RC PYP & Aadhaar and Pan required or else cancellation (RC, Alternate, Aadhaar and Pan required for cancellation)",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "No",
-    "Inspection": "No",
-    "Any Exception": "Customer request for endorsement mandatory - Please ask the customer to share written consent",
-    "Declaration format (if declaration required)": null
-  },
+ {
+  "InsurerRequirement": "ICICIMultiple Mismatch (Reg no, chassis no & Engine no mismatch)",
+  "Insurer": "ICICI",
+  "Requirement": "Multiple Mismatch (Reg no, chassis no & Engine no mismatch)",
+  "Endorsement type": "Non Financial Endt",
+  "Documents or any other requirement": "Reg. date and MMV needs to be correct, then only correction is possible - RC required & Customer Consent\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "no",
+  "Inspection": "No",
+  "Any Exception": "Customer request for endorsement mandatory - Please ask the customer to share written consent",
+  "Declaration format (if declaration required)": "0\n"
+},
   {
     "Insurer": "ICICI",
     "Requirement": "Post Issuance Cancellation",
@@ -4727,16 +4731,18 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Declaration format (if declaration required)": null
   },
   {
-    "Insurer": "ICICI",
-    "Requirement": "Post Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
-    "Endorsement type": null,
-    "Documents or any other requirement": "Customer consent & Alternate policy",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Deduction",
-    "Inspection": null,
-    "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
-    "Declaration format (if declaration required)": null
-  },
+  "InsurerRequirement": "ICICIPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch)",
+  "Insurer": "ICICI",
+  "Requirement": "Post Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch)",
+  "Endorsement type": "0",
+  "Documents or any other requirement": "If Reg. date and MMV need to be correct, then only correction is possible - Alternate policy, RC required & Customer Consent\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Deduction",
+  "Inspection": "0",
+  "Any Exception": "Customer request for endorsement mandatory - Please ask the customer to share written consent",
+  "Declaration format (if declaration required)": "0"
+}
+,
   {
     "Insurer": "ICICI",
     "Requirement": "M-Parivahan",
@@ -6475,16 +6481,17 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Declaration format (if declaration required)": null
   },
   {
-    "Insurer": "Magma",
-    "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": null,
-    "Documents or any other requirement": "Alternate Policy, KYC",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Deduction",
-    "Inspection": null,
-    "Any Exception": null,
-    "Declaration format (if declaration required)": null
-  },
+  "InsurerRequirement": "MagmaPost Issuance Cancellation",
+  "Insurer": "Magma",
+  "Requirement": "Post Issuance Cancellation",
+  "Endorsement type": "0",
+  "Documents or any other requirement": "\"Alternate Policy, KYC & NEFT details of the Insured\nAccount holder name - \nBank Name - \nAccount Number - \nIFSC Code - \"\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Yes",
+  "Inspection": "0",
+  "Any Exception": "0",
+  "Declaration format (if declaration required)": "0\n"
+},
   {
     "Insurer": "Magma",
     "Requirement": "Post Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
@@ -7034,17 +7041,19 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Any Exception": "Proceed with O/t incase cx doesn't have PYP",
     "Declaration format (if declaration required)": "Kindly ask the customer to share below declaration on mail: \n\"I certify that I have applied for the Correction in Insured name in policy no. __________________. This is not the case of Ownership transfer and there is no known or reported loss till date. I certify that the above facts are true to the best of my knowledge and if found false, I am liable for it and Insurer has the right to cancel the policy without any refund.\""
   },
-  {
-    "Insurer": "Oriental",
-    "Requirement": "NCB Certificate",
-    "Endorsement type": "Financial Endt",
-    "Documents or any other requirement": "Sale Letter and PYP",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Yes",
-    "Inspection": "No",
-    "Any Exception": "Charges would not be required incase policy has expired",
-    "Declaration format (if declaration required)": null
-  },
+ {
+  "InsurerRequirement": "OrientalNCB Certificate",
+  "Insurer": "Oriental",
+  "Requirement": "NCB Certificate",
+  "Endorsement type": "Financial Endt",
+  "Documents or any other requirement": "\"Form 29/30\nor\nUpdated RC with transferred date\"\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Yes",
+  "Inspection": "No",
+  "Any Exception": "Charges would not be required incase policy has expired",
+  "Declaration format (if declaration required)": "0\n"
+}
+,
   {
     "Insurer": "Oriental",
     "Requirement": "Registration Date",
@@ -7872,27 +7881,31 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Declaration format (if declaration required)": null
   },
   {
-    "Insurer": "Reliance",
-    "Requirement": "Hypothecation Remove",
-    "Endorsement type": "Non Financial Endt",
-    "Documents or any other requirement": "Bank NOC",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "No",
-    "Inspection": "No",
-    "Any Exception": null,
-    "Declaration format (if declaration required)": null
-  },
+  "InsurerRequirement": "RelianceHypothecation Remove",
+  "Insurer": "Reliance",
+  "Requirement": "Hypothecation Remove",
+  "Endorsement type": "Non Financial Endt",
+  "Documents or any other requirement": "\"Customer Request Letter\nEndorsed RC Copy / NOC from Financier\"\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "no",
+  "Inspection": "No",
+  "Any Exception": "0",
+  "Declaration format (if declaration required)": "0\n"
+}
+,
   {
-    "Insurer": "Reliance",
-    "Requirement": "Hypothecation Add",
-    "Endorsement type": "Nil Endt",
-    "Documents or any other requirement": "Updated RC  or Loan Sanction letter",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "No",
-    "Inspection": "No",
-    "Any Exception": null,
-    "Declaration format (if declaration required)": null
-  },
+  "InsurerRequirement": "RelianceHypothecation Add",
+  "Insurer": "Reliance",
+  "Requirement": "Hypothecation Add",
+  "Endorsement type": "Nil Endt",
+  "Documents or any other requirement": "Customer Request Letter and RC Copy\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "no",
+  "Inspection": "No",
+  "Any Exception": "0",
+  "Declaration format (if declaration required)": "0\n"
+}
+,
  {
   "InsurerRequirement": "RelianceHypothecation Change",
   "Insurer": "Reliance",
@@ -11470,17 +11483,18 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Declaration format (if declaration required)": null
   },
   {
-    "InsurerRequirement": "ZunoPost Issuance Cancellation",
-    "Insurer": "Zuno",
-    "Requirement": "Post Issuance Cancellation",
-    "Endorsement type": null,
-    "Documents or any other requirement": "Alternate Policy, KYC - Pan Card and Unmasked Aadhar card",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Deduction",
-    "Inspection": null,
-    "Any Exception": "For ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
-    "Declaration format (if declaration required)": null
-  },
+  "InsurerRequirement": "ZunoPost Issuance Cancellation",
+  "Insurer": "Zuno",
+  "Requirement": "Post Issuance Cancellation",
+  "Endorsement type": "0",
+  "Documents or any other requirement": "Alternate Policy, KYC - Pan Card and Unmasked Aadhar card\n",
+  "TAT": "SRS / 10 Days",
+  "Charges / Deduction": "Yes",
+  "Inspection": "0",
+  "Any Exception": "For ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
+  "Declaration format (if declaration required)": "0\n"
+}
+,
   {
     "InsurerRequirement": "ZunoPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
     "Insurer": "Zuno",
