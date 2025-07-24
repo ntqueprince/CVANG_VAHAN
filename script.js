@@ -7904,7 +7904,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
   "Inspection": "no",
   "Any Exception": "0",
   "Declaration format (if declaration required)": "0"
-}
+},
   {
     "Insurer": "Reliance",
     "Requirement": "Insured name",
