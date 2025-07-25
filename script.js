@@ -11587,7 +11587,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "short_partial": "Yes",
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required within Video TAT",
-            "zd_claims_year": "ZD Plan: 2, ZD+: Unlimited",
+            "zd_claims_year": "2",
             "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "No",
             "old_3_3": "No"
@@ -11600,8 +11600,8 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "short_partial": "Yes",
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required within Video TAT",
-            "zd_claims_year": "2",
-            "non_zd_claims_year": "Unlimited",
+            "zd_claims_year": "2<br>(Unlimited-3+3)",
+            "non_zd_claims_year": "Unlimited<br>(Unlimited-3+3)",
             "brand_new_3_3": "Yes",
             "old_3_3": "No"
         },
@@ -11632,18 +11632,18 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "old_3_3": "No"
         },
         {
-            "insurer_name": "Tata AIG",
-            "commercial": "Yes",
-            "video_approval": "At PB end",
-            "video_tat": "2 days",
-            "short_partial": "Yes",
-            "artificial_low_lighting": "No",
-            "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
-            "zd_claims_year": "2",
-            "non_zd_claims_year": "Unlimited",
-            "brand_new_3_3": "Yes",
-            "old_3_3": "Yes"
-        },
+  "insurer_name": "Tata AIG",
+  "commercial": "Yes",
+  "video_approval": "At PB end",
+  "video_tat": "2 days",
+  "short_partial": "Yes",
+  "artificial_low_lighting": "No",
+  "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+  "zd_claims_year": "ZD-2<br>3+3 Plan (5 overall, max 2 in a year)<br>4+4 Plan (7 overall, max 2 in a year)<br>5+5 Plan (9 overall, max 2 in a year)",
+  "non_zd_claims_year": "compre.-99<br>3+3 Plan -99<br>4+4 Plan -99<br>5+5 Plan -99",
+  "brand_new_3_3": "Yes",
+  "old_3_3": "Yes"
+},
        {
     "insurer_name": "ICICI Lombard",
     "commercial": "Yes",
@@ -11652,8 +11652,8 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "short_partial": "Yes",
     "artificial_low_lighting": "Yes",
     "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2 per year\n(Unlimited for Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford)",
-    "non_zd_claims_year": "Unlimited",
+    "zd_claims_year": "Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford: Unlimited but Other makers: 2 <br> (ICICI 3+3-6)",
+    "non_zd_claims_year": "Unlimited <br> (ICICI 3+3-Unlimited)",
     "brand_new_3_3": "Yes",
     "old_3_3": "Yes"
 }
@@ -11718,7 +11718,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "short_partial": "Yes",
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required within Video TAT",
-            "zd_claims_year": "2",
+            "zd_claims_year": "Unlimited",
             "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "No",
             "old_3_3": "No"
@@ -11732,7 +11732,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required within Video TAT",
             "zd_claims_year": "2",
-            "non_zd_claims_year": "Unlimited",
+            "non_zd_claims_year": "Unlimited (Cashless limited to 2)",
             "brand_new_3_3": "No",
             "old_3_3": "No"
         },
@@ -11758,7 +11758,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required (Shriram format) + Address ID proof within Video TAT",
             "zd_claims_year": "2",
-            "non_zd_claims_year": "Unlimited till IDV",
+            "non_zd_claims_year": "3",
             "brand_new_3_3": "No",
             "old_3_3": "No"
         },
@@ -11796,7 +11796,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "short_partial": "Yes",
             "artificial_low_lighting": "No",
             "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-            "zd_claims_year": "2",
+            "zd_claims_year": "Unlimited",
             "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "No",
             "old_3_3": "No"
@@ -11810,7 +11810,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
             "zd_claims_year": "2",
-            "non_zd_claims_year": "Unlimited till IDV",
+            "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "No",
             "old_3_3": "No"
         },
@@ -11835,8 +11835,8 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "short_partial": "No",
             "artificial_low_lighting": "No",
             "scar_declaration": "Will Refer to Under Writer",
-            "zd_claims_year": "Unlimited till IDV",
-            "non_zd_claims_year": "Unlimited till IDV",
+            "zd_claims_year": "Unlimited",
+            "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "No",
             "old_3_3": "No"
         },
@@ -11848,8 +11848,8 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "short_partial": "No",
             "artificial_low_lighting": "No",
             "scar_declaration": "Will Refer to Under Writer",
-            "zd_claims_year": "Unlimited till IDV",
-            "non_zd_claims_year": "Unlimited till IDV",
+            "zd_claims_year": "Unlimited till",
+            "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "No",
             "old_3_3": "No"
         },
@@ -11861,8 +11861,8 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "short_partial": "No",
             "artificial_low_lighting": "No",
             "scar_declaration": "Declaration Required within Video TAT",
-            "zd_claims_year": "1 or 2 claims (as per selected plan)",
-            "non_zd_claims_year": "Unlimited till IDV",
+            "zd_claims_year": "Brand-new: Unlimited but Non-brand-new: As per policy PDF",
+            "non_zd_claims_year": "Unlimited",
             "brand_new_3_3": "Yes",
             "old_3_3": "Yes"
         }]; 
