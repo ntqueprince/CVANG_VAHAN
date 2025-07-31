@@ -274,22 +274,22 @@
 <button class="back-btn" onclick="closeRSAPage()">Back to Main Page</button>
 </div>
 </div>
-<script type="module" src="script.js"></script><!-- 🔽 Floating Chat Button -->
-<button id="openChatBtn" class="fixed bottom-4 right-4 w-14 h-14 rounded-full shadow-lg text-white text-2xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-110 transition" onclick="toggleChat()">
+<script type="module" src="script.js"></script>
+ <!-- Floating Chat Button -->
+<button id="openChatBtn" class="fixed bottom-4 right-4 w-14 h-14 rounded-full shadow-lg text-white text-2xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-110 transition z-50" onclick="toggleChat()">
   💬
 </button>
 
-<!-- 🔽 Chat Canvas -->
-<div id="chatCanvas" class="fixed bottom-0 right-0 w-full sm:w-[400px] h-[70vh] bg-white shadow-2xl rounded-tl-2xl border-t-4 border-indigo-600 flex flex-col z-50 translate-y-full transition-transform duration-500">
-  <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-tl-2xl">
-    <h3 class="text-lg font-semibold">External Chat</h3>
-    <button onclick="toggleChat()">✖</button>
+<!-- Chat Canvas (Vertical full screen height) -->
+<div id="chatCanvas" class="fixed bottom-0 right-0 w-full sm:w-[450px] h-[85vh] bg-white shadow-2xl rounded-tl-2xl border-t-4 border-indigo-600 flex flex-col z-50 translate-y-full transition-transform duration-500">
+  <div class="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-tl-2xl">
+    <span class="text-base font-semibold">External Chat</span>
+    <button onclick="toggleChat()" class="text-sm ml-2">✖</button>
   </div>
-  <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-2">
+  <div id="chatMessages" class="flex-1 p-4 overflow-y-auto flex flex-col space-y-2" onclick="event.stopPropagation()">
     <!-- messages go here -->
   </div>
-  <div class="p-4 border-t bg-gray-50">
-    <input id="chatName" type="text" placeholder="Your name (optional)" class="mb-2 w-full px-3 py-2 border rounded-md" />
+  <div class="p-4 border-t bg-gray-50" onclick="event.stopPropagation()">
     <textarea id="chatMessage" placeholder="Type your message..." rows="2" class="w-full px-3 py-2 border rounded-md"></textarea>
     <button onclick="sendMessage()" class="mt-2 w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700">Send</button>
   </div>
@@ -300,18 +300,26 @@ const SUPABASE_URL = "https://zilzzcockvphmhexjggk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppbHp6Y29ja3ZwaG1oZXhqZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NzEwNzgsImV4cCI6MjA2OTU0NzA3OH0.LKHOyHzxdHJGc9fvDbJAwVOmE7F0XwIqCt36tYcPKlk";
 
 const headers = {
-  "apikey": SUPABASE_ANON_KEY,
-  "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+  apikey: SUPABASE_ANON_KEY,
+  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
   "Content-Type": "application/json"
 };
 
 const chatCanvas = document.getElementById('chatCanvas');
 const chatMessages = document.getElementById('chatMessages');
 
-function toggleChat() {
-  chatCanvas.classList.toggle('translate-y-full');
-  if (!chatCanvas.classList.contains('translate-y-full')) loadMessages();
+function toggleChat(show = null) {
+  const visible = !chatCanvas.classList.contains('translate-y-full');
+  const shouldShow = show !== null ? show : !visible;
+  chatCanvas.classList.toggle('translate-y-full', !shouldShow);
+  if (shouldShow) loadMessages();
 }
+
+window.addEventListener('click', function (e) {
+  if (!chatCanvas.contains(e.target) && !document.getElementById('openChatBtn').contains(e.target)) {
+    toggleChat(false);
+  }
+});
 
 async function loadMessages() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/comments?select=*&order=created_at.asc`, { headers });
@@ -320,26 +328,67 @@ async function loadMessages() {
   data.forEach((msg, i) => {
     const color = i % 2 === 0 ? 'bg-orange-100' : 'bg-blue-100';
     const div = document.createElement('div');
-    div.className = `p-3 rounded-md ${color} shadow-sm text-sm`;
-    div.innerHTML = `<strong>${msg.username || "Anonymous"}:</strong><br/>${msg.message}`;
+    div.className = `group relative p-3 rounded-md ${color} shadow-sm text-sm`;
+    div.innerHTML = `
+      <div class="flex justify-between">
+        <div>${msg.message}</div>
+        <button onclick="deleteMessage('${msg.id}')" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-xs text-red-500 hover:text-red-700">❌</button>
+      </div>
+    `;
     chatMessages.appendChild(div);
   });
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 async function sendMessage() {
-  const username = document.getElementById('chatName').value.trim();
-  const message = document.getElementById('chatMessage').value.trim();
+  const messageBox = document.getElementById('chatMessage');
+  const message = messageBox.value.trim();
   if (!message) return alert("Please type something.");
+
+  // Show immediately in UI
+  const div = document.createElement('div');
+  div.className = `p-3 rounded-md bg-orange-100 shadow-sm text-sm flex justify-between items-start`;
+  div.innerHTML = `
+    <div>${message}</div>
+    <button class="text-red-400 hover:text-red-600 text-xs ml-2 opacity-0">❌</button>
+  `;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  // Clear input immediately
+  messageBox.value = '';
+
+  // Send to Supabase in background
   await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ username: username || null, message })
+    body: JSON.stringify({ username: null, message })
   });
-  document.getElementById('chatMessage').value = '';
+
+  // After that, load fresh list
   loadMessages();
 }
+
+async function deleteMessage(id) {
+  const confirmed = confirm("Delete this message?");
+  if (!confirmed) return;
+  await fetch(`${SUPABASE_URL}/rest/v1/comments?id=eq.${id}`, {
+    method: "DELETE",
+    headers
+  });
+  loadMessages();
+}
+
+// Enter to send, Shift+Enter for newline
+const chatInput = document.getElementById('chatMessage');
+chatInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
 </script>
+
 
 </body>
 </html>
