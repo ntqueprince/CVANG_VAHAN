@@ -1373,6 +1373,35 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* Chat message box ko fix width aur wrapping dena */
+#chatMessages .group {
+  max-width: 90%;
+  word-wrap: break-word;
+  white-space: normal;
+  position: relative;
+  padding-right: 24px; /* ❌ button ke liye jagah */
+}
+
+/* ❌ Delete button ke position aur size fix karna */
+#chatMessages .group button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  height: 16px;
+  width: 16px;
+  font-size: 10px;
+  padding: 0;
+  line-height: 1;
+  border-radius: 3px;
+  color: #3b82f6; /* blue */
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+#chatMessages .group button:hover {
+  background-color: #dbeafe; /* light blue */
+  color: #2563eb;
+}
 
 
 
