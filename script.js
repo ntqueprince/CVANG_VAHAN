@@ -12163,7 +12163,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "Magma": [],
             "Raheja QBE": [],
             "Kotak": [],
-            "SBI General": [],
+            "SBI General": [{ date: "2025-08-11", update: "For all Pre issuance rejection: Please mark an email to customer regarding the refund process of 7 working days from the date of rejection" }],
             "Shriram": [],
             "IFFCO Tokio": [],
             "Liberty Videocon": [],
@@ -12177,7 +12177,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
             "Digit": [{ date: "2025-06-12", update: "if cx comes for odometere update in DIGIT , THese 4 things needs to be captured:- odomeret reading, engraved, chasis number, 360 degree view and Engiene compartment" },{
   "date": "2025-06-30",
   "update": "Digit Battery Protection Add-on 1. Applicable for both Hybrid and EV vehicles 2. Covers damage to battery, drive motor/electric motor, and Hybrid Electric Vehicle (HEV), including chargers and cables as well (up to the IDV) 3. Provides coverage for water ingression, short circuit, or damages from accidental external factors 4. Counted as a claim 5. Allowed 2 times in a policy year"
-}],
+},{ date: "2025-08-11", update: "For all Pre issuance rejection: Please mark an email to customer regarding the refund process of 7 working days from the date of rejection" }],
             "BAJAJ CPA": [],
             "DIGIT CPA": [],
             "CHOLA CPA": [],
