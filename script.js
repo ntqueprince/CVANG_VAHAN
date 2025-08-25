@@ -1095,7 +1095,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
   "TAT": "SRS / 10 Days",
   "Charges / Deduction": "Deduction",
   "Inspection": "NA",
-  "Any Exception": "To cancel a third-party policy, need to provide an alternate policy from the same insurer with the same issuance date(POI).",
+  "Any Exception": "To cancel a third-party policy, need to provide an alternate policy from the same insurer with the same issuance date(POI) and cancellation can be processed if the customer provides an alternate policy from the same POI or has another policy that was effective before the NIA policy start date.",
   "Declaration format (if declaration required)": "NA"
 },
   {
