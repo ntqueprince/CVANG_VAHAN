@@ -8723,11 +8723,11 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
   {
     "Insurer": "SBI",
     "Requirement": "Addition of GST No.",
-    "Endorsement type": "Non Financial Endt",
-    "Documents or any other requirement": "Aadhaar and Pan Card with GST Certificate in the name of Insured",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "No",
-    "Inspection": "No",
+    "Endorsement type": "Not Possible",
+    "Documents or any other requirement": "Not Possible",
+    "TAT": "Not Possible",
+    "Charges / Deduction": "Not Possible",
+    "Inspection": "Not Possible",
     "Any Exception": null,
     "Declaration format (if declaration required)": null
   },
