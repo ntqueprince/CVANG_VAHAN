@@ -1083,7 +1083,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "TAT": "SRS / 10 Days",
     "Charges / Deduction": "No",
     "Inspection": "No",
-    "Any Exception": "",
+    "Any Exception": " total mismatch post issuance cancellation not possible ( only correction possible)",
     "Declaration format (if declaration required)": ""
   },
   {
@@ -1102,12 +1102,12 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "InsurerRequirement": "New India AssurancePost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
     "Insurer": "New India Assurance",
     "Requirement": "Post Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
-    "Endorsement type": "NA",
-    "Documents or any other requirement": "RC, KYC, Bank Statement with Payee name & Alternate Policy",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "Deduction",
+    "Endorsement type": "not possible",
+    "Documents or any other requirement": "not possible",
+    "TAT": "not possible",
+    "Charges / Deduction": "not possible",
     "Inspection": "",
-    "Any Exception": "",
+    "Any Exception": " total mismatch post issuance cancellation not possible ( only correction possible)",
     "Declaration format (if declaration required)": ""
   },
   {
