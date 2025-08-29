@@ -19,7 +19,7 @@
     const imagesRef = dbRef(db, 'images');
 
     // Cloudinary configuration (from structure.html)
-    const cloudName = 'di83mshki'; // Replace with your Cloudinary cloud name
+    const cloudName = 'dwmrdluul'; // Replace with your Cloudinary cloud name
     const uploadPreset = 'anonymous_upload'; // Replace with your Cloudinary upload preset
 
     // Global variables
