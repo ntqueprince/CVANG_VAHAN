@@ -6616,10 +6616,10 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
   {
     "Insurer": "National",
     "Requirement": "Registration Date",
-    "Endorsement type": "Financial Endt",
-    "Documents or any other requirement": "RC Required",
-    "TAT": "SRS / 10 Days",
-    "Charges / Deduction": "May Be",
+    "Endorsement type": "Not Possible",
+    "Documents or any other requirement": "Not Possible",
+    "TAT": "Not Possible",
+    "Charges / Deduction": "Not Possible",
     "Inspection": "No",
     "Any Exception": null,
     "Declaration format (if declaration required)": null
