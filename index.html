@@ -18,6 +18,7 @@
 <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" onclick="openInspectionWaiverPage()">Inspection Waiver</button>
 <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" onclick="openRSAPage()">RSA &amp; CONTACT</button>
 <button class="animated-btn bg-gradient-to-r from-purple-500 to-purple-700" onclick="window.open('https://ntqueprince.github.io/notebook/', '_blank')">NOTEBOOK</button>
+<button class="animated-btn bg-gradient-to-r from-pink-500 to-pink-700" onclick="openIncentiveModal()">INCENTIVE CALCULATOR</button>
 </div>
 <!-- Renamed Manual VI button -->
 <!-- New button for Claim_Count & NSTP -->
@@ -388,9 +389,74 @@ chatInput.addEventListener('keydown', function(e) {
   }
 });
 </script>
+<!-- Incentive Calculator Modal -->
+<div class="incentive-modal" id="incentiveModal">
+  <div class="incentive-modal-content">
+    <h2 class="title">🎯 Incentive Calculator</h2>
+
+    <!-- CSAT -->
+    <div class="input-section">
+      <label for="incentiveCSAT">CSAT %:</label>
+      <select id="incentiveCSAT">
+        <!-- 70 से 99% तक -->
+        <script>
+          for (let i = 70; i <= 99; i++) {
+            document.write(`<option value="${i}">${i}%</option>`);
+          }
+        </script>
+      </select>
+    </div>
+
+    <!-- Quality -->
+    <div class="input-section">
+      <label for="incentiveQuality">Quality %:</label>
+      <select id="incentiveQuality">
+        <script>
+          for (let i = 40; i <= 100; i += 5) {
+            document.write(`<option value="${i}">${i}%</option>`);
+          }
+        </script>
+      </select>
+    </div>
+
+    <!-- AHT -->
+    <div class="input-section">
+      <label for="incentiveAHTMin">AHT (Minutes:Seconds):</label>
+      <select id="incentiveAHTMin"></select> :
+      <select id="incentiveAHTSec"></select>
+    </div>
+
+    <!-- Deductions -->
+    <div class="input-section">
+      <label for="escalation">Escalation:</label>
+      <select id="escalation">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2+</option>
+      </select>
+    </div>
+
+    <div class="input-section">
+      <label for="warning">Warning Letter:</label>
+      <select id="warning">
+        <option value="0">0</option>
+        <option value="1">1+</option>
+      </select>
+    </div>
+
+    <!-- Result -->
+    <div class="result-section" id="incentiveResult">
+     <p id="incentiveResult"><span class="colorful-text">Created by Shivang</span></p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-container">
+      <button class="close-btn" onclick="closeIncentiveModal()">Close</button>
+      <button class="calculate-btn" onclick="calculateIncentive()">Calculate</button>
+    </div>
+  </div>
+</div>
 
 
 </body>
 </html>
-<script async="async" data-cfasync="false" src="//pl27511638.profitableratecpm.com/56a70ac979ef8c7a97938c1af5d3e83d/invoke.js"></script>
-<div id="container-56a70ac979ef8c7a97938c1af5d3e83d"></div>
