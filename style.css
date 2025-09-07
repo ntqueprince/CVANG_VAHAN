@@ -1434,7 +1434,115 @@
   background-color: #dbeafe; /* light blue */
   color: #2563eb;
 }
+.incentive-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
 
+.incentive-modal-content {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 420px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  animation: pop 0.3s ease;
+}
 
+@keyframes pop {
+  from {transform: scale(0.8);}
+  to {transform: scale(1);}
+}
 
+.incentive-modal-content h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
 
+.input-section {
+  margin: 10px 0;
+}
+
+.input-section label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.input-section select {
+  width: 100%;
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  color: #333;
+}
+
+.result-section {
+  margin-top: 15px;
+  background: #fff;
+  color: #333;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.calculate-btn {
+  background: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close-btn {
+  background: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+/* Rainbow text for the title */
+@keyframes rainbow-animation {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+.rainbow-text {
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-weight: bold;
+    animation: rainbow-animation 10s linear infinite;
+}
+
+/* Colorful text for "Created by Shivang" */
+.colorful-text {
+    background: linear-gradient(to right, #FF7E5F, #FEB47B, #FFD3B5, #FFB995);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-weight: bold;
+}
