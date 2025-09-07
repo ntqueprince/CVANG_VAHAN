@@ -6171,8 +6171,7 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
     "Inspection": "No",
     "Any Exception": null,
     "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
-  },
-  {
+  }, {
     "Insurer": "Magma",
     "Requirement": "Registration Date",
     "Endorsement type": "Financial Endt",
@@ -12326,3 +12325,153 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
         // Initial call to display new update indicator/snippet on page load
         showNewUpdateIndicatorAndSnippet();
     });
+// Fill CSAT & Quality dropdowns + AHT
+window.onload = function () {
+  let csatSelect = document.getElementById("incentiveCSAT");
+  let qualitySelect = document.getElementById("incentiveQuality");
+  let minSelect = document.getElementById("incentiveAHTMin");
+  let secSelect = document.getElementById("incentiveAHTSec");
+
+  // Clear existing options to prevent duplication issues
+  csatSelect.innerHTML = '';
+  qualitySelect.innerHTML = '';
+  minSelect.innerHTML = '';
+  secSelect.innerHTML = '';
+
+  // CSAT 80–100
+  for (let i = 80; i <= 100; i++) {
+    csatSelect.innerHTML += `<option value="${i}">${i}%</option>`;
+    if (i < 100) {
+      csatSelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+    }
+  }
+  csatSelect.value = "90";
+
+  // Quality 40–100
+  for (let i = 40; i <= 100; i++) {
+    qualitySelect.innerHTML += `<option value="${i}">${i}%</option>`;
+    if (i < 100) {
+      qualitySelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+    }
+  }
+  qualitySelect.value = "90";
+
+  // AHT minutes (2–7 min)
+  for (let i = 2; i <= 7; i++) {
+    minSelect.innerHTML += `<option value="${i}">${i} Min</option>`;
+  }
+  minSelect.value = "4";
+
+  // AHT seconds (step of 10 sec)
+  // AHT seconds (1 to 59 sec)
+for (let i = 0; i < 60; i++) {
+  secSelect.innerHTML += `<option value="${i}">${i} Sec</option>`;
+}
+  secSelect.value = "30";
+};
+
+// Open Modal
+window.openIncentiveModal = function () {
+  document.getElementById("incentiveModal").style.display = "flex";
+};
+
+// Close Modal
+window.closeIncentiveModal = function () {
+  document.getElementById("incentiveModal").style.display = "none";
+};
+
+// --- Helper Functions ---
+
+// Step 1: CSAT flat amount
+function getCSATFlatAmount(csatValue) {
+  let csat = parseFloat(csatValue);
+  let isPlus = csatValue.includes("+");
+
+  if (csat <= 85 && !isPlus) return 0;
+  if (csat <= 87 && !isPlus) return 2000;
+  if (csat <= 90 && !isPlus) return 5000;
+  if (csat <= 92 && !isPlus) return 6000;
+  if (csat <= 95 && !isPlus) return 7000;
+  if (csat <= 97 && !isPlus) return 8000;
+  
+  // Logic for '+' values and scores > 97
+  if (csat > 97 || (isPlus && csat >= 97)) return 10000;
+  if (isPlus && csat >= 95) return 8000;
+  if (isPlus && csat >= 92) return 7000;
+  if (isPlus && csat >= 90) return 6000;
+  if (isPlus && csat >= 87) return 5000;
+  if (isPlus && csat >= 85) return 2000;
+  if (isPlus && csat < 85) return 0;
+
+  return 0; // Default case
+}
+
+// Step 2: Quality Bonus
+function getQualityBonus(qualityValue, csatFlatAmount) {
+  let quality = parseFloat(qualityValue);
+  let isPlus = qualityValue.includes("+");
+
+  if (quality < 80 && !isPlus) return null; // Cancel incentive
+  if (quality <= 85 && !isPlus) return csatFlatAmount * 0.05;
+  if (quality <= 90 && !isPlus) return csatFlatAmount * 0.10;
+
+  // Logic for '+' values and scores > 90
+  if (quality > 90 || (isPlus && quality >= 90)) return csatFlatAmount * 0.25;
+  if (isPlus && quality >= 85) return csatFlatAmount * 0.10;
+  if (isPlus && quality < 85 && quality >= 80) return csatFlatAmount * 0.05;
+  if (isPlus && quality < 80) return null;
+
+  return csatFlatAmount * 0.25; // Default for >90
+}
+
+// Step 3: AHT Bonus (No change here)
+function getAHTBonus(aht, csatFlatAmount) {
+  if (aht <= 230) return csatFlatAmount * 0.25; // ≤ 3:50
+  else if (aht <= 290) return csatFlatAmount * 0.10; // 3:51 – 4:50
+  else if (aht <= 360) return csatFlatAmount * 0.05; // 4:51 – 6:00
+  else return 0; // > 6:00
+}
+
+// --- Main Logic ---
+window.calculateIncentive = function () {
+  let csatValue = document.getElementById("incentiveCSAT").value;
+  let qualityValue = document.getElementById("incentiveQuality").value;
+  let min = parseInt(document.getElementById("incentiveAHTMin").value);
+  let sec = parseInt(document.getElementById("incentiveAHTSec").value);
+  let escalation = document.getElementById("escalation").value;
+  let warning = parseInt(document.getElementById("warning").value);
+
+  let aht = min * 60 + sec; // total seconds
+
+  // Get the original CSAT flat amount first
+  let csatFlatAmount = getCSATFlatAmount(csatValue);
+
+  // Then calculate the 70% CSAT bonus
+  let csatBonus = csatFlatAmount * 0.7;
+
+  // Calculate Quality & AHT bonuses based on the original flat amount
+  let qBonus = getQualityBonus(qualityValue, csatFlatAmount);
+  let ahtBonus = getAHTBonus(aht, csatFlatAmount);
+
+  // Check for quality rule (if < 80, incentive is null)
+  if (qBonus === null) {
+    document.getElementById("incentiveResult").innerHTML =
+      "<p style='color:red;'>❌ Incentive Cancelled (Quality < 80%)</p>";
+    return;
+  }
+
+  // Calculate total before final deductions
+  let totalIncentive = csatBonus + qBonus + ahtBonus;
+
+  // Step 4: Final Deductions
+  if (warning >= 1) {
+    totalIncentive = 0;
+  } else {
+    if (escalation == "1") totalIncentive *= 0.75;
+    else if (escalation == "2" || escalation == "2+") totalIncentive *= 0.5;
+  }
+
+  document.getElementById(
+    "incentiveResult"
+  ).innerHTML = `<p>💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>`;
+};
