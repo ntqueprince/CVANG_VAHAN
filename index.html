@@ -39,7 +39,7 @@
 <div class="upload-section">
 <h2>Upload Images</h2>
 <label for="fileUpload">Choose image files to upload:</label>
-<input accept="image/*" id="fileUpload" type="file"/>
+<input accept="image/*" id="fileUpload" type="file" multiple />
 <input id="tagInput" placeholder="Enter tag (e.g., SHIVANG)" type="text"/>
 <button class="colorful-upload-btn" onclick="uploadImage()">Upload</button>
 <div class="progress-container">
@@ -456,7 +456,17 @@ chatInput.addEventListener('keydown', function(e) {
     </div>
   </div>
 </div>
+<!-- Mobile Info Popup -->
+<div id="mobilePopup" class="mobile-popup">
+  <div class="popup-content">
+    <p>📸 Now you can upload <b>multiple photos</b> at once!<br>
+       Just select more than one photo from your gallery.</p>
+    <button onclick="closePopup()">Got it</button>
+  </div>
+</div>
 
 
 </body>
 </html>
+
+
