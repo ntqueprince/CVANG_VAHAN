@@ -27,29 +27,36 @@
     let hasCalculated = false;
 
     // Expose functions to window object
-    window.uploadImage = function() {const uploadBtn = document.querySelector(".colorful-upload-btn");
-uploadBtn.style.display = "none";    // Upload button ko hide kar do
+// Multiple Image Upload Function
+window.uploadImage = function () {
+  const uploadBtn = document.querySelector(".colorful-upload-btn");
+  uploadBtn.style.display = "none"; // Upload button ko hide kar do
 
-      const fileInput = document.getElementById('fileUpload');
-      const tagInput = document.getElementById('tagInput');
-      const file = fileInput.files[0];
-      const tag = tagInput.value.trim();
-      const progressBar = document.getElementById('progress');
-      const statusText = document.getElementById('status');
+  const fileInput = document.getElementById("fileUpload");
+  const tagInput = document.getElementById("tagInput");
+  const files = fileInput.files;   // Multiple files select kiye gaye
+  const tag = tagInput.value.trim();
+  const progressBar = document.getElementById("progress");
+  const statusText = document.getElementById("status");
 
-      if (!file) {
-        showMessage("Please select a file first!", "error");
-        return;
-      }
+  if (!files.length) {
+    showMessage("Please select at least one file!", "error");
+    return;
+  }
 
-      if (!tag) {
-        selectedFile = file; // Store file for modal upload
-        document.getElementById('tagModal').style.display = 'flex';
-        return;
-      }
+  if (!tag) {
+    // Agar tag blank hai to modal open karo (sirf pehli file ke liye)
+    selectedFile = files[0];
+    document.getElementById("tagModal").style.display = "flex";
+    return;
+  }
 
-      uploadFile(file, tag, progressBar, statusText);
-    };
+  // ✅ Loop through all selected files
+  Array.from(files).forEach((file) => {
+    uploadFile(file, tag, progressBar, statusText);
+  });
+};
+
 
     window.closeModal = function() {
       document.getElementById('tagModal').style.display = 'none';
@@ -82,84 +89,74 @@ uploadBtn.style.display = "none";    // Upload button ko hide kar do
       uploadFile(selectedFile, tag, progressBar, statusText, modalProgress);
     };
 
-    function uploadFile(file, tag, progressBar, statusText, modalProgress = null) {
-      const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', uploadPreset);
-      formData.append('tags', tag);
+    function uploadFile(file, tag, progressBar, statusText) {
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', uploadPreset);
+  formData.append('tags', tag);
 
-      const xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
 
-      xhr.upload.onprogress = function(event) {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round((event.loaded / event.total) * 100);
-          progressBar.style.width = percentComplete + '%';
-          progressBar.textContent = percentComplete + '%';
-          if (modalProgress) {
-            modalProgress.style.width = percentComplete + '%';
-            modalProgress.textContent = percentComplete + '%';
-          }
-          statusText.textContent = 'Uploading...';
-        }
-      };
-
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
-          console.log("Cloudinary Response:", data);
-          if (!data.secure_url) {
-            showMessage('Upload failed: No secure URL received', 'error');
-            statusText.textContent = 'Upload failed!';
-            closeModal();
-            return;
-          }
-          const imgObj = {
-            url: data.secure_url,
-            tag: tag,
-            name: file.name, // Store original file name for download
-            timestamp: Date.now() // Use Date.now() for client-side timestamp
-          };
-          push(imagesRef, imgObj)
-            .then(() => {
-              console.log("Firebase Push Successful:", imgObj);
-              progressBar.style.width = '100%';
-              progressBar.textContent = '100%';
-              if (modalProgress) {
-                modalProgress.style.width = '100%';
-                modalProgress.textContent = '100%';
-              }
-              statusText.textContent = 'Complete';
-              showMessage('Uploaded Successfully!', 'info');
-              closeModal();
-              document.getElementById('fileUpload').value = ''; // Clear file input
-              document.getElementById('tagInput').value = ''; // Clear tag input
-              loadImages(); // Reload images to display the new one
-            })
-            .catch((error) => {
-              console.error("Firebase Push Error:", error);
-              statusText.textContent = 'Upload failed: Firebase error';
-              showMessage('Upload failed: Firebase error', 'error');
-              closeModal();
-            });
-        } else {
-          console.error("Cloudinary Upload Failed (HTTP status:", xhr.status, ") Response:", xhr.responseText);
-          statusText.textContent = 'Upload failed!';
-          showMessage('Upload failed!', 'error');
-          closeModal();
-        }
-      };
-
-      xhr.onerror = function() {
-        console.error("Upload error occurred (XHR onerror):", xhr.status);
-        statusText.textContent = 'Upload error occurred!';
-        showMessage('Upload failed due to a network error!', 'error');
-        closeModal();
-      };
-
-      xhr.open('POST', url, true);
-      xhr.send(formData);
+  // Progress bar update for each file
+  xhr.upload.onprogress = function (event) {
+    if (event.lengthComputable) {
+      const percentComplete = Math.round((event.loaded / event.total) * 100);
+      progressBar.style.width = percentComplete + '%';
+      progressBar.textContent = percentComplete + '%';
+      statusText.textContent = 'Uploading...';
     }
+  };
+
+  // Upload complete
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const data = JSON.parse(xhr.responseText);
+      if (!data.secure_url) {
+        showMessage('Upload failed: No secure URL received', 'error');
+        statusText.textContent = 'Upload failed!';
+        return;
+      }
+
+      const imgObj = {
+        url: data.secure_url,
+        tag: tag,
+        name: file.name,
+        timestamp: Date.now()
+      };
+
+      // Save into Firebase
+      push(imagesRef, imgObj)
+        .then(() => {
+          progressBar.style.width = '100%';
+          progressBar.textContent = '100%';
+          statusText.textContent = 'Complete';
+          showMessage(`${file.name} uploaded successfully!`, 'info');
+          document.getElementById('fileUpload').value = '';
+          document.getElementById('tagInput').value = '';
+          loadImages();
+        })
+        .catch((error) => {
+          console.error("Firebase Push Error:", error);
+          statusText.textContent = 'Upload failed: Firebase error';
+          showMessage('Upload failed: Firebase error', 'error');
+        });
+    } else {
+      console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
+      statusText.textContent = 'Upload failed!';
+      showMessage('Upload failed!', 'error');
+    }
+  };
+
+  xhr.onerror = function () {
+    console.error("Upload error occurred:", xhr.status);
+    statusText.textContent = 'Upload error!';
+    showMessage('Upload failed due to network error!', 'error');
+  };
+
+  xhr.open('POST', url, true);
+  xhr.send(formData);
+}
 
     // Custom message box function (instead of alert)
     function showMessage(message, type = "info") {
@@ -12474,4 +12471,26 @@ window.calculateIncentive = function () {
   document.getElementById(
     "incentiveResult"
   ).innerHTML = `<p>💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>`;
+};
+// Show popup only for mobile users
+window.onload = function () {
+  if (window.innerWidth < 768) { // mobile screen size
+    document.getElementById("mobilePopup").style.display = "flex";
+  }
+};
+
+// Close popup
+function closePopup() {
+  document.getElementById("mobilePopup").style.display = "none";
+}
+// Show popup only for mobile users
+window.onload = function () {
+  if (window.innerWidth < 768) { // sirf mobile size
+    document.getElementById("mobilePopup").style.display = "flex";
+  }
+};
+
+// Close popup on button click
+window.closePopup = function () {
+  document.getElementById("mobilePopup").style.display = "none";
 };
