@@ -24,6 +24,7 @@
 
     // Global variables
     let selectedFile = null;
+    let selectedFiles = [];
     let hasCalculated = false;
 
     // Expose functions to window object
@@ -45,11 +46,11 @@ window.uploadImage = function () {
   }
 
   if (!tag) {
-    // Agar tag blank hai to modal open karo (sirf pehli file ke liye)
-    selectedFile = files[0];
-    document.getElementById("tagModal").style.display = "flex";
-    return;
-  }
+  // Agar tag blank hai to sabhi files save karo
+  selectedFiles = Array.from(files);
+  document.getElementById("tagModal").style.display = "flex";
+  return;
+}
 
   // ✅ Loop through all selected files
   Array.from(files).forEach((file) => {
@@ -86,7 +87,21 @@ window.uploadImage = function () {
       document.querySelector('.modal-content .upload-btn').style.display = 'none'; // Hide buttons during upload
       document.querySelector('.modal-content .cancel-btn').style.display = 'none'; // Hide buttons during upload
 
-      uploadFile(selectedFile, tag, progressBar, statusText, modalProgress);
+   // ✅ Multiple files handle
+if (selectedFiles.length > 0) {
+  selectedFiles.forEach((file, index) => {
+    uploadFile(file, tag, progressBar, statusText, modalProgress);
+    if (index === selectedFiles.length - 1) {
+      // Last file ke baad modal close
+      setTimeout(() => closeModal(), 1000);
+    }
+  });
+  selectedFiles = []; // reset
+} else if (selectedFile) {
+  uploadFile(selectedFile, tag, progressBar, statusText, modalProgress);
+  setTimeout(() => closeModal(), 1000);
+  selectedFile = null; // reset
+}
     };
 
     function uploadFile(file, tag, progressBar, statusText) {
