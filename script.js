@@ -12487,25 +12487,3 @@ window.calculateIncentive = function () {
     "incentiveResult"
   ).innerHTML = `<p>💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>`;
 };
-// Show popup only for mobile users
-window.onload = function () {
-  if (window.innerWidth < 768) { // mobile screen size
-    document.getElementById("mobilePopup").style.display = "flex";
-  }
-};
-
-// Close popup
-function closePopup() {
-  document.getElementById("mobilePopup").style.display = "none";
-}
-// Show popup only for mobile users
-window.onload = function () {
-  if (window.innerWidth < 768) { // sirf mobile size
-    document.getElementById("mobilePopup").style.display = "flex";
-  }
-};
-
-// Close popup on button click
-window.closePopup = function () {
-  document.getElementById("mobilePopup").style.display = "none";
-};
