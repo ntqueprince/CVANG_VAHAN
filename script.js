@@ -21,6 +21,23 @@
       // Cloudinary configuration (from structure.html)
       const cloudName = 'dfajanvsi'; // Replace with your Cloudinary cloud name
       const uploadPreset = 'anonymous_upload'; // Replace with your Cloudinary upload preset
+      // ✅ Handle paste event for images
+document.addEventListener("paste", function (event) {
+  const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+  for (const item of items) {
+    if (item.type.indexOf("image") === 0) {
+      const file = item.getAsFile();
+      if (file) {
+        const tagInput = document.getElementById("tagInput");
+        const tag = tagInput.value.trim() || "ClipboardImage";
+        const progressBar = document.getElementById("progress");
+        const statusText = document.getElementById("status");
+        uploadFile(file, tag, progressBar, statusText);
+      }
+    }
+  }
+});
+
 
       // Global variables
       let selectedFile = null;
