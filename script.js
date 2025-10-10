@@ -11889,7 +11889,7 @@ document.addEventListener("paste", function (event) {
               "short_partial": "No",
               "artificial_low_lighting": "No",
               "scar_declaration": "Declaration Required within Video TAT",
-              "zd_claims_year": "Brand-new: Unlimited but Non-brand-new: As per policy PDF",
+              "zd_claims_year": "Unlimited",
               "non_zd_claims_year": "Unlimited",
               "brand_new_3_3": "Yes",
               "old_3_3": "Yes"
