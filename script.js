@@ -12506,3 +12506,32 @@ document.addEventListener("paste", function (event) {
       "incentiveResult"
     ).innerHTML = `<p>💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>`;
   };
+  // Highlight "NO" cells in ADP table
+document.addEventListener("DOMContentLoaded", () => {
+  const adpTable = document.querySelector(".manual-vi-page table");
+  if (adpTable) {
+    adpTable.querySelectorAll("td").forEach(td => {
+      if (td.textContent.trim().toUpperCase() === "NO") {
+        td.classList.add("bg-red-100", "text-red-700", "font-semibold");
+      }
+    });
+  }
+});
+
+
+//PB WHeels-Script delete after diwali 2025
+
+window.addEventListener("DOMContentLoaded", () => {
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const popup = document.getElementById("pbPopup");
+  const closeBtn = document.getElementById("closePopupBtn");
+
+  if (!isMobile && popup) {
+    popup.classList.remove("hidden");
+  }
+
+  closeBtn.addEventListener("click", () => {
+    popup.classList.add("hidden");
+  });
+});
+//PB WHeels-Script delete after diwali 2025
