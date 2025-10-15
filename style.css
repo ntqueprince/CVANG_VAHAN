@@ -1546,4 +1546,19 @@
       background-clip: text;
       font-weight: bold;
   }
+/* Table ke rows ke liye halka gradient background */
+.adp-table tbody tr:nth-child(3n+1) {
+  background: linear-gradient(to right, #e8f0fe, #ffffff); /* halka blue */
+}
+.adp-table tbody tr:nth-child(3n+2) {
+  background: linear-gradient(to right, #fff7e6, #ffffff); /* halka orange */
+}
+.adp-table tbody tr:nth-child(3n+3) {
+  background: linear-gradient(to right, #e6f7ff, #ffffff); /* light sky blue */
+}
 
+/* Mouse le jaane par halka highlight ho */
+.adp-table tbody tr:hover {
+  background: linear-gradient(to right, #dbeafe, #ffffff);
+  transition: background 0.3s ease-in-out;
+}
