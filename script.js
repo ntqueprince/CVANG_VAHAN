@@ -12517,21 +12517,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-
-//PB WHeels-Script delete after diwali 2025
-
-window.addEventListener("DOMContentLoaded", () => {
-  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+// ✅ PB Wheels Popup Control
+window.openPBWheelsScript = function () {
   const popup = document.getElementById("pbPopup");
   const closeBtn = document.getElementById("closePopupBtn");
+  if (!popup || !closeBtn) return;
 
-  if (!isMobile && popup) {
-    popup.classList.remove("hidden");
-  }
+  // 🔹 Popup open karo
+  popup.classList.remove("hidden");
 
-  closeBtn.addEventListener("click", () => {
-    popup.classList.add("hidden");
+  // 🔹 Close button par click karne se band ho
+  closeBtn.onclick = () => popup.classList.add("hidden");
+
+  // 🔹 Popup ke bahar click karne se bhi band ho
+  popup.addEventListener("click", (event) => {
+    // agar user ne background (black area) pe click kiya
+    if (event.target === popup) {
+      popup.classList.add("hidden");
+    }
   });
-});
-//PB WHeels-Script delete after diwali 2025
+};
