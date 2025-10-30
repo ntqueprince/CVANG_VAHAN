@@ -21,6 +21,7 @@
 <button class="animated-btn bg-gradient-to-r from-pink-500 to-pink-700" onclick="openIncentiveModal()">INCENTIVE CALCULATOR</button>
 <button class="animated-btn bg-gradient-to-r from-teal-500 to-emerald-700"onclick="window.open('https://ntqueprince.github.io/mail/', '_blank')">TICKETING MAIL</button>
 <button class="animated-btn bg-gradient-to-r from-cyan-500 to-cyan-700" onclick="window.open('https://ntqueprince.github.io/excel/', '_blank')">CVANG_EXCEL</button>
+<button class="animated-btn bg-gradient-to-r from-yellow-500 to-yellow-700" onclick="openPBWheelsScript()">PB Wheels - Script</button>
 </div>
 <!-- Renamed Manual VI button -->
 <!-- New button for Claim_Count & NSTP -->
@@ -499,11 +500,7 @@ chatInput.addEventListener('keydown', function(e) {
     </div>
   </div>
 </div>
-
-
-<!--//PB WHeels-Script delete after diwali 2025 -->
-
-<!-- 🌟 PB Wheels Popup --> 
+<!-- 🌟 PB Wheels Popup -->
 <div id="pbPopup" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 hidden">
   <div class="bg-white max-w-4xl w-11/12 md:w-3/4 rounded-2xl shadow-2xl relative p-8 overflow-y-auto max-h-[90vh] border border-indigo-200">
     
@@ -515,64 +512,54 @@ chatInput.addEventListener('keydown', function(e) {
       PB Wheels - Script
     </h2>
 
-    <!-- 📘 English Section -->
-    <div class="mb-8">
+    <!-- 📘 ENGLISH SCRIPT -->
+    <div class="mb-8 text-gray-800 leading-relaxed space-y-4">
       <h3 class="text-2xl font-bold text-indigo-700 border-b-2 border-indigo-300 inline-block mb-3">ENGLISH SCRIPT</h3>
+      
+      <p><strong>Main Script:</strong></p>
+      <p>Sharing a quick offer that could help you save up to <span class="text-green-600 font-semibold">40% on your next car service</span> — may I take 30 seconds to explain?</p>
+      <p>We’re currently running a <span class="font-semibold text-indigo-700">special service program</span> with our partner garage network where you get a <strong>free car health check-up</strong>, and if you go ahead with servicing, we complete it within just <strong>60 minutes</strong> (excluding washing).</p>
+      <p>The best part — our customers are saving up to <span class="text-green-600 font-semibold">40%</span> compared to branded workshops with genuine parts, trained technicians, and complete warranty on service quality.</p>
+      <p><em>(Add Value Hook)</em> You also get updates at every step, and we even offer <strong>free pickup & drop</strong> for select services — so you don’t have to spend your day waiting at the garage.</p>
+      <p class="text-indigo-600 font-semibold">(Closing CTA) Would you like me to schedule a call back with our garage servicing team?</p>
+      <p>Also, please help me with your last car service month and year, and if you remember your odometer reading, please share that too.</p>
 
-      <div class="space-y-4 text-gray-800 leading-relaxed">
-        <p><strong>Main Script:</strong></p>
-        <p>Sharing a quick offer that could help you save up to <span class="text-green-600 font-semibold">40% on your next car service</span> — may I take 30 seconds to explain?</p>
-        <p>We’re currently running a <span class="font-semibold text-indigo-700">special service program</span> with our partner garage network where you get a <strong>free car health check-up</strong>, and if you go ahead with servicing, we complete it within just <strong>60 minutes</strong> (excluding washing).</p>
-        <p>The best part — our customers are saving up to <span class="text-green-600 font-semibold">40%</span> compared to branded workshops with genuine parts, trained technicians, and complete warranty on service quality.</p>
-        <p><em>(Add Value Hook)</em> You also get updates at every step, and we even offer <strong>free pickup & drop</strong> for select services — so you don’t have to spend your day waiting at the garage.</p>
-        <p class="text-indigo-600 font-semibold">(Closing CTA) Would you like me to schedule a call back with our garage servicing team?</p>
+      <div class="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
+        <p><strong>If customer says “No”:</strong></p>
+        <p><em>Savings Hook (Money Angle)</em> — Understood, Sir/Ma’am. Just letting you know — most of our customers switched because they were spending 30–40% more at their old workshop for the same quality.</p>
+        <p>The free car health check-up alone helps spot issues early and costs nothing — would you like me to just book that for you?</p>
+      </div>
 
-        <p>Also, please help me with your last car service month and year, and if you remember your odometer reading, please share that too.</p>
-
-        <div class="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
-          <p><strong>If customer says “No”:</strong></p>
-          <p><em>Savings Hook (Money Angle)</em> — Understood, Sir/Ma’am. Just letting you know — most of our customers switched because they were spending 30–40% more at their old workshop for the same quality.</p>
-          <p>The free car health check-up alone helps spot issues early and costs nothing — would you like me to just book that for you?</p>
-        </div>
-
-        <div class="bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-400">
-          <p><strong>If customer says “No” again:</strong></p>
-          <p>Totally fine, Sir/Ma’am. If you ever plan a service in the future, do keep our garage network in mind — we offer up to 40% savings and 1-hour quick service with a free car health check-up.</p>
-          <p>You can reach us anytime on our toll-free number. Thank you for your time!</p>
-        </div>
+      <div class="bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-400">
+        <p><strong>If customer says “No” again:</strong></p>
+        <p>Totally fine, Sir/Ma’am. If you ever plan a service in the future, do keep our garage network in mind — we offer up to 40% savings and 1-hour quick service with a free car health check-up.</p>
+        <p>You can reach us anytime on our toll-free number. Thank you for your time!</p>
       </div>
     </div>
 
-    <!-- 📙 Hindi Section -->
-    <div>
+    <!-- 📙 HINDI SCRIPT -->
+    <div class="text-gray-800 leading-relaxed space-y-4">
       <h3 class="text-2xl font-bold text-orange-700 border-b-2 border-orange-300 inline-block mb-3">HINDI SCRIPT</h3>
 
-      <div class="space-y-4 text-gray-800 leading-relaxed">
-        <p><strong>Main Script:</strong></p>
-        <p>“<span class="text-orange-600 font-semibold">नमस्कार!</span> हमारे पास आपके लिए एक <strong>विशेष ऑफर</strong> है। हमारे पार्टनर गैराज में आपको <strong>फ्री कार हेल्थ चेकअप</strong> मिलेगा, और अगर आप सर्विस कराते हैं, तो हम उसे सिर्फ <strong>1 घंटे</strong> में पूरा करेंगे।”</p>
-        <p>“हमारे ग्राहक <span class="text-green-600 font-semibold">30–40%</span> तक बचत कर रहे हैं। यहाँ आपको मिलेंगे <strong>genuine parts</strong>, <strong>trained technicians</strong>, और <strong>service warranty</strong>। साथ ही, <strong>free pickup & drop</strong> की सुविधा भी है।”</p>
-        <p>“क्या मैं आपके लिए <strong>callback</strong> शेड्यूल कर सकता हूँ?”</p>
+      <p><strong>Main Script:</strong></p>
+      <p>“<span class="text-orange-600 font-semibold">नमस्कार!</span> हमारे पास आपके लिए एक <strong>विशेष ऑफर</strong> है। हमारे पार्टनर गैराज में आपको <strong>फ्री कार हेल्थ चेकअप</strong> मिलेगा, और अगर आप सर्विस कराते हैं, तो हम उसे सिर्फ <strong>1 घंटे</strong> में पूरा करेंगे।”</p>
+      <p>“हमारे ग्राहक <span class="text-green-600 font-semibold">30–40%</span> तक बचत कर रहे हैं। यहाँ आपको मिलेंगे <strong>genuine parts</strong>, <strong>trained technicians</strong>, और <strong>service warranty</strong>। साथ ही, <strong>free pickup & drop</strong> की सुविधा भी है।”</p>
+      <p>“क्या मैं आपके लिए <strong>callback</strong> शेड्यूल कर सकता हूँ?”</p>
 
-        <div class="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-400">
-          <p><strong>अगर ग्राहक “ना” कहे:</strong></p>
-          <p>“ठीक है सर/मैम। हमारे अधिकतर ग्राहक पहले 30–40% ज़्यादा खर्च कर रहे थे, इसलिए उन्होंने हमारी सेवा ली। फ्री कार हेल्थ चेकअप से हम आपकी कार की दिक्कतें पहले ही पता कर सकते हैं।”</p>
-          <p>“क्या मैं आपके लिए यह बुक कर सकता हूँ?”</p>
-        </div>
+      <div class="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-400">
+        <p><strong>अगर ग्राहक “ना” कहे:</strong></p>
+        <p>“ठीक है सर/मैम। हमारे अधिकतर ग्राहक पहले 30–40% ज़्यादा खर्च कर रहे थे, इसलिए उन्होंने हमारी सेवा ली। फ्री कार हेल्थ चेकअप से हम आपकी कार की दिक्कतें पहले ही पता कर सकते हैं।”</p>
+        <p>“क्या मैं आपके लिए यह बुक कर सकता हूँ?”</p>
+      </div>
 
-        <div class="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
-          <p><strong>अगर ग्राहक फिर “ना” कहे:</strong></p>
-          <p>“कोई बात नहीं सर/मैम। भविष्य में जब भी आपको सर्विस की ज़रूरत हो, हमारे गैराज नेटवर्क को याद रखें। हम 40% तक बचत और 1 घंटे की त्वरित सर्विस के साथ फ्री हेल्थ चेकअप ऑफर करते हैं।”</p>
-          <p>“आप हमें कभी भी हमारे टोल-फ्री नंबर पर संपर्क कर सकते हैं। धन्यवाद!”</p>
-        </div>
+      <div class="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
+        <p><strong>अगर ग्राहक फिर “ना” कहे:</strong></p>
+        <p>“कोई बात नहीं सर/मैम। भविष्य में जब भी आपको सर्विस की ज़रूरत हो, हमारे गैराज नेटवर्क को याद रखें। हम 40% तक बचत और 1 घंटे की त्वरित सर्विस के साथ फ्री हेल्थ चेकअप ऑफर करते हैं।”</p>
+        <p>“आप हमें कभी भी हमारे टोल-फ्री नंबर पर संपर्क कर सकते हैं। धन्यवाद!”</p>
       </div>
     </div>
 
   </div>
 </div>
-<!--//PB WHeels-Script delete after diwali 2025 -->
-
-
-
-
 </body>
 </html>
