@@ -1562,3 +1562,18 @@
   background: linear-gradient(to right, #dbeafe, #ffffff);
   transition: background 0.3s ease-in-out;
 }
+.shivang-rainbow {
+  font-size: 1.6em;
+  font-weight: 800;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg,
+    #ff9a9e,
+    #fad0c4,
+    #fad0c4,
+    #a1c4fd,
+    #c2e9fb
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
