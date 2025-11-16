@@ -346,11 +346,11 @@ document.addEventListener("paste", function (event) {
         resultSection.querySelector('p:nth-child(1)').textContent = `Total: ${total}`;
         resultSection.querySelector('p:nth-child(2)').textContent = `CSAT: ${formattedCSAT}%`;
 
-        if (total === 0) {
-          status.textContent = 'Enter counts to see status';
-          status.className = '';
-          return;
-        }
+      if (total === 0) {
+    status.innerHTML = '<span class="shivang-rainbow">SHIVANG</span>';
+    status.className = '';
+    return;
+}
 
         let additionalGoodNeeded = 0;
         let newCSAT = csat;
