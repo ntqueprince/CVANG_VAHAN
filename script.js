@@ -12008,28 +12008,27 @@ document.addEventListener("paste", function (event) {
       }
 
       // Data for Inspection Waiver
-      const inspectionWaiverData = [
-          { "Insurer Name": "Bajaj Allianz", "Policy Waiver": "Only Fresh Cases. 3 Days" },
-          { "Insurer Name": "Cholamandalam", "Policy Waiver": "5 Days" },
-          { "Insurer Name": "Digit", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Future Generali", "Policy Waiver": "5 Days" },
-          { "Insurer Name": "Hdfc Ergo", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Icici Lombard", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Iffco Tokio", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Kotak General Insurance", "Policy Waiver": "5 Days" },
-          { "Insurer Name": "Liberty General Insurance", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Magma Hdi", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "National Insurance", "Policy Waiver": "5 Days" },
-          { "Insurer Name": "New India Assurance", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Oriental", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Raheja Qbe", "Policy Waiver": "5 Days" },
-          { "Insurer Name": "Reliance", "Policy Waiver": "1 Day" },
-          { "Insurer Name": "Royal Sundaram", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "SBI", "Policy Waiver": "Only In Pb Renewal 5 Days" },
-          { "Insurer Name": "Shriram General Insurance", "Policy Waiver": "5 Days" },
-          { "Insurer Name": "United Insurance", "Policy Waiver": "10 Days" },
-          { "Insurer Name": "Universal Sompo", "Policy Waiver": "No Waiver" },
-          { "Insurer Name": "Zuno", "Policy Waiver": "5 Days" }
+      const inspectionWaiverData = [{ "Insurer Name": "Bajaj Allianz", "Policy Waiver": "5 Days" },
+{ "Insurer Name": "Cholamandalam MS", "Policy Waiver": "5 Days" },
+{ "Insurer Name": "Future Generali", "Policy Waiver": "No waiver" },
+{ "Insurer Name": "Digit", "Policy Waiver": "No waiver" },
+{ "Insurer Name": "HDFC Ergo", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "ICICI Lombard", "Policy Waiver": "5 Days only for Some cases" },
+{ "Insurer Name": "Iffco Tokio", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "LIBERTY GENERAL", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "Magma General", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "National Insurance", "Policy Waiver": "5 Days" },
+{ "Insurer Name": "Reliance", "Policy Waiver": "15 Days – ( Renewal ), 1 Day ( Fresh, Rollover )" },
+{ "Insurer Name": "Royal Sundaram", "Policy Waiver": "7 Days" },
+{ "Insurer Name": "SBI", "Policy Waiver": "5 days ( Only Renewal )" },
+{ "Insurer Name": "Shriram", "Policy Waiver": "5 Days" },
+{ "Insurer Name": "TATA AIG", "Policy Waiver": "1 Day" },
+{ "Insurer Name": "New India", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "Oriental", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "United", "Policy Waiver": "5 Days" },
+{ "Insurer Name": "Universal Sompo", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "Zuno General", "Policy Waiver": "No Waiver" },
+{ "Insurer Name": "Zurich Kotak", "Policy Waiver": "5 Days" }
       ];
 
       function populateInspectionWaiverTable(data) {
