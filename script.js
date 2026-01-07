@@ -19,7 +19,7 @@
       const imagesRef = dbRef(db, 'images');
 
       // Cloudinary configuration (from structure.html)
-      const cloudName = 'dmnqn28py'; // Replace with your Cloudinary cloud name
+      const cloudName = 'dpzn1ym6x'; // Replace with your Cloudinary cloud name
       const uploadPreset = 'anonymous_upload'; // Replace with your Cloudinary upload preset
       // ✅ Handle paste event for images
 document.addEventListener("paste", function (event) {
