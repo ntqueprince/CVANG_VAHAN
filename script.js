@@ -778,7 +778,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "No",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "New India AssuranceRegistration Date",
@@ -1126,7 +1126,7 @@ const endorsementData = [
         "Charges / Deduction": "Deduction",
         "Inspection": "",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Declaration Required:\nI/We hereby declare that Policy No. _____________________ for Vehicle No. _____________________, covering the period from _____________________ to _____________________, was purchased by me/us on _____________________.\nDue to ________________________________________________, I/we request the cancellation of the above-mentioned Policy No. _____________________.\nI/we further confirm that no claims have been made under this policy or any other policy related to the said vehicle till date. I/we also confirm that an alternate policy, Policy No. _____________________, valid from _____________________, issued by _______________________________, has been provided and is currently active."
+        "Declaration format (if declaration required)": "Declaration Required:\r\nI/We hereby declare that Policy No. _____________________ for Vehicle No. _____________________, covering the period from _____________________ to _____________________, was purchased by me/us on _____________________.\r\nDue to ________________________________________________, I/we request the cancellation of the above-mentioned Policy No. _____________________.\r\nI/we further confirm that no claims have been made under this policy or any other policy related to the said vehicle till date. I/we also confirm that an alternate policy, Policy No. _____________________, valid from _____________________, issued by _______________________________, has been provided and is currently active."
     },
     {
         "InsurerRequirement": "New India AssurancePost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
@@ -1245,7 +1245,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "Proceed with O/t incase cx doesn't have PYP\nFor Ticketing associate: Raise endorsement with XML sheet ",
+        "Any Exception": "Proceed with O/t incase cx doesn't have PYP\r\nFor Ticketing associate: Raise endorsement with XML sheet",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -1258,7 +1258,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "No",
         "Any Exception": "For Ticketing associate: Raise endorsement with XML sheet",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "Future GeneraliRegistration Date",
@@ -1601,7 +1601,7 @@ const endorsementData = [
         "Insurer": "Future Generali",
         "Requirement": "Post Issuance Cancellation",
         "Endorsement type": "",
-        "Documents or any other requirement": "Alternate Policy\n\nWritten declaration with signature on KYC Xerox paper (Either PAN or Driving Licence)\nDeclaration wordings - I want to cancel my policy wide <<policy no.>> and proceed the refund.",
+        "Documents or any other requirement": "Alternate Policy\r\n\r\nWritten declaration with signature on KYC Xerox paper (Either PAN or Driving Licence)\r\nDeclaration wordings - I want to cancel my policy wide <<policy no.>> and proceed the refund.",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "",
@@ -1617,7 +1617,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.\n\nFor ticketing associate: Raise cancellation with XML Sheet",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.\r\n\r\nFor ticketing associate: Raise cancellation with XML Sheet",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -1725,7 +1725,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "correction can be done Post start date of the policy \nProceed with O/t incase cx doesn't have PYP",
+        "Any Exception": "correction can be done Post start date of the policy \r\nProceed with O/t incase cx doesn't have PYP",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -1738,7 +1738,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "No",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "Iffco tokioRegistration Date",
@@ -2025,7 +2025,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "Yes",
-        "Any Exception": "correction possible Post start date of the policy\nFor ticketing associate: Raise request to insurer with NOC in the said format",
+        "Any Exception": "correction possible Post start date of the policy\r\nFor ticketing associate: Raise request to insurer with NOC in the said format",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -2097,7 +2097,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -2218,7 +2218,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "No",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "MagmaRegistration Date",
@@ -2561,7 +2561,7 @@ const endorsementData = [
         "Insurer": "Magma",
         "Requirement": "Post Issuance Cancellation",
         "Endorsement type": "",
-        "Documents or any other requirement": "Alternate Policy, KYC & NEFT details of the Insured\nAccount holder name - \nBank Name - \nAccount Number - \nIFSC Code - ",
+        "Documents or any other requirement": "Alternate Policy, KYC & NEFT details of the Insured\r\nAccount holder name - \r\nBank Name - \r\nAccount Number - \r\nIFSC Code -",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
@@ -2577,7 +2577,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -2698,7 +2698,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "Maybe",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "RahejaRegistration Date",
@@ -2981,7 +2981,7 @@ const endorsementData = [
         "Insurer": "Raheja",
         "Requirement": "Ownership Transfer",
         "Endorsement type": "Financial Endt",
-        "Documents or any other requirement": "RC, New owner details, KYC, \nDeclaration from old owner (Written confirmation on mail from Old owner with date & SIgnature - that he has no objection in transferring the policy to the new owner)\n& CPA declaration form (available with ticketing team)",
+        "Documents or any other requirement": "RC, New owner details, KYC, \r\nDeclaration from old owner (Written confirmation on mail from Old owner with date & SIgnature - that he has no objection in transferring the policy to the new owner)\r\n& CPA declaration form (available with ticketing team)",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "Yes",
@@ -3057,7 +3057,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -3178,7 +3178,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "No",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "Royal SundaramRegistration Date",
@@ -3537,7 +3537,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -3645,7 +3645,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "Proceed with O/t incase cx doesn't have PYP\nFor ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
+        "Any Exception": "Proceed with O/t incase cx doesn't have PYP\r\nFor ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -3658,7 +3658,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "No",
         "Any Exception": "For ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "ZunoRegistration Date",
@@ -3825,7 +3825,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Correction possible Before Policy Start Date, \nFor Ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
+        "Any Exception": "Correction possible Before Policy Start Date, \r\nFor Ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -3837,7 +3837,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Correction possible Before Policy Start Date, \nFor Ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
+        "Any Exception": "Correction possible Before Policy Start Date, \r\nFor Ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -3849,7 +3849,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Correction possible Before Policy Start Date, \nFor Ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
+        "Any Exception": "Correction possible Before Policy Start Date, \r\nFor Ticketing associates: Feedfile required while raising the endorsement if Policy number starts with 52 series",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -4138,7 +4138,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "No",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
+        "Declaration format (if declaration required)": "Kindly request the customer to provide in written on mail or from MyAccount:\r\nKindly confirm whether customer wants to cancel the Own damage part of the policy or want to recover the ncb."
     },
     {
         "InsurerRequirement": "DigitRegistration Date",
@@ -4497,7 +4497,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -4977,7 +4977,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -5093,11 +5093,11 @@ const endorsementData = [
         "Insurer": "Bajaj",
         "Requirement": "NCB Certificate",
         "Endorsement type": "Financial Endt",
-        "Documents or any other requirement": "Sale letter & RC (In case of vehicle sold out)\nRC and Customer request (If vehicle retained)",
+        "Documents or any other requirement": "Sale letter & RC (In case of vehicle sold out)\r\nRC and Customer request (If vehicle retained)",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "May be",
         "Inspection": "Maybe",
-        "Any Exception": "Cacellation Decalration Required : \nSell letter required if cx wants to cancel the policy and OD premium will be refund and Third party premium will be retained by insurer\nIf cx don't want to cancel the policy then NCB Recovery and inspection will be applicable (Sell letter will be required in case of OT)",
+        "Any Exception": "Cacellation Decalration Required : \r\nSell letter required if cx wants to cancel the policy and OD premium will be refund and Third party premium will be retained by insurer\r\nIf cx don't want to cancel the policy then NCB Recovery and inspection will be applicable (Sell letter will be required in case of OT)",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -5565,7 +5565,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "Will be considered as o/t incase of complete name mismatch\nFor Ticket associate: Endorsement form to be filled and raised to insurer",
+        "Any Exception": "Will be considered as o/t incase of complete name mismatch\r\nFor Ticket associate: Endorsement form to be filled and raised to insurer",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -5637,7 +5637,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "Backdated correction not possible \nFor Ticket associate: Endorsement form to be filled and raised to insurer",
+        "Any Exception": "Backdated correction not possible \r\nFor Ticket associate: Endorsement form to be filled and raised to insurer",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -5781,7 +5781,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "Yes",
-        "Any Exception": "For ticket associate: \nEndorsement form to be filled and raised to insurer \nInspection to be raised from Insurer portal (from insurer end)",
+        "Any Exception": "For ticket associate: \r\nEndorsement form to be filled and raised to insurer \r\nInspection to be raised from Insurer portal (from insurer end)",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -5865,7 +5865,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "Yes",
-        "Any Exception": "For ticket associate: \nEndorsement form to be filled and raised to insurer \nInspection to be raised from Insurer portal (from insurer end)",
+        "Any Exception": "For ticket associate: \r\nEndorsement form to be filled and raised to insurer \r\nInspection to be raised from Insurer portal (from insurer end)",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -5937,7 +5937,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -6045,7 +6045,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "\nProceed with O/t incase cx doesn't have PYP",
+        "Any Exception": "Proceed with O/t incase cx doesn't have PYP",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -6417,7 +6417,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -6485,7 +6485,7 @@ const endorsementData = [
         "Insurer": "Reliance",
         "Requirement": "Hypothecation Remove",
         "Endorsement type": "Non Financial Endt",
-        "Documents or any other requirement": "Customer Request Letter\nEndorsed RC Copy / NOC from Financier",
+        "Documents or any other requirement": "Customer Request Letter\r\nEndorsed RC Copy / NOC from Financier",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
@@ -6509,7 +6509,7 @@ const endorsementData = [
         "Insurer": "Reliance",
         "Requirement": "Hypothecation Change",
         "Endorsement type": "Self Endt",
-        "Documents or any other requirement": "Customer Request Letter\n              Endorsed RC Copy / Financier letter / Sanction Letter from Financial Institute",
+        "Documents or any other requirement": "Customer Request Letter\r\n              Endorsed RC Copy / Financier letter / Sanction Letter from Financial Institute",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
@@ -6538,7 +6538,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "Maybe",
         "Any Exception": "Inspection to be raised from Reliance portal (from insurer end)",
-        "Declaration format (if declaration required)": "Please confirm from the below scenario from the customer and share information:\n1. In case customer want to cancel policy then alternate policy or sell proof will be required and ncb will be recovered, also refund amount will be declared as per U/W \n2. If customer don't want to cancel only ncb will be recovered and cx can process ownership transfer also "
+        "Declaration format (if declaration required)": "Please confirm from the below scenario from the customer and share information:\r\n1. In case customer want to cancel policy then alternate policy or sell proof will be required and ncb will be recovered, also refund amount will be declared as per U/W \r\n2. If customer don't want to cancel only ncb will be recovered and cx can process ownership transfer also"
     },
     {
         "InsurerRequirement": "RelianceRegistration Date",
@@ -6897,7 +6897,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -7006,14 +7006,14 @@ const endorsementData = [
         "Charges / Deduction": "No",
         "Inspection": "No",
         "Any Exception": "Proceed with O/t incase cx doesn't have PYP",
-        "Declaration format (if declaration required)": "Kindly ask the customer to share below declaration on mail: \n\"I certify that I have applied for the Correction in Insured name in policy no. __________________. This is not the case of Ownership transfer and there is no known or reported loss till date. I certify that the above facts are true to the best of my knowledge and if found false, I am liable for it and Insurer has the right to cancel the policy without any refund.\""
+        "Declaration format (if declaration required)": "Kindly ask the customer to share below declaration on mail: \r\n\"I certify that I have applied for the Correction in Insured name in policy no. __________________. This is not the case of Ownership transfer and there is no known or reported loss till date. I certify that the above facts are true to the best of my knowledge and if found false, I am liable for it and Insurer has the right to cancel the policy without any refund.\""
     },
     {
         "InsurerRequirement": "OrientalNCB Certificate",
         "Insurer": "Oriental",
         "Requirement": "NCB Certificate",
         "Endorsement type": "Financial Endt",
-        "Documents or any other requirement": "Form 29/30\nor\nUpdated RC with transferred date",
+        "Documents or any other requirement": "Form 29/30\r\nor\r\nUpdated RC with transferred date",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
@@ -7306,7 +7306,7 @@ const endorsementData = [
         "Charges / Deduction": "Yes",
         "Inspection": "Yes",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Kindly ask the customer to share below declaration on mail: \n\"I certify that I have applied for the transfer of ownership in policy no. __________________ and there is no known or reported loss till date. I certify that the above facts are true to the best of my knowledge and if found false, I am liable for it and Insurer has the right to cancel the policy without any refund.\""
+        "Declaration format (if declaration required)": "Kindly ask the customer to share below declaration on mail: \r\n\"I certify that I have applied for the transfer of ownership in policy no. __________________ and there is no known or reported loss till date. I certify that the above facts are true to the best of my knowledge and if found false, I am liable for it and Insurer has the right to cancel the policy without any refund.\""
     },
     {
         "InsurerRequirement": "OrientalNCB Correction (taken extra NCB)",
@@ -7485,7 +7485,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "For KYC: CKYC number or PAN and Adhar will required \nProceed with O/t incase cx doesn't have PYP",
+        "Any Exception": "For KYC: CKYC number or PAN and Adhar will required \r\nProceed with O/t incase cx doesn't have PYP",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -7857,7 +7857,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -8337,7 +8337,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -8445,7 +8445,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "PAN and Masked Adhar (If CKYC not done) \nProceed with O/t incase cx doesn't have PYP",
+        "Any Exception": "PAN and Masked Adhar (If CKYC not done) \r\nProceed with O/t incase cx doesn't have PYP",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -8625,7 +8625,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Endt possible before policy start date \n PAN and Masked Adhar card is required ( If CKYC not done)",
+        "Any Exception": "Endt possible before policy start date \r\n PAN and Masked Adhar card is required ( If CKYC not done)",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -8637,7 +8637,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Endt possible before policy start date \n PAN and Masked Adhar card is required ( If CKYC not done)",
+        "Any Exception": "Endt possible before policy start date \r\n PAN and Masked Adhar card is required ( If CKYC not done)",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -8649,7 +8649,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Endt possible before policy start date \n PAN and Masked Adhar card is required ( If CKYC not done)",
+        "Any Exception": "Endt possible before policy start date \r\n PAN and Masked Adhar card is required ( If CKYC not done)",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -8817,7 +8817,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -9297,7 +9297,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -9585,7 +9585,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Addition possible only before policy start date (Post policy start date will suggest customer to take separate PA through ICICI website)\nCustomer request for endorsement mandatory - Please ask the customer to share written consent",
+        "Any Exception": "Addition possible only before policy start date (Post policy start date will suggest customer to take separate PA through ICICI website)\r\nCustomer request for endorsement mandatory - Please ask the customer to share written consent",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -9597,7 +9597,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Addition possible only before policy start date\nCustomer request for endorsement mandatory - Please ask the customer to share written consent",
+        "Any Exception": "Addition possible only before policy start date\r\nCustomer request for endorsement mandatory - Please ask the customer to share written consent",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -9609,7 +9609,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Addition possible only before policy start date\nCustomer request for endorsement mandatory - Please ask the customer to share written consent",
+        "Any Exception": "Addition possible only before policy start date\r\nCustomer request for endorsement mandatory - Please ask the customer to share written consent",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -9737,7 +9737,7 @@ const endorsementData = [
         "Insurer": "ICICI",
         "Requirement": "Top Up (PAYD plan)",
         "Endorsement type": "Financial Endt",
-        "Documents or any other requirement": "Customer Written Consent (By Mail or My Account)\nIf the initial purchase KM limit is exhausted, a complete inspection is required.\nIf not, an odometer photo must be collected from the customer while raising the request to the insurer.",
+        "Documents or any other requirement": "Customer Written Consent (By Mail or My Account)\r\nIf the initial purchase KM limit is exhausted, a complete inspection is required.\r\nIf not, an odometer photo must be collected from the customer while raising the request to the insurer.",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "Yes",
@@ -10245,7 +10245,7 @@ const endorsementData = [
         "TAT": "",
         "Charges / Deduction": "Deduction",
         "Inspection": "No",
-        "Any Exception": "can only be canceled if the period of insurance (POI) of the alternate policy is exactly the same as the current policy\n\nThird Party cancellation - Can be cancelled on the basis of comprehensive with no POI condition",
+        "Any Exception": "can only be canceled if the period of insurance (POI) of the alternate policy is exactly the same as the current policy\r\n\r\nThird Party cancellation - Can be cancelled on the basis of comprehensive with no POI condition",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -10257,7 +10257,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -10737,7 +10737,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -11201,12 +11201,12 @@ const endorsementData = [
         "Insurer": "United",
         "Requirement": "Post Issuance Cancellation",
         "Endorsement type": "",
-        "Documents or any other requirement": "For Non New Car - Alternate and Written Declaration from Customer (in the required format)\nFor New Car - \n1. Where policy has started - No cancellation will be done for UIIC where policies have started for brand new cases. UIIC will retain TP of 1 year and cancel policy remaining OD (pro rata/short period basis)\n2. where policy has not started -  Cancelled invoice of non-delivered vehicle\n    - Dealer declaration of non-delivery with reason and date along with Vehicle Inspection (Need to show same day Newspaper in the video)",
+        "Documents or any other requirement": "For Non New Car - Alternate and Written Declaration from Customer (in the required format)\r\nFor New Car - \r\n1. Where policy has started - No cancellation will be done for UIIC where policies have started for brand new cases. UIIC will retain TP of 1 year and cancel policy remaining OD (pro rata/short period basis)\r\n2. where policy has not started -  Cancelled invoice of non-delivered vehicle\r\n    - Dealer declaration of non-delivery with reason and date along with Vehicle Inspection (Need to show same day Newspaper in the video)",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "No",
-        "Any Exception": "Non brand New Car:\nComprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy).\nSAOD policy cancellation: Alteranate bundle policy required\nTP cancellation - Alternate comprehensive/TP should be from UIIC",
-        "Declaration format (if declaration required)": " I request for cancellation of policy no. _____________________.\n I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy.\n I declare that the alternate policy no. ____________________ is an active policy.\""
+        "Any Exception": "Non brand New Car:\r\nComprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy).\r\nSAOD policy cancellation: Alteranate bundle policy required\r\nTP cancellation - Alternate comprehensive/TP should be from UIIC",
+        "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________.\r\n I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy.\r\n I declare that the alternate policy no. ____________________ is an active policy.\""
     },
     {
         "InsurerRequirement": "UnitedPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
@@ -11217,7 +11217,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\n\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -11321,7 +11321,7 @@ const endorsementData = [
         "Insurer": "CPA - Kotak",
         "Requirement": "Addition of GST No.",
         "Endorsement type": "Non-Financial Endorsement",
-        "Documents or any other requirement": "GST Certificate in the name of Insured\nKYC Documents (Aadhaar Card and PAN Card)",
+        "Documents or any other requirement": "GST Certificate in the name of Insured\r\nKYC Documents (Aadhaar Card and PAN Card)",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
@@ -11357,7 +11357,7 @@ const endorsementData = [
         "Insurer": "CPA - Kotak",
         "Requirement": "Post Issuance Cancellation",
         "Endorsement type": "",
-        "Documents or any other requirement": "Within Freelook period: Reason for cancellation & Aadhaar and PAN\nPost Free look period: Alternate policy & Reason for cancellation & Aadhaar and PAN",
+        "Documents or any other requirement": "Within Freelook period: Reason for cancellation & Aadhaar and PAN\r\nPost Free look period: Alternate policy & Reason for cancellation & Aadhaar and PAN",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "No",
@@ -12023,8 +12023,9 @@ const endorsementData = [
         "Inspection": "No",
         "Any Exception": "Provides freelook period of 15 Days from the policy start date, deductions are done post free look up period",
         "Declaration format (if declaration required)": ""
-    },
-]; // Populate insurer dropdown for Endorsement
+    }
+];
+ // Populate insurer dropdown for Endorsement
 try {
     const insurers = [...new Set(endorsementData.map(d => d["Insurer"]))].sort();
     insurers.forEach(ins => {
