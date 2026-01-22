@@ -12084,294 +12084,316 @@ requirementDropdown.addEventListener("change", () => {
 });
 
 // Insurance Comparison Dashboard Data and Logic (from index (4).html)
-// IMPORTANT: User requested to remove this data and will add it later.
-const insuranceData = [{
-  "insurer_name": "National",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "24 Hours",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "New India Assurance",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "24 Hours",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "2<br>(Unlimited-3+3)",
-  "non_zd_claims_year": "Unlimited<br>(Unlimited-3+3)",
-  "brand_new_3_3": "Yes",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Oriental",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "24 Hours",
-  "short_partial": "No",
-  "artificial_low_lighting": "Yes",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "United India",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "48 Hours",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "Yes",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Tata AIG",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
-  "zd_claims_year": "ZD-2<br>3+3 Plan (5 overall, max 2 in a year)<br>4+4 Plan (7 overall, max 2 in a year)<br>5+5 Plan (9 overall, max 2 in a year)",
-  "non_zd_claims_year": "compre.-99<br>3+3 Plan -99<br>4+4 Plan -99<br>5+5 Plan -99",
-  "brand_new_3_3": "Yes",
-  "old_3_3": "Yes"
-},
-{
-  "insurer_name": "ICICI Lombard",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "Yes",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford: Unlimited but Other makers: 2 <br> (ICICI 3+3-6)",
-  "non_zd_claims_year": "Unlimited <br> (ICICI 3+3-Unlimited)",
-  "brand_new_3_3": "Yes",
-  "old_3_3": "Yes"
-}
-  ,
-{
-  "insurer_name": "Zuno General",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Cholamandalam MS",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Future Generali",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "MAGMA",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required (Scar on Driver Side not accepted) within Video TAT",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Raheja QBE",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Kotak",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited (Cashless limited to 2)",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "SBI General",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Shriram",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required (Shriram format) + Address ID proof within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "3",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Iffco Tokio",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Liberty Videocon",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "No",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "HDFC Ergo",
-  "commercial": "No",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Reliance",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Bajaj Allianz",
-  "commercial": "Yes",
-  "video_approval": "At U/W end",
-  "video_tat": "2 days",
-  "short_partial": "Yes",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Will Refer to Under Writer",
-  "zd_claims_year": "2",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Royal Sundaram",
-  "commercial": "No",
-  "video_approval": "At U/W end",
-  "video_tat": "2 days",
-  "short_partial": "No",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Will Refer to Under Writer",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Universal Sompo",
-  "commercial": "No",
-  "video_approval": "At U/W end",
-  "video_tat": "2 days",
-  "short_partial": "No",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Will Refer to Under Writer",
-  "zd_claims_year": "Unlimited till",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "No",
-  "old_3_3": "No"
-},
-{
-  "insurer_name": "Digit",
-  "commercial": "Yes",
-  "video_approval": "At PB end",
-  "video_tat": "2 days",
-  "short_partial": "No",
-  "artificial_low_lighting": "No",
-  "scar_declaration": "Declaration Required within Video TAT",
-  "zd_claims_year": "Unlimited",
-  "non_zd_claims_year": "Unlimited",
-  "brand_new_3_3": "Yes",
-  "old_3_3": "Yes"
-}];
+const insuranceData = [
+  {
+    "insurer_name": "National",
+    "video_approval": "At PB end",
+    "video_tat": "24 Hours",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "ZD Plan: 2, ZD+: Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "New India Assurance",
+    "video_approval": "At PB end",
+    "video_tat": "24 Hours",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "Yes",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Oriental",
+    "video_approval": "At PB end",
+    "video_tat": "24 Hours",
+    "short_partial": "No",
+    "cng_kit_vi": "Yes",
+    "artificial_low_lighting": "Yes",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "United India",
+    "video_approval": "At PB end",
+    "video_tat": "48 Hours",
+    "short_partial": "Yes",
+    "cng_kit_vi": "Yes",
+    "artificial_low_lighting": "Yes",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "Tata AIG",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "Yes",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "Yes",
+    "old_3_3": "Yes",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "ICICI Lombard",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "Yes",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2<br>Unlimited for Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "Yes",
+    "old_3_3": "Yes",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "Zuno General",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "Cholamandalam MS",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Future Generali",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "MAGMA",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required (Scar on Driver Side we will not accept) within Video TAT",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Raheja QBE",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Kotak",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited, 2 Cashless",
+    "brand_new_3_3": "Yes",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "SBI General",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Shriram",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required (In Shriram format)+Address ID proof within Video TAT<br>Declaration required if Air Bag indicator is on at engine start",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "3",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "Iffco Tokio",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Liberty Videocon",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "No",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "HDFC Ergo",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "Yes",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Reliance",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "Bajaj",
+    "video_approval": "At U/W end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Will Refer to Under Writer",
+    "zd_claims_year": "2",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "Yes"
+  },
+  {
+    "insurer_name": "Royal Sundaram",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Universal Sompo",
+    "video_approval": "At U/W end",
+    "video_tat": "2 days",
+    "short_partial": "No",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Will Refer to Under Writer",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "No",
+    "old_3_3": "No",
+    "vas": "No"
+  },
+  {
+    "insurer_name": "Digit",
+    "video_approval": "At PB end",
+    "video_tat": "2 days",
+    "short_partial": "Yes",
+    "cng_kit_vi": "No",
+    "artificial_low_lighting": "No",
+    "scar_declaration": "Declaration Required within Video TAT",
+    "zd_claims_year": "Unlimited",
+    "non_zd_claims_year": "Unlimited",
+    "brand_new_3_3": "Yes",
+    "old_3_3": "Yes",
+    "vas": "No"
+  }
+];
 // You will need to add your insurance data here in the future
 /*
 const insuranceData =
@@ -12403,7 +12425,7 @@ function populateTable(data) {
   tableBody.innerHTML = ''; // Clear existing rows
   if (data.length === 0) {
     // Display a message if no data is available
-    tableBody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-gray-500">No insurance data available. Please add data to the "insuranceData" array in the script.</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="12" class="p-4 text-center text-gray-500">No insurance data available. Please add data to the "insuranceData" array in the script.</td></tr>';
     return;
   }
   data.forEach(item => {
@@ -12413,14 +12435,15 @@ function populateTable(data) {
                   <td class="p-2 font-medium text-indigo-900">${item.insurer_name}</td>
                   <td class="p-2">${item.zd_claims_year}</td>
                   <td class="p-2">${item.non_zd_claims_year}</td>
-                  <td class="p-2 ${item.commercial === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.commercial}</td>
                   <td class="p-2">${item.video_approval}</td>
                   <td class="p-2">${item.video_tat}</td>
                   <td class="p-2 ${item.short_partial === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.short_partial}</td>
+                  <td class="p-2 ${item.cng_kit_vi === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.cng_kit_vi}</td>
                   <td class="p-2 ${item.artificial_low_lighting === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.artificial_low_lighting}</td>
                   <td class="p-2">${item.scar_declaration}</td>
                   <td class="p-2 ${item.brand_new_3_3 === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.brand_new_3_3}</td>
                   <td class="p-2 ${item.old_3_3 === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.old_3_3}</td>
+                  <td class="p-2 ${item.vas === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.vas}</td>
               `;
     tableBody.appendChild(row);
   });
@@ -12509,6 +12532,7 @@ const inspectionWaiverData = [
   { "Insurer Name": "Zuno", "Policy Waiver": "No Waiver" },
   { "Insurer Name": "SBI", "Policy Waiver": "Only Renewal (5 Days)" }
 ];
+
 function populateInspectionWaiverTable(data) {
   const tableBody = document.getElementById('inspectionWaiverTableBody');
   // Check if tableBody exists before proceeding
