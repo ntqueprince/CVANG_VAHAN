@@ -8025,7 +8025,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "No",
-        "Any Exception": "",
+        "Any Exception": "Commercial - If seating capacity is incorrectly mentioned and the customer requests a correction where the seating capacity is above 7, corrections is not possible as per insurer, need to proceed with cancellation",
         "Declaration format (if declaration required)": ""
     },
     {
