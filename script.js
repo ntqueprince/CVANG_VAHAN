@@ -4,13 +4,13 @@ import { getDatabase, ref as dbRef, push, onValue, remove, serverTimestamp } fro
 
 // Your web app's Firebase configuration (using config from structure.html)
 const firebaseConfig = {
-  apiKey: "AIzaSyCIfleywEbd1rcjymkfEfFYxPpvYdZHGhk",
-  authDomain: "cvang-vahan.firebaseapp.com",
-  databaseURL: "https://cvang-vahan-default-rtdb.firebaseio.com",
-  projectId: "cvang-vahan",
-  storageBucket: "cvang-vahan.appspot.com",
-  messagingSenderId: "117318825099",
-  appId: "1:117318825099:web:afc0e2f863117cb14bfc"
+    apiKey: "AIzaSyCIfleywEbd1rcjymkfEfFYxPpvYdZHGhk",
+    authDomain: "cvang-vahan.firebaseapp.com",
+    databaseURL: "https://cvang-vahan-default-rtdb.firebaseio.com",
+    projectId: "cvang-vahan",
+    storageBucket: "cvang-vahan.appspot.com",
+    messagingSenderId: "117318825099",
+    appId: "1:117318825099:web:afc0e2f863117cb14bfc"
 };
 
 // Initialize Firebase
@@ -23,19 +23,19 @@ const cloudName = 'duiskktjx'; // Replace with your Cloudinary cloud name
 const uploadPreset = 'anonymous_upload'; // Replace with your Cloudinary upload preset
 // ✅ Handle paste event for images
 document.addEventListener("paste", function (event) {
-  const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-  for (const item of items) {
-    if (item.type.indexOf("image") === 0) {
-      const file = item.getAsFile();
-      if (file) {
-        const tagInput = document.getElementById("tagInput");
-        const tag = tagInput.value.trim() || "ClipboardImage";
-        const progressBar = document.getElementById("progress");
-        const statusText = document.getElementById("status");
-        uploadFile(file, tag, progressBar, statusText);
-      }
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for (const item of items) {
+        if (item.type.indexOf("image") === 0) {
+            const file = item.getAsFile();
+            if (file) {
+                const tagInput = document.getElementById("tagInput");
+                const tag = tagInput.value.trim() || "ClipboardImage";
+                const progressBar = document.getElementById("progress");
+                const statusText = document.getElementById("status");
+                uploadFile(file, tag, progressBar, statusText);
+            }
+        }
     }
-  }
 });
 
 
@@ -47,622 +47,622 @@ let hasCalculated = false;
 // Expose functions to window object
 // Multiple Image Upload Function
 window.uploadImage = function () {
-  const uploadBtn = document.querySelector(".colorful-upload-btn");
-  uploadBtn.style.display = "none"; // Upload button ko hide kar do
+    const uploadBtn = document.querySelector(".colorful-upload-btn");
+    uploadBtn.style.display = "none"; // Upload button ko hide kar do
 
-  const fileInput = document.getElementById("fileUpload");
-  const tagInput = document.getElementById("tagInput");
-  const files = fileInput.files;   // Multiple files select kiye gaye
-  const tag = tagInput.value.trim();
-  const progressBar = document.getElementById("progress");
-  const statusText = document.getElementById("status");
+    const fileInput = document.getElementById("fileUpload");
+    const tagInput = document.getElementById("tagInput");
+    const files = fileInput.files;   // Multiple files select kiye gaye
+    const tag = tagInput.value.trim();
+    const progressBar = document.getElementById("progress");
+    const statusText = document.getElementById("status");
 
-  if (!files.length) {
-    showMessage("Please select at least one file!", "error");
-    return;
-  }
+    if (!files.length) {
+        showMessage("Please select at least one file!", "error");
+        return;
+    }
 
-  if (!tag) {
-    // Agar tag blank hai to sabhi files save karo
-    selectedFiles = Array.from(files);
-    document.getElementById("tagModal").style.display = "flex";
-    return;
-  }
+    if (!tag) {
+        // Agar tag blank hai to sabhi files save karo
+        selectedFiles = Array.from(files);
+        document.getElementById("tagModal").style.display = "flex";
+        return;
+    }
 
-  // ✅ Loop through all selected files
-  Array.from(files).forEach((file) => {
-    uploadFile(file, tag, progressBar, statusText);
-  });
+    // ✅ Loop through all selected files
+    Array.from(files).forEach((file) => {
+        uploadFile(file, tag, progressBar, statusText);
+    });
 };
 
 
 window.closeModal = function () {
-  document.getElementById('tagModal').style.display = 'none';
-  document.getElementById('modalTagInput').value = '';
-  document.getElementById('modalProgressContainer').style.display = 'none';
-  document.getElementById('modalProgress').style.width = '0%';
-  document.getElementById('modalProgress').textContent = '0%';
-  document.querySelector('.modal-content .upload-btn').style.display = 'inline-block'; // Show buttons again
-  document.querySelector('.modal-content .cancel-btn').style.display = 'inline-block'; // Show buttons again
-  selectedFile = null; // Clear selected file
+    document.getElementById('tagModal').style.display = 'none';
+    document.getElementById('modalTagInput').value = '';
+    document.getElementById('modalProgressContainer').style.display = 'none';
+    document.getElementById('modalProgress').style.width = '0%';
+    document.getElementById('modalProgress').textContent = '0%';
+    document.querySelector('.modal-content .upload-btn').style.display = 'inline-block'; // Show buttons again
+    document.querySelector('.modal-content .cancel-btn').style.display = 'inline-block'; // Show buttons again
+    selectedFile = null; // Clear selected file
 };
 
 window.submitTag = function () {
-  const modalTagInput = document.getElementById('modalTagInput');
-  const tag = modalTagInput.value.trim();
-  const progressBar = document.getElementById('progress');
-  const statusText = document.getElementById('status');
-  const modalProgress = document.getElementById('modalProgress');
-  const modalProgressContainer = document.getElementById('modalProgressContainer');
+    const modalTagInput = document.getElementById('modalTagInput');
+    const tag = modalTagInput.value.trim();
+    const progressBar = document.getElementById('progress');
+    const statusText = document.getElementById('status');
+    const modalProgress = document.getElementById('modalProgress');
+    const modalProgressContainer = document.getElementById('modalProgressContainer');
 
-  if (!tag) {
-    showMessage("Tag is required!", "error");
-    return;
-  }
+    if (!tag) {
+        showMessage("Tag is required!", "error");
+        return;
+    }
 
-  modalProgressContainer.style.display = 'block';
-  document.querySelector('.modal-content .upload-btn').style.display = 'none'; // Hide buttons during upload
-  document.querySelector('.modal-content .cancel-btn').style.display = 'none'; // Hide buttons during upload
+    modalProgressContainer.style.display = 'block';
+    document.querySelector('.modal-content .upload-btn').style.display = 'none'; // Hide buttons during upload
+    document.querySelector('.modal-content .cancel-btn').style.display = 'none'; // Hide buttons during upload
 
-  // ✅ Multiple files handle
-  if (selectedFiles.length > 0) {
-    selectedFiles.forEach((file, index) => {
-      uploadFile(file, tag, progressBar, statusText, modalProgress);
-      if (index === selectedFiles.length - 1) {
-        // Last file ke baad modal close
+    // ✅ Multiple files handle
+    if (selectedFiles.length > 0) {
+        selectedFiles.forEach((file, index) => {
+            uploadFile(file, tag, progressBar, statusText, modalProgress);
+            if (index === selectedFiles.length - 1) {
+                // Last file ke baad modal close
+                setTimeout(() => closeModal(), 1000);
+            }
+        });
+        selectedFiles = []; // reset
+    } else if (selectedFile) {
+        uploadFile(selectedFile, tag, progressBar, statusText, modalProgress);
         setTimeout(() => closeModal(), 1000);
-      }
-    });
-    selectedFiles = []; // reset
-  } else if (selectedFile) {
-    uploadFile(selectedFile, tag, progressBar, statusText, modalProgress);
-    setTimeout(() => closeModal(), 1000);
-    selectedFile = null; // reset
-  }
+        selectedFile = null; // reset
+    }
 };
 
 function uploadFile(file, tag, progressBar, statusText) {
-  const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', uploadPreset);
-  formData.append('tags', tag);
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', uploadPreset);
+    formData.append('tags', tag);
 
-  const xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
 
-  // Progress bar update for each file
-  xhr.upload.onprogress = function (event) {
-    if (event.lengthComputable) {
-      const percentComplete = Math.round((event.loaded / event.total) * 100);
-      progressBar.style.width = percentComplete + '%';
-      progressBar.textContent = percentComplete + '%';
-      statusText.textContent = 'Uploading...';
-    }
-  };
+    // Progress bar update for each file
+    xhr.upload.onprogress = function (event) {
+        if (event.lengthComputable) {
+            const percentComplete = Math.round((event.loaded / event.total) * 100);
+            progressBar.style.width = percentComplete + '%';
+            progressBar.textContent = percentComplete + '%';
+            statusText.textContent = 'Uploading...';
+        }
+    };
 
-  // Upload complete
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      const data = JSON.parse(xhr.responseText);
-      if (!data.secure_url) {
-        showMessage('Upload failed: No secure URL received', 'error');
-        statusText.textContent = 'Upload failed!';
-        return;
-      }
+    // Upload complete
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            if (!data.secure_url) {
+                showMessage('Upload failed: No secure URL received', 'error');
+                statusText.textContent = 'Upload failed!';
+                return;
+            }
 
-      const imgObj = {
-        url: data.secure_url,
-        tag: tag,
-        name: file.name,
-        timestamp: Date.now()
-      };
+            const imgObj = {
+                url: data.secure_url,
+                tag: tag,
+                name: file.name,
+                timestamp: Date.now()
+            };
 
-      // Save into Firebase
-      push(imagesRef, imgObj)
-        .then(() => {
-          progressBar.style.width = '100%';
-          progressBar.textContent = '100%';
-          statusText.textContent = 'Complete';
-          showMessage(`${file.name} uploaded successfully!`, 'info');
-          document.getElementById('fileUpload').value = '';
-          document.getElementById('tagInput').value = '';
-          loadImages();
-        })
-        .catch((error) => {
-          console.error("Firebase Push Error:", error);
-          statusText.textContent = 'Upload failed: Firebase error';
-          showMessage('Upload failed: Firebase error', 'error');
-        });
-    } else {
-      console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
-      statusText.textContent = 'Upload failed!';
-      showMessage('Upload failed!', 'error');
-    }
-  };
+            // Save into Firebase
+            push(imagesRef, imgObj)
+                .then(() => {
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = '100%';
+                    statusText.textContent = 'Complete';
+                    showMessage(`${file.name} uploaded successfully!`, 'info');
+                    document.getElementById('fileUpload').value = '';
+                    document.getElementById('tagInput').value = '';
+                    loadImages();
+                })
+                .catch((error) => {
+                    console.error("Firebase Push Error:", error);
+                    statusText.textContent = 'Upload failed: Firebase error';
+                    showMessage('Upload failed: Firebase error', 'error');
+                });
+        } else {
+            console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
+            statusText.textContent = 'Upload failed!';
+            showMessage('Upload failed!', 'error');
+        }
+    };
 
-  xhr.onerror = function () {
-    console.error("Upload error occurred:", xhr.status);
-    statusText.textContent = 'Upload error!';
-    showMessage('Upload failed due to network error!', 'error');
-  };
+    xhr.onerror = function () {
+        console.error("Upload error occurred:", xhr.status);
+        statusText.textContent = 'Upload error!';
+        showMessage('Upload failed due to network error!', 'error');
+    };
 
-  xhr.open('POST', url, true);
-  xhr.send(formData);
+    xhr.open('POST', url, true);
+    xhr.send(formData);
 }
 
 // Custom message box function (instead of alert)
 function showMessage(message, type = "info") {
-  const messageBox = document.createElement("div");
-  messageBox.style.position = "fixed";
-  messageBox.style.top = "20px";
-  messageBox.style.left = "50%";
-  messageBox.style.transform = "translateX(-50%)";
-  messageBox.style.padding = "15px 25px";
-  messageBox.style.borderRadius = "10px";
-  messageBox.style.zIndex = "9999";
-  messageBox.style.color = "white";
-  messageBox.style.fontWeight = "bold";
-  messageBox.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
-  messageBox.style.transition = "opacity 0.5s ease-in-out";
-  messageBox.style.opacity = "1";
+    const messageBox = document.createElement("div");
+    messageBox.style.position = "fixed";
+    messageBox.style.top = "20px";
+    messageBox.style.left = "50%";
+    messageBox.style.transform = "translateX(-50%)";
+    messageBox.style.padding = "15px 25px";
+    messageBox.style.borderRadius = "10px";
+    messageBox.style.zIndex = "9999";
+    messageBox.style.color = "white";
+    messageBox.style.fontWeight = "bold";
+    messageBox.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
+    messageBox.style.transition = "opacity 0.5s ease-in-out";
+    messageBox.style.opacity = "1";
 
-  if (type === "error") {
-    messageBox.style.backgroundColor = "#f44336"; /* Red */
-  } else {
-    messageBox.style.backgroundColor = "#4CAF50"; /* Green */
-  }
+    if (type === "error") {
+        messageBox.style.backgroundColor = "#f44336"; /* Red */
+    } else {
+        messageBox.style.backgroundColor = "#4CAF50"; /* Green */
+    }
 
-  messageBox.textContent = message;
-  document.body.appendChild(messageBox);
+    messageBox.textContent = message;
+    document.body.appendChild(messageBox);
 
-  setTimeout(() => {
-    messageBox.style.opacity = "0";
-    messageBox.addEventListener("transitionend", () => messageBox.remove());
-  }, 3000);
+    setTimeout(() => {
+        messageBox.style.opacity = "0";
+        messageBox.addEventListener("transitionend", () => messageBox.remove());
+    }, 3000);
 }
 
 // Function to handle direct image download
 window.downloadImageDirectly = async function (imageUrl, fileName) {
-  try {
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
-    showMessage('Download initiated!', 'info');
-  } catch (error) {
-    console.error("Error downloading image:", error);
-    showMessage('Failed to download image.', 'error');
-  }
+    try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        showMessage('Download initiated!', 'info');
+    } catch (error) {
+        console.error("Error downloading image:", error);
+        showMessage('Failed to download image.', 'error');
+    }
 };
 
 
 function loadImages() {
-  const gallery = document.getElementById('gallery');
-  gallery.innerHTML = '';
+    const gallery = document.getElementById('gallery');
+    gallery.innerHTML = '';
 
-  // Clear the gallery first to avoid duplicates when data updates
-  // The onValue listener will handle re-rendering on changes
-  onValue(imagesRef, (snapshot) => {
-    gallery.innerHTML = ''; // Clear content every time data changes
-    const images = snapshot.val();
-    const now = Date.now();
+    // Clear the gallery first to avoid duplicates when data updates
+    // The onValue listener will handle re-rendering on changes
+    onValue(imagesRef, (snapshot) => {
+        gallery.innerHTML = ''; // Clear content every time data changes
+        const images = snapshot.val();
+        const now = Date.now();
 
-    if (images) {
-      const sortedImages = Object.entries(images)
-        .map(([key, img]) => ({ key, ...img }))
-        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); // Sort by timestamp descending
+        if (images) {
+            const sortedImages = Object.entries(images)
+                .map(([key, img]) => ({ key, ...img }))
+                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); // Sort by timestamp descending
 
-      sortedImages.forEach(({ key, url, tag, timestamp, name }) => {
-        // Check if the image is older than 5 minutes (300,000 milliseconds)
-        // If it is, delete it from the database (cleanup logic)
-        if (now - (timestamp || 0) > 300000) {
-          remove(dbRef(db, `images/${key}`))
-            .then(() => console.log(`Image ${key} deleted (older than 5 min)`))
-            .catch((error) => console.error("Auto-delete error:", error));
+            sortedImages.forEach(({ key, url, tag, timestamp, name }) => {
+                // Check if the image is older than 5 minutes (300,000 milliseconds)
+                // If it is, delete it from the database (cleanup logic)
+                if (now - (timestamp || 0) > 300000) {
+                    remove(dbRef(db, `images/${key}`))
+                        .then(() => console.log(`Image ${key} deleted (older than 5 min)`))
+                        .catch((error) => console.error("Auto-delete error:", error));
+                } else {
+                    const container = document.createElement('div');
+                    container.className = 'image-container';
+
+                    const imgElement = document.createElement('img');
+                    imgElement.src = url;
+                    imgElement.alt = tag || 'Uploaded image';
+                    imgElement.loading = 'lazy';
+                    imgElement.onerror = () => { // Fallback for broken images
+                        imgElement.src = `https://placehold.co/150x150/cccccc/333333?text=Image+Error`;
+                        console.warn(`Failed to load image: ${url}`);
+                    };
+
+                    const tagElement = document.createElement('p');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = `Tag: ${tag || 'No tag'}`;
+
+                    // Changed to Download Button with new downloadImageDirectly function
+                    const downloadBtn = document.createElement('button'); // Changed back to button for click event
+                    downloadBtn.className = 'download-btn';
+                    downloadBtn.textContent = 'Download';
+                    // Call the new download function
+                    downloadBtn.onclick = () => window.downloadImageDirectly(url, name || `image_${key}.jpg`);
+
+                    container.appendChild(imgElement);
+                    container.appendChild(tagElement);
+                    container.appendChild(downloadBtn); // Append the download button
+                    gallery.appendChild(container);
+                }
+            });
         } else {
-          const container = document.createElement('div');
-          container.className = 'image-container';
-
-          const imgElement = document.createElement('img');
-          imgElement.src = url;
-          imgElement.alt = tag || 'Uploaded image';
-          imgElement.loading = 'lazy';
-          imgElement.onerror = () => { // Fallback for broken images
-            imgElement.src = `https://placehold.co/150x150/cccccc/333333?text=Image+Error`;
-            console.warn(`Failed to load image: ${url}`);
-          };
-
-          const tagElement = document.createElement('p');
-          tagElement.className = 'tag';
-          tagElement.textContent = `Tag: ${tag || 'No tag'}`;
-
-          // Changed to Download Button with new downloadImageDirectly function
-          const downloadBtn = document.createElement('button'); // Changed back to button for click event
-          downloadBtn.className = 'download-btn';
-          downloadBtn.textContent = 'Download';
-          // Call the new download function
-          downloadBtn.onclick = () => window.downloadImageDirectly(url, name || `image_${key}.jpg`);
-
-          container.appendChild(imgElement);
-          container.appendChild(tagElement);
-          container.appendChild(downloadBtn); // Append the download button
-          gallery.appendChild(container);
+            gallery.innerHTML = '<p style="color: #455a64; margin-top: 20px;">No images uploaded yet.</p>';
         }
-      });
-    } else {
-      gallery.innerHTML = '<p style="color: #455a64; margin-top: 20px;">No images uploaded yet.</p>';
-    }
-  });
+    });
 }
 
 // CSAT Calculator Functions
 window.openCSATModal = function () {
-  document.getElementById('csatModal').style.display = 'flex';
-  hideAllMainContent();
-  // Ensure all other full-page views are hidden
-  const endorsementPage = document.getElementById('endorsementPage');
-  if (endorsementPage) endorsementPage.style.display = 'none';
-  const manualVIPage = document.getElementById('manualVIPage');
-  if (manualVIPage) manualVIPage.style.display = 'none';
-  const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
-  if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
-  const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
-  if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
-  const rsaContactPage = document.getElementById('rsaContactPage');
-  if (rsaContactPage) rsaContactPage.style.display = 'none';
-  calculateCSAT();
+    document.getElementById('csatModal').style.display = 'flex';
+    hideAllMainContent();
+    // Ensure all other full-page views are hidden
+    const endorsementPage = document.getElementById('endorsementPage');
+    if (endorsementPage) endorsementPage.style.display = 'none';
+    const manualVIPage = document.getElementById('manualVIPage');
+    if (manualVIPage) manualVIPage.style.display = 'none';
+    const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+    if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+    const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+    if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+    const rsaContactPage = document.getElementById('rsaContactPage');
+    if (rsaContactPage) rsaContactPage.style.display = 'none';
+    calculateCSAT();
 };
 
 window.closeCSATModal = function () {
-  document.getElementById('csatModal').style.display = 'none';
-  document.getElementById('goodCount').value = '0';
-  document.getElementById('badCount').value = '0';
-  document.getElementById('requiredCSAT').value = '70';
-  document.getElementById('calculateButton').textContent = 'Calculate';
-  hasCalculated = false;
-  calculateCSAT();
-  showAllMainContent();
+    document.getElementById('csatModal').style.display = 'none';
+    document.getElementById('goodCount').value = '0';
+    document.getElementById('badCount').value = '0';
+    document.getElementById('requiredCSAT').value = '70';
+    document.getElementById('calculateButton').textContent = 'Calculate';
+    hasCalculated = false;
+    calculateCSAT();
+    showAllMainContent();
 };
 
 window.calculateCSAT = function () {
-  const goodCount = parseInt(document.getElementById('goodCount').value) || 0;
-  const badCount = parseInt(document.getElementById('badCount').value) || 0;
-  const requiredCSAT = parseInt(document.getElementById('requiredCSAT').value);
-  const resultSection = document.getElementById('csatResult');
-  const status = document.getElementById('csatStatus');
-  const calculateButton = document.getElementById('calculateButton');
+    const goodCount = parseInt(document.getElementById('goodCount').value) || 0;
+    const badCount = parseInt(document.getElementById('badCount').value) || 0;
+    const requiredCSAT = parseInt(document.getElementById('requiredCSAT').value);
+    const resultSection = document.getElementById('csatResult');
+    const status = document.getElementById('csatStatus');
+    const calculateButton = document.getElementById('calculateButton');
 
-  const total = goodCount + badCount;
-  const csat = total === 0 ? 0 : (goodCount / total) * 100;
-  const formattedCSAT = csat.toFixed(2);
+    const total = goodCount + badCount;
+    const csat = total === 0 ? 0 : (goodCount / total) * 100;
+    const formattedCSAT = csat.toFixed(2);
 
-  resultSection.querySelector('p:nth-child(1)').textContent = `Total: ${total}`;
-  resultSection.querySelector('p:nth-child(2)').textContent = `CSAT: ${formattedCSAT}%`;
+    resultSection.querySelector('p:nth-child(1)').textContent = `Total: ${total}`;
+    resultSection.querySelector('p:nth-child(2)').textContent = `CSAT: ${formattedCSAT}%`;
 
-  if (total === 0) {
-    status.innerHTML = '<span class="shivang-rainbow">SHIVANG</span>';
-    status.className = '';
-    return;
-  }
-
-  let additionalGoodNeeded = 0;
-  let newCSAT = csat;
-  let newGoodCount = goodCount;
-  let newTotal = total;
-
-  if (csat <= requiredCSAT) {
-    while (newCSAT <= requiredCSAT) {
-      additionalGoodNeeded++;
-      newGoodCount = goodCount + additionalGoodNeeded;
-      newTotal = total + additionalGoodNeeded;
-      newCSAT = (newGoodCount / newTotal) * 100;
+    if (total === 0) {
+        status.innerHTML = '<span class="shivang-rainbow">SHIVANG</span>';
+        status.className = '';
+        return;
     }
-  }
 
-  const exactCSAT = newCSAT;
+    let additionalGoodNeeded = 0;
+    let newCSAT = csat;
+    let newGoodCount = goodCount;
+    let newTotal = total;
 
-  const isAboveRequired = csat > requiredCSAT;
+    if (csat <= requiredCSAT) {
+        while (newCSAT <= requiredCSAT) {
+            additionalGoodNeeded++;
+            newGoodCount = goodCount + additionalGoodNeeded;
+            newTotal = total + additionalGoodNeeded;
+            newCSAT = (newGoodCount / newTotal) * 100;
+        }
+    }
 
-  if (isAboveRequired) {
-    status.textContent = `Success! CSAT (${formattedCSAT}%) is above required (${requiredCSAT}%+).`;
-    status.className = 'success';
-  } else {
-    status.textContent = `Need ${additionalGoodNeeded} more good count(s) to achieve ${requiredCSAT}%+ (exact: ${exactCSAT.toFixed(2)}%).`;
-    status.className = 'error';
-  }
+    const exactCSAT = newCSAT;
 
-  if (!hasCalculated) {
-    hasCalculated = true;
-    calculateButton.textContent = 'Recalculate';
-  }
+    const isAboveRequired = csat > requiredCSAT;
+
+    if (isAboveRequired) {
+        status.textContent = `Success! CSAT (${formattedCSAT}%) is above required (${requiredCSAT}%+).`;
+        status.className = 'success';
+    } else {
+        status.textContent = `Need ${additionalGoodNeeded} more good count(s) to achieve ${requiredCSAT}%+ (exact: ${exactCSAT.toFixed(2)}%).`;
+        status.className = 'error';
+    }
+
+    if (!hasCalculated) {
+        hasCalculated = true;
+        calculateButton.textContent = 'Recalculate';
+    }
 };
 
 // Close CSAT Modal on Outside Click
 document.getElementById('csatModal').addEventListener('click', function (event) {
-  if (event.target === this) {
-    closeCSATModal();
-  }
+    if (event.target === this) {
+        closeCSATModal();
+    }
 });
 
 // ENDORSEMENT Full-Page Functionality
 window.openEndorsementPage = function () {
-  document.getElementById('endorsementPage').style.display = 'block';
-  setTimeout(() => {
-    const endorsementContainer = document.querySelector('.endorsement-container');
-    if (endorsementContainer) endorsementContainer.classList.add('active');
-  }, 10);
-  hideAllMainContent();
-  // Ensure all other full-page views are hidden
-  const csatModal = document.getElementById('csatModal');
-  if (csatModal) csatModal.style.display = 'none';
-  const manualVIPage = document.getElementById('manualVIPage');
-  if (manualVIPage) manualVIPage.style.display = 'none';
-  const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
-  if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
-  const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
-  if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
-  const rsaContactPage = document.getElementById('rsaContactPage');
-  if (rsaContactPage) rsaContactPage.style.display = 'none';
+    document.getElementById('endorsementPage').style.display = 'block';
+    setTimeout(() => {
+        const endorsementContainer = document.querySelector('.endorsement-container');
+        if (endorsementContainer) endorsementContainer.classList.add('active');
+    }, 10);
+    hideAllMainContent();
+    // Ensure all other full-page views are hidden
+    const csatModal = document.getElementById('csatModal');
+    if (csatModal) csatModal.style.display = 'none';
+    const manualVIPage = document.getElementById('manualVIPage');
+    if (manualVIPage) manualVIPage.style.display = 'none';
+    const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+    if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+    const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+    if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+    const rsaContactPage = document.getElementById('rsaContactPage');
+    if (rsaContactPage) rsaContactPage.style.display = 'none';
 };
 
 window.closeEndorsementPage = function () {
-  const endorsementPage = document.getElementById('endorsementPage');
-  if (endorsementPage) endorsementPage.style.display = 'none';
-  const endorsementContainer = document.querySelector('.endorsement-container');
-  if (endorsementContainer) endorsementContainer.classList.remove('active');
-  showAllMainContent();
+    const endorsementPage = document.getElementById('endorsementPage');
+    if (endorsementPage) endorsementPage.style.display = 'none';
+    const endorsementContainer = document.querySelector('.endorsement-container');
+    if (endorsementContainer) endorsementContainer.classList.remove('active');
+    showAllMainContent();
 };
 
 // Close ENDORSEMENT Page on Outside Click
 document.getElementById('endorsementPage').addEventListener('click', function (event) {
-  if (event.target === this) {
-    closeEndorsementPage();
-  }
+    if (event.target === this) {
+        closeEndorsementPage();
+    }
 });
 
 // MANUAL-VI Full-Page Functionality
 window.openManualVIPage = function () {
-  document.getElementById('manualVIPage').style.display = 'block';
-  // Ensure the manual VI card content is visible by default when opening this page
-  const manualVICardContent = document.getElementById('manualVICardContent');
-  if (manualVICardContent) manualVICardContent.style.display = 'block';
-  const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
-  if (claimCoverageOverlay) claimCoverageOverlay.style.display = 'none'; // Hide overlay initially
-  const manualVIPage = document.getElementById('manualVIPage');
-  if (manualVIPage) manualVIPage.classList.remove('claim-coverage-active'); // Remove class if present
-  hideAllMainContent();
-  // Ensure all other full-page views are hidden
-  const csatModal = document.getElementById('csatModal');
-  if (csatModal) csatModal.style.display = 'none';
-  const endorsementPage = document.getElementById('endorsementPage');
-  if (endorsementPage) endorsementPage.style.display = 'none';
-  const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
-  if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
-  const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
-  if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
-  const rsaContactPage = document.getElementById('rsaContactPage');
-  if (rsaContactPage) rsaContactPage.style.display = 'none';
+    document.getElementById('manualVIPage').style.display = 'block';
+    // Ensure the manual VI card content is visible by default when opening this page
+    const manualVICardContent = document.getElementById('manualVICardContent');
+    if (manualVICardContent) manualVICardContent.style.display = 'block';
+    const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
+    if (claimCoverageOverlay) claimCoverageOverlay.style.display = 'none'; // Hide overlay initially
+    const manualVIPage = document.getElementById('manualVIPage');
+    if (manualVIPage) manualVIPage.classList.remove('claim-coverage-active'); // Remove class if present
+    hideAllMainContent();
+    // Ensure all other full-page views are hidden
+    const csatModal = document.getElementById('csatModal');
+    if (csatModal) csatModal.style.display = 'none';
+    const endorsementPage = document.getElementById('endorsementPage');
+    if (endorsementPage) endorsementPage.style.display = 'none';
+    const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+    if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+    const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+    if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+    const rsaContactPage = document.getElementById('rsaContactPage');
+    if (rsaContactPage) rsaContactPage.style.display = 'none';
 };
 
 window.closeManualVIPage = function () {
-  const manualVIPage = document.getElementById('manualVIPage');
-  if (manualVIPage) manualVIPage.style.display = 'none';
-  showAllMainContent();
-  // Also hide the claim coverage overlay when going back to home
-  const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
-  if (claimCoverageOverlay) claimCoverageOverlay.style.display = 'none';
-  const manualVIPageClassList = document.getElementById('manualVIPage');
-  if (manualVIPageClassList) manualVIPageClassList.classList.remove('claim-coverage-active');
+    const manualVIPage = document.getElementById('manualVIPage');
+    if (manualVIPage) manualVIPage.style.display = 'none';
+    showAllMainContent();
+    // Also hide the claim coverage overlay when going back to home
+    const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
+    if (claimCoverageOverlay) claimCoverageOverlay.style.display = 'none';
+    const manualVIPageClassList = document.getElementById('manualVIPage');
+    if (manualVIPageClassList) manualVIPageClassList.classList.remove('claim-coverage-active');
 };
 
 // Toggle Claim Coverage Overlay within Manual VI Page
 window.toggleClaimCoverage = function () {
-  const manualVICardContent = document.getElementById('manualVICardContent');
-  const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
-  const manualVIPage = document.getElementById('manualVIPage');
+    const manualVICardContent = document.getElementById('manualVICardContent');
+    const claimCoverageOverlay = document.getElementById('claimCoverageOverlay');
+    const manualVIPage = document.getElementById('manualVIPage');
 
-  if (claimCoverageOverlay && manualVICardContent && manualVIPage) {
-    if (claimCoverageOverlay.style.display === 'flex') {
-      // If overlay is visible, hide it and show main card content
-      claimCoverageOverlay.style.display = 'none';
-      manualVICardContent.style.display = 'block';
-      manualVIPage.classList.remove('claim-coverage-active'); // Remove class
-    } else {
-      // If overlay is hidden, show it and hide main card content
-      claimCoverageOverlay.style.display = 'flex';
-      manualVICardContent.style.display = 'none';
-      manualVIPage.classList.add('claim-coverage-active'); // Add class for styling
+    if (claimCoverageOverlay && manualVICardContent && manualVIPage) {
+        if (claimCoverageOverlay.style.display === 'flex') {
+            // If overlay is visible, hide it and show main card content
+            claimCoverageOverlay.style.display = 'none';
+            manualVICardContent.style.display = 'block';
+            manualVIPage.classList.remove('claim-coverage-active'); // Remove class
+        } else {
+            // If overlay is hidden, show it and hide main card content
+            claimCoverageOverlay.style.display = 'flex';
+            manualVICardContent.style.display = 'none';
+            manualVIPage.classList.add('claim-coverage-active'); // Add class for styling
+        }
     }
-  }
 };
 
 // Close Manual VI Page OR Claim Coverage Overlay on Outside Click
 document.getElementById('manualVIPage').addEventListener('click', function (event) {
-  // If the click is directly on the manual-vi-page (background),
-  // regardless of which sub-section is open, close the entire page.
-  if (event.target === this) {
-    closeManualVIPage();
-  }
+    // If the click is directly on the manual-vi-page (background),
+    // regardless of which sub-section is open, close the entire page.
+    if (event.target === this) {
+        closeManualVIPage();
+    }
 });
 
 // New: Add click listener to the claimCoverageOverlay to close the entire manualVIPage
 document.getElementById('claimCoverageOverlay').addEventListener('click', function (event) {
-  if (event.target === this) { // Only if the click is directly on the overlay's background
-    closeManualVIPage(); // Go back to the main page
-  }
+    if (event.target === this) { // Only if the click is directly on the overlay's background
+        closeManualVIPage(); // Go back to the main page
+    }
 });
 
 
 // New Claim_Count & NSTP Page Functionality
 window.openClaimCountNSTPPage = function () {
-  document.getElementById('claimCountNSTPPage').style.display = 'block';
-  hideAllMainContent();
-  // Ensure all other full-page views are hidden
-  const csatModal = document.getElementById('csatModal');
-  if (csatModal) csatModal.style.display = 'none';
-  const endorsementPage = document.getElementById('endorsementPage');
-  if (endorsementPage) endorsementPage.style.display = 'none';
-  const manualVIPage = document.getElementById('manualVIPage');
-  if (manualVIPage) manualVIPage.style.display = 'none';
-  const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
-  if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
-  const rsaContactPage = document.getElementById('rsaContactPage');
-  if (rsaContactPage) rsaContactPage.style.display = 'none';
-  // Populate the table when the page is opened
-  populateTable(insuranceData);
-  // Re-apply sort/search listeners as content is dynamic
-  setupInsuranceDashboardListeners();
+    document.getElementById('claimCountNSTPPage').style.display = 'block';
+    hideAllMainContent();
+    // Ensure all other full-page views are hidden
+    const csatModal = document.getElementById('csatModal');
+    if (csatModal) csatModal.style.display = 'none';
+    const endorsementPage = document.getElementById('endorsementPage');
+    if (endorsementPage) endorsementPage.style.display = 'none';
+    const manualVIPage = document.getElementById('manualVIPage');
+    if (manualVIPage) manualVIPage.style.display = 'none';
+    const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+    if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+    const rsaContactPage = document.getElementById('rsaContactPage');
+    if (rsaContactPage) rsaContactPage.style.display = 'none';
+    // Populate the table when the page is opened
+    populateTable(insuranceData);
+    // Re-apply sort/search listeners as content is dynamic
+    setupInsuranceDashboardListeners();
 };
 
 window.closeClaimCountNSTPPage = function () {
-  const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
-  if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
-  showAllMainContent();
+    const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+    if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+    showAllMainContent();
 };
 
 // Close Claim_Count & NSTP Page on Outside Click
 document.getElementById('claimCountNSTPPage').addEventListener('click', function (event) {
-  if (event.target === this) {
-    // Only close if the click is directly on the overlay, not on the content
-    if (event.target.classList.contains('claim-count-nstp-page')) {
-      closeClaimCountNSTPPage();
+    if (event.target === this) {
+        // Only close if the click is directly on the overlay, not on the content
+        if (event.target.classList.contains('claim-count-nstp-page')) {
+            closeClaimCountNSTPPage();
+        }
     }
-  }
 });
 
 // New Inspection Waiver Page Functionality
 window.openInspectionWaiverPage = function () {
-  document.getElementById('inspectionWaiverPage').style.display = 'block';
-  hideAllMainContent();
-  // Ensure all other full-page views are hidden
-  const csatModal = document.getElementById('csatModal');
-  if (csatModal) csatModal.style.display = 'none';
-  const endorsementPage = document.getElementById('endorsementPage');
-  if (endorsementPage) endorsementPage.style.display = 'none';
-  const manualVIPage = document.getElementById('manualVIPage');
-  if (manualVIPage) manualVIPage.style.display = 'none';
-  const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
-  if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
-  const rsaContactPage = document.getElementById('rsaContactPage');
-  if (rsaContactPage) rsaContactPage.style.display = 'none';
-  // Add a small delay to ensure the page is fully rendered before populating
-  setTimeout(() => {
-    populateInspectionWaiverTable(inspectionWaiverData);
-    console.log("Inspection Waiver table populated with data:", inspectionWaiverData); // Debugging log
-  }, 0);
+    document.getElementById('inspectionWaiverPage').style.display = 'block';
+    hideAllMainContent();
+    // Ensure all other full-page views are hidden
+    const csatModal = document.getElementById('csatModal');
+    if (csatModal) csatModal.style.display = 'none';
+    const endorsementPage = document.getElementById('endorsementPage');
+    if (endorsementPage) endorsementPage.style.display = 'none';
+    const manualVIPage = document.getElementById('manualVIPage');
+    if (manualVIPage) manualVIPage.style.display = 'none';
+    const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+    if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+    const rsaContactPage = document.getElementById('rsaContactPage');
+    if (rsaContactPage) rsaContactPage.style.display = 'none';
+    // Add a small delay to ensure the page is fully rendered before populating
+    setTimeout(() => {
+        populateInspectionWaiverTable(inspectionWaiverData);
+        console.log("Inspection Waiver table populated with data:", inspectionWaiverData); // Debugging log
+    }, 0);
 };
 
 window.closeInspectionWaiverPage = function () {
-  const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
-  if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
-  showAllMainContent();
+    const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+    if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+    showAllMainContent();
 };
 
 // Close Inspection Waiver Page on Outside Click
 document.getElementById('inspectionWaiverPage').addEventListener('click', function (event) {
-  if (event.target === this) {
-    closeInspectionWaiverPage();
-  }
+    if (event.target === this) {
+        closeInspectionWaiverPage();
+    }
 });
 
 // New RSA & Contact Page Functionality
 window.openRSAPage = function () {
-  document.getElementById('rsaContactPage').style.display = 'block';
-  hideAllMainContent();
-  // Ensure all other full-page views are hidden
-  const csatModal = document.getElementById('csatModal');
-  if (csatModal) csatModal.style.display = 'none';
-  const endorsementPage = document.getElementById('endorsementPage');
-  if (endorsementPage) endorsementPage.style.display = 'none';
-  const manualVIPage = document.getElementById('manualVIPage');
-  if (manualVIPage) manualVIPage.style.display = 'none';
-  const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
-  if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
-  const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
-  if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
-  // Add a small delay to ensure the page is fully rendered before populating
-  setTimeout(() => {
-    populateRSATable(rsaContactData);
-    console.log("RSA & Contact table populated with data:", rsaContactData); // Debugging log
-  }, 0);
-  setupRSADashboardListeners();
+    document.getElementById('rsaContactPage').style.display = 'block';
+    hideAllMainContent();
+    // Ensure all other full-page views are hidden
+    const csatModal = document.getElementById('csatModal');
+    if (csatModal) csatModal.style.display = 'none';
+    const endorsementPage = document.getElementById('endorsementPage');
+    if (endorsementPage) endorsementPage.style.display = 'none';
+    const manualVIPage = document.getElementById('manualVIPage');
+    if (manualVIPage) manualVIPage.style.display = 'none';
+    const claimCountNSTPPage = document.getElementById('claimCountNSTPPage');
+    if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
+    const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
+    if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+    // Add a small delay to ensure the page is fully rendered before populating
+    setTimeout(() => {
+        populateRSATable(rsaContactData);
+        console.log("RSA & Contact table populated with data:", rsaContactData); // Debugging log
+    }, 0);
+    setupRSADashboardListeners();
 };
 
 window.closeRSAPage = function () {
-  const rsaContactPage = document.getElementById('rsaContactPage');
-  if (rsaContactPage) rsaContactPage.style.display = 'none';
-  showAllMainContent();
+    const rsaContactPage = document.getElementById('rsaContactPage');
+    if (rsaContactPage) rsaContactPage.style.display = 'none';
+    showAllMainContent();
 };
 
 // Close RSA & Contact Page on Outside Click
 document.getElementById('rsaContactPage').addEventListener('click', function (event) {
-  if (event.target === this) {
-    closeRSAPage();
-  }
+    if (event.target === this) {
+        closeRSAPage();
+    }
 });
 
 // Helper functions to manage visibility
 function hideAllMainContent() {
-  const uploadSection = document.querySelector('.upload-section');
-  if (uploadSection) uploadSection.style.display = 'none';
-  const h3Element = document.querySelector('h3'); /* 'Uploaded Images' header */
-  if (h3Element) h3Element.style.display = 'none';
-  const gallery = document.getElementById('gallery');
-  if (gallery) gallery.style.display = 'none';
-  const csatBtn = document.querySelector('.csat-btn');
-  if (csatBtn) csatBtn.style.display = 'none';
-  const endorsementBtn = document.querySelector('.endorsement-btn');
-  if (endorsementBtn) endorsementBtn.style.display = 'none';
-  const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
-  if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'none';
-  const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
-  if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'none';
-  const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
-  if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'none';
-  const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
-  if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'none';
-  const companyUpdatesButton = document.getElementById('companyUpdatesButton');
-  if (companyUpdatesButton) companyUpdatesButton.style.display = 'none';
-  const notebookButton = document.getElementById('notebookButton');
-  if (notebookButton) notebookButton.style.display = 'none';
+    const uploadSection = document.querySelector('.upload-section');
+    if (uploadSection) uploadSection.style.display = 'none';
+    const h3Element = document.querySelector('h3'); /* 'Uploaded Images' header */
+    if (h3Element) h3Element.style.display = 'none';
+    const gallery = document.getElementById('gallery');
+    if (gallery) gallery.style.display = 'none';
+    const csatBtn = document.querySelector('.csat-btn');
+    if (csatBtn) csatBtn.style.display = 'none';
+    const endorsementBtn = document.querySelector('.endorsement-btn');
+    if (endorsementBtn) endorsementBtn.style.display = 'none';
+    const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
+    if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'none';
+    const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
+    if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'none';
+    const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
+    if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'none';
+    const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
+    if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'none';
+    const companyUpdatesButton = document.getElementById('companyUpdatesButton');
+    if (companyUpdatesButton) companyUpdatesButton.style.display = 'none';
+    const notebookButton = document.getElementById('notebookButton');
+    if (notebookButton) notebookButton.style.display = 'none';
 }
 
 function showAllMainContent() {
-  const uploadSection = document.querySelector('.upload-section');
-  if (uploadSection) uploadSection.style.display = 'block';
-  const h3Element = document.querySelector('h3'); /* 'Uploaded Images' header */
-  if (h3Element) h3Element.style.display = 'block';
-  const gallery = document.getElementById('gallery');
-  if (gallery) gallery.style.display = 'grid'; /* grid for gallery */
+    const uploadSection = document.querySelector('.upload-section');
+    if (uploadSection) uploadSection.style.display = 'block';
+    const h3Element = document.querySelector('h3'); /* 'Uploaded Images' header */
+    if (h3Element) h3Element.style.display = 'block';
+    const gallery = document.getElementById('gallery');
+    if (gallery) gallery.style.display = 'grid'; /* grid for gallery */
 
-  // Only show fixed buttons if not on mobile (based on media query)
-  const isMobile = window.matchMedia("(max-width: 600px)").matches;
-  if (!isMobile) {
-    const csatBtn = document.querySelector('.csat-btn');
-    if (csatBtn) csatBtn.style.display = 'block';
-    const endorsementBtn = document.querySelector('.endorsement-btn');
-    if (endorsementBtn) endorsementBtn.style.display = 'block';
-    const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
-    if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'block';
-    const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
-    if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'block';
-    const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
-    if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'block';
-    const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
-    if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'block';
-  }
-  // Explicitly control visibility of the new updates button
-  const companyUpdatesButton = document.getElementById('companyUpdatesButton');
-  if (companyUpdatesButton) companyUpdatesButton.style.display = 'flex';
-  const notebookButton = document.getElementById('notebookButton');
-  if (notebookButton) notebookButton.style.display = 'flex';
+    // Only show fixed buttons if not on mobile (based on media query)
+    const isMobile = window.matchMedia("(max-width: 600px)").matches;
+    if (!isMobile) {
+        const csatBtn = document.querySelector('.csat-btn');
+        if (csatBtn) csatBtn.style.display = 'block';
+        const endorsementBtn = document.querySelector('.endorsement-btn');
+        if (endorsementBtn) endorsementBtn.style.display = 'block';
+        const manualVIBtnFixed = document.querySelector('.manual-vi-btn-fixed');
+        if (manualVIBtnFixed) manualVIBtnFixed.style.display = 'block';
+        const claimCountNSTPBtnFixed = document.querySelector('.claim-count-nstp-btn-fixed');
+        if (claimCountNSTPBtnFixed) claimCountNSTPBtnFixed.style.display = 'block';
+        const inspectionWaiverBtnFixed = document.querySelector('.inspection-waiver-btn-fixed');
+        if (inspectionWaiverBtnFixed) inspectionWaiverBtnFixed.style.display = 'block';
+        const rsaContactBtnFixed = document.querySelector('.rsa-contact-btn-fixed');
+        if (rsaContactBtnFixed) rsaContactBtnFixed.style.display = 'block';
+    }
+    // Explicitly control visibility of the new updates button
+    const companyUpdatesButton = document.getElementById('companyUpdatesButton');
+    if (companyUpdatesButton) companyUpdatesButton.style.display = 'flex';
+    const notebookButton = document.getElementById('notebookButton');
+    if (notebookButton) notebookButton.style.display = 'flex';
 }
 
 // Endorsement Data and Logic
@@ -12027,44 +12027,44 @@ const endorsementData = [
 ];
 // Populate insurer dropdown for Endorsement
 try {
-  const insurers = [...new Set(endorsementData.map(d => d["Insurer"]))].sort();
-  insurers.forEach(ins => {
-    const opt = document.createElement("option");
-    opt.value = opt.textContent = ins;
-    insurerDropdown.appendChild(opt);
-  });
+    const insurers = [...new Set(endorsementData.map(d => d["Insurer"]))].sort();
+    insurers.forEach(ins => {
+        const opt = document.createElement("option");
+        opt.value = opt.textContent = ins;
+        insurerDropdown.appendChild(opt);
+    });
 } catch (error) {
-  console.error("Error populating insurers for endorsement:", error);
-  showMessage("Error in endorsement JSON data. Please check the syntax and paste valid JSON.", "error");
+    console.error("Error populating insurers for endorsement:", error);
+    showMessage("Error in endorsement JSON data. Please check the syntax and paste valid JSON.", "error");
 }
 
 // Handle insurer selection for endorsement
 insurerDropdown.addEventListener("change", () => {
-  requirementDropdown.innerHTML = "<option disabled selected>Select Requirement</option>";
-  outputBox.style.display = "none";
-  outputBox.classList.remove("show", "output-red");
-  const selectedInsurer = insurerDropdown.value;
-  const requirements = [...new Set(
-    endorsementData.filter(d => d["Insurer"] === selectedInsurer)
-      .map(d => d["Requirement"])
-  )].sort();
-  requirements.forEach(req => {
-    const opt = document.createElement("option");
-    opt.value = opt.textContent = req;
-    requirementDropdown.appendChild(opt);
-  });
-  requirementDropdown.disabled = false;
+    requirementDropdown.innerHTML = "<option disabled selected>Select Requirement</option>";
+    outputBox.style.display = "none";
+    outputBox.classList.remove("show", "output-red");
+    const selectedInsurer = insurerDropdown.value;
+    const requirements = [...new Set(
+        endorsementData.filter(d => d["Insurer"] === selectedInsurer)
+            .map(d => d["Requirement"])
+    )].sort();
+    requirements.forEach(req => {
+        const opt = document.createElement("option");
+        opt.value = opt.textContent = req;
+        requirementDropdown.appendChild(opt);
+    });
+    requirementDropdown.disabled = false;
 });
 
 // Handle requirement selection for endorsement
 requirementDropdown.addEventListener("change", () => {
-  const ins = insurerDropdown.value;
-  const req = requirementDropdown.value;
-  const record = endorsementData.find(
-    d => d["Insurer"] === ins && d["Requirement"] === req
-  );
-  if (record) {
-    outputBox.innerHTML = `
+    const ins = insurerDropdown.value;
+    const req = requirementDropdown.value;
+    const record = endorsementData.find(
+        d => d["Insurer"] === ins && d["Requirement"] === req
+    );
+    if (record) {
+        outputBox.innerHTML = `
             <div><span class="label">Endorsement Type:</span><span class="value">${record["Endorsement type"]}</span></div>
             <div><span class="label">Documents Required:</span><span class="value">${record["Documents or any other requirement"]}</span></div>
             <div><span class="label">TAT:</span><span class="value">${record["TAT"]}</span></div>
@@ -12073,326 +12073,326 @@ requirementDropdown.addEventListener("change", () => {
             <div><span class="label">Exception:</span><span class="value">${record["Any Exception"]}</span></div>
             <div><span class="label">Declaration Format:</span><span class="value">${record["Declaration format (if declaration required)"]}</span></div>
           `;
-    if (record["Endorsement type"].toLowerCase() === "not possible") {
-      outputBox.classList.add("output-red");
-    } else {
-      outputBox.classList.remove("output-red");
+        if (record["Endorsement type"].toLowerCase() === "not possible") {
+            outputBox.classList.add("output-red");
+        } else {
+            outputBox.classList.remove("output-red");
+        }
+        outputBox.style.display = "block";
+        setTimeout(() => outputBox.classList.add("show"), 10);
     }
-    outputBox.style.display = "block";
-    setTimeout(() => outputBox.classList.add("show"), 10);
-  }
 });
 
 // Insurance Comparison Dashboard Data and Logic (from index (4).html)
 const insuranceData = [
-  {
-    "insurer_name": "National",
-    "video_approval": "At PB end",
-    "video_tat": "24 Hours",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "ZD Plan: 2, ZD+: Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "New India Assurance",
-    "video_approval": "At PB end",
-    "video_tat": "24 Hours",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "Yes",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Oriental",
-    "video_approval": "At PB end",
-    "video_tat": "24 Hours",
-    "short_partial": "No",
-    "cng_kit_vi": "Yes",
-    "artificial_low_lighting": "Yes",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "United India",
-    "video_approval": "At PB end",
-    "video_tat": "48 Hours",
-    "short_partial": "Yes",
-    "cng_kit_vi": "Yes",
-    "artificial_low_lighting": "Yes",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "Tata AIG",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "Yes",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "Yes",
-    "old_3_3": "Yes",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "ICICI Lombard",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "Yes",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2<br>Unlimited for Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "Yes",
-    "old_3_3": "Yes",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "Zuno General",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "Cholamandalam MS",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Future Generali",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "MAGMA",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required (Scar on Driver Side we will not accept) within Video TAT",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Raheja QBE",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Kotak",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited, 2 Cashless",
-    "brand_new_3_3": "Yes",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "SBI General",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Shriram",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required (In Shriram format)+Address ID proof within Video TAT<br>Declaration required if Air Bag indicator is on at engine start",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "3",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "Iffco Tokio",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Liberty Videocon",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "No",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "HDFC Ergo",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "Yes",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Reliance",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "Bajaj",
-    "video_approval": "At U/W end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Will Refer to Under Writer",
-    "zd_claims_year": "2",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "Yes"
-  },
-  {
-    "insurer_name": "Royal Sundaram",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Universal Sompo",
-    "video_approval": "At U/W end",
-    "video_tat": "2 days",
-    "short_partial": "No",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Will Refer to Under Writer",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "No",
-    "old_3_3": "No",
-    "vas": "No"
-  },
-  {
-    "insurer_name": "Digit",
-    "video_approval": "At PB end",
-    "video_tat": "2 days",
-    "short_partial": "Yes",
-    "cng_kit_vi": "No",
-    "artificial_low_lighting": "No",
-    "scar_declaration": "Declaration Required within Video TAT",
-    "zd_claims_year": "Unlimited",
-    "non_zd_claims_year": "Unlimited",
-    "brand_new_3_3": "Yes",
-    "old_3_3": "Yes",
-    "vas": "No"
-  }
+    {
+        "insurer_name": "National",
+        "video_approval": "At PB end",
+        "video_tat": "24 Hours",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "ZD Plan: 2, ZD+: Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "New India Assurance",
+        "video_approval": "At PB end",
+        "video_tat": "24 Hours",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Oriental",
+        "video_approval": "At PB end",
+        "video_tat": "24 Hours",
+        "short_partial": "No",
+        "cng_kit_vi": "Yes",
+        "artificial_low_lighting": "Yes",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "United India",
+        "video_approval": "At PB end",
+        "video_tat": "48 Hours",
+        "short_partial": "Yes",
+        "cng_kit_vi": "Yes",
+        "artificial_low_lighting": "Yes",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Tata AIG",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "Yes",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "ICICI Lombard",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "Yes",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2<br>Unlimited for Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Zuno General",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Cholamandalam MS",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Future Generali",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "MAGMA",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (Scar on Driver Side we will not accept) within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Raheja QBE",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Kotak",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited, 2 Cashless",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "SBI General",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Shriram",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (In Shriram format)+Address ID proof within Video TAT<br>Declaration required if Air Bag indicator is on at engine start",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "3",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Iffco Tokio",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Liberty Videocon",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "No",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "HDFC Ergo",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Will Not Accept Scar on WS/change insurer",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Reliance",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Bajaj",
+        "video_approval": "At U/W end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Will Refer to Under Writer",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Royal Sundaram",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Universal Sompo",
+        "video_approval": "At U/W end",
+        "video_tat": "2 days",
+        "short_partial": "No",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Will Refer to Under Writer",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Digit",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
+        "vas": "No"
+    }
 ];
 // You will need to add your insurance data here in the future
 /*
@@ -12417,21 +12417,21 @@ const insuranceData = [
 */
 
 function populateTable(data) {
-  const tableBody = document.getElementById('tableBody');
-  if (!tableBody) {
-    console.error("Error: tableBody element not found for insuranceTable.");
-    return;
-  }
-  tableBody.innerHTML = ''; // Clear existing rows
-  if (data.length === 0) {
-    // Display a message if no data is available
-    tableBody.innerHTML = '<tr><td colspan="12" class="p-4 text-center text-gray-500">No insurance data available. Please add data to the "insuranceData" array in the script.</td></tr>';
-    return;
-  }
-  data.forEach(item => {
-    const row = document.createElement('tr');
-    row.className = 'table-row border-b';
-    row.innerHTML = `
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) {
+        console.error("Error: tableBody element not found for insuranceTable.");
+        return;
+    }
+    tableBody.innerHTML = ''; // Clear existing rows
+    if (data.length === 0) {
+        // Display a message if no data is available
+        tableBody.innerHTML = '<tr><td colspan="12" class="p-4 text-center text-gray-500">No insurance data available. Please add data to the "insuranceData" array in the script.</td></tr>';
+        return;
+    }
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.className = 'table-row border-b';
+        row.innerHTML = `
                   <td class="p-2 font-medium text-indigo-900">${item.insurer_name}</td>
                   <td class="p-2">${item.zd_claims_year}</td>
                   <td class="p-2">${item.non_zd_claims_year}</td>
@@ -12445,214 +12445,214 @@ function populateTable(data) {
                   <td class="p-2 ${item.old_3_3 === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.old_3_3}</td>
                   <td class="p-2 ${item.vas === 'Yes' ? 'text-green-700' : 'text-red-700'}">${item.vas}</td>
               `;
-    tableBody.appendChild(row);
-  });
+        tableBody.appendChild(row);
+    });
 }
 
 function sortTable(column, order) {
-  // Create a copy of the original data to sort, to avoid modifying the global `insuranceData` directly
-  const sortedData = [...insuranceData].sort((a, b) => {
-    const aValue = String(a[column]).toLowerCase(); // Ensure values are strings for comparison
-    const bValue = String(b[column]).toLowerCase();
+    // Create a copy of the original data to sort, to avoid modifying the global `insuranceData` directly
+    const sortedData = [...insuranceData].sort((a, b) => {
+        const aValue = String(a[column]).toLowerCase(); // Ensure values are strings for comparison
+        const bValue = String(b[column]).toLowerCase();
 
-    if (order === 'asc') {
-      return aValue > bValue ? 1 : -1;
-    } else {
-      return aValue < bValue ? 1 : -1;
-    }
-  });
-  populateTable(sortedData);
+        if (order === 'asc') {
+            return aValue > bValue ? 1 : -1;
+        } else {
+            return aValue < bValue ? 1 : -1;
+        }
+    });
+    populateTable(sortedData);
 }
 
 function setupInsuranceDashboardListeners() {
-  // Remove existing listeners to prevent multiple bindings if the page is opened multiple times
-  const tableHeaders = document.querySelectorAll('#insuranceTable .table-header');
-  tableHeaders.forEach(header => {
-    // Remove previous event listener safely by recreating the element
-    const newHeader = header.cloneNode(true);
-    header.parentNode.replaceChild(newHeader, header);
-  });
-
-  // Add event listeners to the newly (or freshly cloned) table headers
-  document.querySelectorAll('#insuranceTable .table-header').forEach(header => {
-    header.addEventListener('click', () => {
-      const column = header.dataset.column;
-      const currentOrder = header.classList.contains('sort-asc') ? 'desc' : 'asc';
-
-      document.querySelectorAll('#insuranceTable .table-header').forEach(h => {
-        h.classList.remove('sort-asc', 'sort-desc');
-        h.classList.add('sort-icon'); /* Default icon wapas add karein */
-      });
-
-      header.classList.remove('sort-icon'); /* Current header se default icon hatayen */
-      header.classList.add(currentOrder === 'asc' ? 'sort-asc' : 'sort-desc');
-
-      sortTable(column, currentOrder);
+    // Remove existing listeners to prevent multiple bindings if the page is opened multiple times
+    const tableHeaders = document.querySelectorAll('#insuranceTable .table-header');
+    tableHeaders.forEach(header => {
+        // Remove previous event listener safely by recreating the element
+        const newHeader = header.cloneNode(true);
+        header.parentNode.replaceChild(newHeader, header);
     });
-  });
 
-  // Remove existing listener for search input and re-add
-  const searchInput = document.getElementById('searchInput');
-  // searchInput maujood hai ya nahi, check karein clone karne se pehle
-  if (searchInput) {
-    const newSearchInput = searchInput.cloneNode(true);
-    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+    // Add event listeners to the newly (or freshly cloned) table headers
+    document.querySelectorAll('#insuranceTable .table-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const column = header.dataset.column;
+            const currentOrder = header.classList.contains('sort-asc') ? 'desc' : 'asc';
 
-    newSearchInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const filteredData = insuranceData.filter(item =>
-        item.insurer_name.toLowerCase().includes(searchTerm)
-      );
-      populateTable(filteredData);
+            document.querySelectorAll('#insuranceTable .table-header').forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+                h.classList.add('sort-icon'); /* Default icon wapas add karein */
+            });
+
+            header.classList.remove('sort-icon'); /* Current header se default icon hatayen */
+            header.classList.add(currentOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+
+            sortTable(column, currentOrder);
+        });
     });
-  }
+
+    // Remove existing listener for search input and re-add
+    const searchInput = document.getElementById('searchInput');
+    // searchInput maujood hai ya nahi, check karein clone karne se pehle
+    if (searchInput) {
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+        newSearchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredData = insuranceData.filter(item =>
+                item.insurer_name.toLowerCase().includes(searchTerm)
+            );
+            populateTable(filteredData);
+        });
+    }
 }
 
 // Data for Inspection Waiver
 const inspectionWaiverData = [
-  { "Insurer Name": "Tata AIG", "Policy Waiver": "1 Day" },
-  { "Insurer Name": "Reliance", "Policy Waiver": "15 Days (Renewal), 1 Day (New, Rollover)" },
-  { "Insurer Name": "Bajaj Allianz", "Policy Waiver": "5 Days" },
-  { "Insurer Name": "Chola MS", "Policy Waiver": "5 Days" },
-  { "Insurer Name": "National Insurance", "Policy Waiver": "5 Days" },
-  { "Insurer Name": "Shriram General Insurance", "Policy Waiver": "5 Days" },
-  { "Insurer Name": "United Insurance", "Policy Waiver": "5 Days" },
-  { "Insurer Name": "Zurich Kotak General Insurance", "Policy Waiver": "5 Days" },
-  { "Insurer Name": "Royal Sundaram Insurance", "Policy Waiver": "7 Days" },
-  { "Insurer Name": "New India Assurance", "Policy Waiver": "1 Day" },
-  { "Insurer Name": "Oriental", "Policy Waiver": "3 Days" },
-  { "Insurer Name": "HDFC ERGO", "Policy Waiver": "5 Days" },
-  { "Insurer Name": "ICICI Lombard General Insurance Company Ltd", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "DIGIT", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "Future Generali", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "IFFCO Tokio", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "Liberty General Insurance", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "Magma HDI General Insurance", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "Universal Sompo", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "Zuno", "Policy Waiver": "No Waiver" },
-  { "Insurer Name": "SBI", "Policy Waiver": "Only Renewal (5 Days)" }
+    { "Insurer Name": "Tata AIG", "Policy Waiver": "1 Day" },
+    { "Insurer Name": "Reliance", "Policy Waiver": "15 Days (Renewal), 1 Day (New, Rollover)" },
+    { "Insurer Name": "Bajaj Allianz", "Policy Waiver": "5 Days" },
+    { "Insurer Name": "Chola MS", "Policy Waiver": "5 Days" },
+    { "Insurer Name": "National Insurance", "Policy Waiver": "5 Days" },
+    { "Insurer Name": "Shriram General Insurance", "Policy Waiver": "5 Days" },
+    { "Insurer Name": "United Insurance", "Policy Waiver": "5 Days" },
+    { "Insurer Name": "Zurich Kotak General Insurance", "Policy Waiver": "5 Days" },
+    { "Insurer Name": "Royal Sundaram Insurance", "Policy Waiver": "7 Days" },
+    { "Insurer Name": "New India Assurance", "Policy Waiver": "1 Day" },
+    { "Insurer Name": "Oriental", "Policy Waiver": "3 Days" },
+    { "Insurer Name": "HDFC ERGO", "Policy Waiver": "5 Days" },
+    { "Insurer Name": "ICICI Lombard General Insurance Company Ltd", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "DIGIT", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "Future Generali", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "IFFCO Tokio", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "Liberty General Insurance", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "Magma HDI General Insurance", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "Universal Sompo", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "Zuno", "Policy Waiver": "No Waiver" },
+    { "Insurer Name": "SBI", "Policy Waiver": "Only Renewal (5 Days)" }
 ];
 
 function populateInspectionWaiverTable(data) {
-  const tableBody = document.getElementById('inspectionWaiverTableBody');
-  // Check if tableBody exists before proceeding
-  if (!tableBody) {
-    console.error("Error: inspectionWaiverTableBody element not found.");
-    return;
-  }
-  tableBody.innerHTML = ''; // Clear existing rows
-  data.forEach(item => {
-    const row = document.createElement('tr');
-    const waiverText = item["Policy Waiver"].toLowerCase();
-    let waiverClass = '';
-    if (waiverText.includes("no waiver")) {
-      waiverClass = 'no-waiver';
-    } else if (waiverText.includes("days") || waiverText.includes("day")) {
-      waiverClass = 'days-waiver';
+    const tableBody = document.getElementById('inspectionWaiverTableBody');
+    // Check if tableBody exists before proceeding
+    if (!tableBody) {
+        console.error("Error: inspectionWaiverTableBody element not found.");
+        return;
     }
+    tableBody.innerHTML = ''; // Clear existing rows
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        const waiverText = item["Policy Waiver"].toLowerCase();
+        let waiverClass = '';
+        if (waiverText.includes("no waiver")) {
+            waiverClass = 'no-waiver';
+        } else if (waiverText.includes("days") || waiverText.includes("day")) {
+            waiverClass = 'days-waiver';
+        }
 
-    row.innerHTML = `
+        row.innerHTML = `
                   <td>${item["Insurer Name"]}</td>
                   <td class="policy-waiver-column ${waiverClass}">${item["Policy Waiver"]}</td>
               `;
-    tableBody.appendChild(row);
-  });
+        tableBody.appendChild(row);
+    });
 }
 
 // Data for RSA & Contact
 // Function to clean numbers and replace commas with slashes
 function cleanAndFormatNumber(numberString) {
-  if (!numberString) return "";
-  return numberString.replace(/,/g, '/').trim();
+    if (!numberString) return "";
+    return numberString.replace(/,/g, '/').trim();
 }
 
 const rsaContactData = [
 
-  { "Sr.": "1", "Insurer Name": "Bajaj Allianz", "RSA and Toll Free Number": "1800 209 5858 / 1800 209 0144 / 1800 103 5858", "Claim No.": "1800 209 0144 / 1800-209-5858" },
-  { "Sr.": "2", "Insurer Name": "United Insurance", "RSA and Toll Free Number": "7042113114 (Roadzen-delhi) and 1800 210 2051 (ROI)", "Claim No.": "" },
-  { "Sr.": "3", "Insurer Name": "Digit General", "RSA and Toll Free Number": "1800 258 5956 / (7026061234-whatsapp)", "Claim No.": "1800 103 4448" },
-  { "Sr.": "4", "Insurer Name": "Edelweiss (Zuno)", "RSA and Toll Free Number": "22 4231 2000 / 1800 12 000", "Claim No.": "" },
-  { "Sr.": "5", "Insurer Name": "Future Generali", "RSA and Toll Free Number": "1860 500 3333 / 1800 220 233 / 022 67837800", "Claim No.": "" },
-  { "Sr.": "6", "Insurer Name": "HDFC Ergo", "RSA and Toll Free Number": "022 6234 6234 / 0120 6234 6234", "Claim No.": "" },
-  { "Sr.": "7", "Insurer Name": "Iffco Tokio", "RSA and Toll Free Number": "1800 103 5499", "Claim No.": "" },
-  { "Sr.": "8", "Insurer Name": "Kotak General Insurance", "RSA and Toll Free Number": "1800 266 4545", "Claim No.": "" },
-  { "Sr.": "9", "Insurer Name": "Magma HDI", "RSA and Toll Free Number": "1800 266 3202", "Claim No.": "" },
-  { "Sr.": "10", "Insurer Name": "Reliance General Insurance", "RSA and Toll Free Number": "022 4890 3009 / 1800 3009 / 022 48947020", "Claim No.": "" },
-  { "Sr.": "11", "Insurer Name": "Royal Sundaram", "RSA and Toll Free Number": "1800 568 9999", "Claim No.": "" },
-  { "Sr.": "12", "Insurer Name": "SBI General Insurance", "RSA and Toll Free Number": "1800 22 1111 / 1800 102 1111", "Claim No.": "" },
-  { "Sr.": "13", "Insurer Name": "Shriram General Insurance", "RSA and Toll Free Number": "1800 300 30000 / 1800 103 3009", "Claim No.": "" },
-  { "Sr.": "14", "Insurer Name": "TATA AIG", "RSA and Toll Free Number": "1800 266 7780", "Claim No.": "" },
-  { "Sr.": "15", "Insurer Name": "Universal Sompo", "RSA and Toll Free Number": "1800 22 4030 / 1800 200 5142 / 022 27639800 / 1800 22 4090 / 1800 200 4030", "Claim No.": "" },
-  { "Sr.": "16", "Insurer Name": "Raheja QBE", "RSA and Toll Free Number": "1800 102 7723", "Claim No.": "18001027723" },
-  { "Sr.": "17", "Insurer Name": "Oriental Insurance", "RSA and Toll Free Number": "1800 309 1209", "Claim No.": "1800118485 / 011-33208485" },
-  { "Sr.": "18", "Insurer Name": "New India Insurance", "RSA and Toll Free Number": "1800-209-1415", "Claim No.": "1800-209-1415" },
-  { "Sr.": "19", "Insurer Name": "ICICI Lombard", "RSA and Toll Free Number": "1800 2666", "Claim No.": "1800 2666" },
-  { "Sr.": "20", "Insurer Name": "National", "RSA and Toll Free Number": "1800 345 0330", "Claim No.": "" },
-  { "Sr.": "21", "Insurer Name": "Liberty Videocon", "RSA and Toll Free Number": "1800 266 5844", "Claim No.": "" },
-  { "Sr.": "22", "Insurer Name": "PB_What's App No.", "RSA and Toll Free Number": "8506013131", "Claim No.": "" },
-  { "Sr.": "23", "Insurer Name": "PB_Service Team No.", "RSA and Toll Free Number": "1800-258-5970", "Claim No.": "" },
-  { "Sr.": "24", "Insurer Name": "PB_Health Renewal Team No.", "RSA and Toll Free Number": "1800-572-3919", "Claim No.": "" },
-  { "Sr.": "25", "Insurer Name": "PB_Health Sales Team No.", "RSA and Toll Free Number": "1800-419-7715", "Claim No.": "" },
-  { "Sr.": "26", "Insurer Name": "PB_Car Motor Sales Team No.", "RSA and Toll Free Number": "1800-419--7716", "Claim No.": "" },
-  { "Sr.": "27", "Insurer Name": "PB_Term/Jeevan Bima Sales Team No.", "RSA and Toll Free Number": "1800-419-7713", "Claim No.": "" },
-  { "Sr.": "28", "Insurer Name": "PB_Investment Sales Team No.", "RSA and Toll Free Number": "1800-419-7717", "Claim No.": "" },
-  { "Sr.": "29", "Insurer Name": "PB_Travel Sales Team No.", "RSA and Toll Free Number": "1800-419-7824", "Claim No.": "" },
-  { "Sr.": "30", "Insurer Name": "PB_Corporate Sales Team No.", "RSA and Toll Free Number": "1800-309-0988", "Claim No.": "" },
-  { "Sr.": "31", "Insurer Name": "PB_Corporate Service Team No.", "RSA and Toll Free Number": "1800-572-3918", "Claim No.": "" },
-  { "Sr.": "32", "Insurer Name": "PB_Home Insurance Team No.", "RSA and Toll Free Number": "1800-258-7202", "Claim No.": "" },
-  { "Sr.": "33", "Insurer Name": "PB_Commercial Vehicle Sales Team No.", "RSA and Toll Free Number": "0124-6108850", "Claim No.": "" },
-  { "Sr.": "34", "Insurer Name": "PB_Service Email Id", "RSA and Toll Free Number": "CARE@POLICYBAZAAR.COM", "Claim No.": "" },
-  { "Sr.": "35", "Insurer Name": "PB_NRI Team No.", "RSA and Toll Free Number": "0124-6656507", "Claim No.": "" },
-  { "Sr.": "36", "Insurer Name": "PB Partner Agent Team No.", "RSA and Toll Free Number": "1800-120-800", "Claim No.": "" },
-  { "Sr.": "37", "Insurer Name": "PB_Mail", "RSA and Toll Free Number": "SUPPORT@PBPARTNER.COM", "Claim No.": "" },
-  { "Sr.": "38", "Insurer Name": "Paisa Bazaar.com Team No.", "RSA and Toll Free Number": "1800-208-8877", "Claim No.": "" },
-  { "Sr.": "39", "Insurer Name": "PB_2W Renewal Team No.", "RSA and Toll Free Number": "0124-6138301", "Claim No.": "" },
-  { "Sr.": "40", "Insurer Name": "PB_Sales Team No.", "RSA and Toll Free Number": "1800-419-7716", "Claim No.": "" },
-  { "Sr.": "41", "Insurer Name": "PB_Claim Team NO.", "RSA and Toll Free Number": "1800-258-5881", "Claim No.": "" }
+    { "Sr.": "1", "Insurer Name": "Bajaj Allianz", "RSA and Toll Free Number": "1800 209 5858 / 1800 209 0144 / 1800 103 5858", "Claim No.": "1800 209 0144 / 1800-209-5858" },
+    { "Sr.": "2", "Insurer Name": "United Insurance", "RSA and Toll Free Number": "7042113114 (Roadzen-delhi) and 1800 210 2051 (ROI)", "Claim No.": "" },
+    { "Sr.": "3", "Insurer Name": "Digit General", "RSA and Toll Free Number": "1800 258 5956 / (7026061234-whatsapp)", "Claim No.": "1800 103 4448" },
+    { "Sr.": "4", "Insurer Name": "Edelweiss (Zuno)", "RSA and Toll Free Number": "22 4231 2000 / 1800 12 000", "Claim No.": "" },
+    { "Sr.": "5", "Insurer Name": "Future Generali", "RSA and Toll Free Number": "1860 500 3333 / 1800 220 233 / 022 67837800", "Claim No.": "" },
+    { "Sr.": "6", "Insurer Name": "HDFC Ergo", "RSA and Toll Free Number": "022 6234 6234 / 0120 6234 6234", "Claim No.": "" },
+    { "Sr.": "7", "Insurer Name": "Iffco Tokio", "RSA and Toll Free Number": "1800 103 5499", "Claim No.": "" },
+    { "Sr.": "8", "Insurer Name": "Kotak General Insurance", "RSA and Toll Free Number": "1800 266 4545", "Claim No.": "" },
+    { "Sr.": "9", "Insurer Name": "Magma HDI", "RSA and Toll Free Number": "1800 266 3202", "Claim No.": "" },
+    { "Sr.": "10", "Insurer Name": "Reliance General Insurance", "RSA and Toll Free Number": "022 4890 3009 / 1800 3009 / 022 48947020", "Claim No.": "" },
+    { "Sr.": "11", "Insurer Name": "Royal Sundaram", "RSA and Toll Free Number": "1800 568 9999", "Claim No.": "" },
+    { "Sr.": "12", "Insurer Name": "SBI General Insurance", "RSA and Toll Free Number": "1800 22 1111 / 1800 102 1111", "Claim No.": "" },
+    { "Sr.": "13", "Insurer Name": "Shriram General Insurance", "RSA and Toll Free Number": "1800 300 30000 / 1800 103 3009", "Claim No.": "" },
+    { "Sr.": "14", "Insurer Name": "TATA AIG", "RSA and Toll Free Number": "1800 266 7780", "Claim No.": "" },
+    { "Sr.": "15", "Insurer Name": "Universal Sompo", "RSA and Toll Free Number": "1800 22 4030 / 1800 200 5142 / 022 27639800 / 1800 22 4090 / 1800 200 4030", "Claim No.": "" },
+    { "Sr.": "16", "Insurer Name": "Raheja QBE", "RSA and Toll Free Number": "1800 102 7723", "Claim No.": "18001027723" },
+    { "Sr.": "17", "Insurer Name": "Oriental Insurance", "RSA and Toll Free Number": "1800 309 1209", "Claim No.": "1800118485 / 011-33208485" },
+    { "Sr.": "18", "Insurer Name": "New India Insurance", "RSA and Toll Free Number": "1800-209-1415", "Claim No.": "1800-209-1415" },
+    { "Sr.": "19", "Insurer Name": "ICICI Lombard", "RSA and Toll Free Number": "1800 2666", "Claim No.": "1800 2666" },
+    { "Sr.": "20", "Insurer Name": "National", "RSA and Toll Free Number": "1800 345 0330", "Claim No.": "" },
+    { "Sr.": "21", "Insurer Name": "Liberty Videocon", "RSA and Toll Free Number": "1800 266 5844", "Claim No.": "" },
+    { "Sr.": "22", "Insurer Name": "PB_What's App No.", "RSA and Toll Free Number": "8506013131", "Claim No.": "" },
+    { "Sr.": "23", "Insurer Name": "PB_Service Team No.", "RSA and Toll Free Number": "1800-258-5970", "Claim No.": "" },
+    { "Sr.": "24", "Insurer Name": "PB_Health Renewal Team No.", "RSA and Toll Free Number": "1800-572-3919", "Claim No.": "" },
+    { "Sr.": "25", "Insurer Name": "PB_Health Sales Team No.", "RSA and Toll Free Number": "1800-419-7715", "Claim No.": "" },
+    { "Sr.": "26", "Insurer Name": "PB_Car Motor Sales Team No.", "RSA and Toll Free Number": "1800-419--7716", "Claim No.": "" },
+    { "Sr.": "27", "Insurer Name": "PB_Term/Jeevan Bima Sales Team No.", "RSA and Toll Free Number": "1800-419-7713", "Claim No.": "" },
+    { "Sr.": "28", "Insurer Name": "PB_Investment Sales Team No.", "RSA and Toll Free Number": "1800-419-7717", "Claim No.": "" },
+    { "Sr.": "29", "Insurer Name": "PB_Travel Sales Team No.", "RSA and Toll Free Number": "1800-419-7824", "Claim No.": "" },
+    { "Sr.": "30", "Insurer Name": "PB_Corporate Sales Team No.", "RSA and Toll Free Number": "1800-309-0988", "Claim No.": "" },
+    { "Sr.": "31", "Insurer Name": "PB_Corporate Service Team No.", "RSA and Toll Free Number": "1800-572-3918", "Claim No.": "" },
+    { "Sr.": "32", "Insurer Name": "PB_Home Insurance Team No.", "RSA and Toll Free Number": "1800-258-7202", "Claim No.": "" },
+    { "Sr.": "33", "Insurer Name": "PB_Commercial Vehicle Sales Team No.", "RSA and Toll Free Number": "0124-6108850", "Claim No.": "" },
+    { "Sr.": "34", "Insurer Name": "PB_Service Email Id", "RSA and Toll Free Number": "CARE@POLICYBAZAAR.COM", "Claim No.": "" },
+    { "Sr.": "35", "Insurer Name": "PB_NRI Team No.", "RSA and Toll Free Number": "0124-6656507", "Claim No.": "" },
+    { "Sr.": "36", "Insurer Name": "PB Partner Agent Team No.", "RSA and Toll Free Number": "1800-120-800", "Claim No.": "" },
+    { "Sr.": "37", "Insurer Name": "PB_Mail", "RSA and Toll Free Number": "SUPPORT@PBPARTNER.COM", "Claim No.": "" },
+    { "Sr.": "38", "Insurer Name": "Paisa Bazaar.com Team No.", "RSA and Toll Free Number": "1800-208-8877", "Claim No.": "" },
+    { "Sr.": "39", "Insurer Name": "PB_2W Renewal Team No.", "RSA and Toll Free Number": "0124-6138301", "Claim No.": "" },
+    { "Sr.": "40", "Insurer Name": "PB_Sales Team No.", "RSA and Toll Free Number": "1800-419-7716", "Claim No.": "" },
+    { "Sr.": "41", "Insurer Name": "PB_Claim Team NO.", "RSA and Toll Free Number": "1800-258-5881", "Claim No.": "" }
 
 ];
 
 function populateRSATable(data) {
-  const tableBody = document.getElementById('rsaContactTableBody');
-  // Check if tableBody exists before proceeding
-  if (!tableBody) {
-    console.error("Error: rsaContactTableBody element not found.");
-    return;
-  }
-  tableBody.innerHTML = ''; // Clear existing rows
-  if (data.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No RSA & Contact data available.</td></tr>';
-    return;
-  }
-  data.forEach(item => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
+    const tableBody = document.getElementById('rsaContactTableBody');
+    // Check if tableBody exists before proceeding
+    if (!tableBody) {
+        console.error("Error: rsaContactTableBody element not found.");
+        return;
+    }
+    tableBody.innerHTML = ''; // Clear existing rows
+    if (data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No RSA & Contact data available.</td></tr>';
+        return;
+    }
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
                   <td>${item["Sr."]}</td>
                   <td>${item["Insurer Name"]}</td>
                   <td>${cleanAndFormatNumber(item["RSA and Toll Free Number"])}</td>
                   <td>${cleanAndFormatNumber(item["Claim No."])}</td>
               `;
-    tableBody.appendChild(row);
-  });
+        tableBody.appendChild(row);
+    });
 }
 
 function setupRSADashboardListeners() {
-  // Remove existing listener for search input and re-add
-  const rsaSearchInput = document.getElementById('rsaSearchInput');
-  if (rsaSearchInput) {
-    const newRSASearchInput = rsaSearchInput.cloneNode(true);
-    rsaSearchInput.parentNode.replaceChild(newRSASearchInput, rsaSearchInput);
+    // Remove existing listener for search input and re-add
+    const rsaSearchInput = document.getElementById('rsaSearchInput');
+    if (rsaSearchInput) {
+        const newRSASearchInput = rsaSearchInput.cloneNode(true);
+        rsaSearchInput.parentNode.replaceChild(newRSASearchInput, rsaSearchInput);
 
-    newRSASearchInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const filteredData = rsaContactData.filter(item =>
-        item["Insurer Name"].toLowerCase().includes(searchTerm) ||
-        cleanAndFormatNumber(item["RSA and Toll Free Number"]).toLowerCase().includes(searchTerm) ||
-        cleanAndFormatNumber(item["Claim No."]).toLowerCase().includes(searchTerm)
-      );
-      populateRSATable(filteredData);
-    });
-  }
+        newRSASearchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredData = rsaContactData.filter(item =>
+                item["Insurer Name"].toLowerCase().includes(searchTerm) ||
+                cleanAndFormatNumber(item["RSA and Toll Free Number"]).toLowerCase().includes(searchTerm) ||
+                cleanAndFormatNumber(item["Claim No."]).toLowerCase().includes(searchTerm)
+            );
+            populateRSATable(filteredData);
+        });
+    }
 }
 
 
@@ -12661,382 +12661,382 @@ loadImages();
 
 // --- NEW JAVASCRIPT FOR UPDATES BUTTON AND MODAL ---
 document.addEventListener('DOMContentLoaded', function () {
-  const updatesButton = document.getElementById('companyUpdatesButton');
-  const updatesModal = document.getElementById('updatesModal');
-  const closeModalButton = document.getElementById('closeModalButton');
-  const updatesContainer = document.getElementById('updatesContainer');
-  const latestUpdateSnippetElem = document.getElementById('latestUpdateSnippet');
-  const newUpdateIndicator = document.getElementById('newUpdateIndicator');
+    const updatesButton = document.getElementById('companyUpdatesButton');
+    const updatesModal = document.getElementById('updatesModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+    const updatesContainer = document.getElementById('updatesContainer');
+    const latestUpdateSnippetElem = document.getElementById('latestUpdateSnippet');
+    const newUpdateIndicator = document.getElementById('newUpdateIndicator');
 
-  // --- IMPORTANT: DAILY UPDATES DATA SECTION (दैनिक अपडेट डेटा सेक्शन) ---
-  // YAHAN AAP APNE DAILY UPDATES DALEIN. (यहां आप अपने दैनिक अपडेट डालें।)
-  // Har company ke liye, updates ko array ke andar dalien. (हर कंपनी के लिए, अपडेट को एरे के अंदर डालें।)
-  // Naye updates ko array ke shuruat (top) mein dalien, taaki woh pehle dikhein. (नए अपडेट को एरे की शुरुआत (शीर्ष) में डालें, ताकि वह पहले दिखें।)
-  // Format: { date: "YYYY-MM-DD", update: "Your update text here" } (फॉर्मेट: { date: "YYYY-MM-DD", update: "आपका अपडेट टेक्स्ट यहां" })
-  const companyUpdates = {
-    "National": [],
-    "New India Assurance": [],
-    "Oriental": [],
-    "United India": [],
-    "Tata AIG": [{
-      "date": "2025-06-30",
-      "update": "TATA AIG Battery Protection Cover 1. Applicable for EV vehicles 2. Covers damage to battery, drive motor/electric motor, and includes chargers & cables as well (up to the IDV) 3. Provides coverage for water ingression, short circuit, or damages from accidental external factors 4. Counted as a claim 5. Allowed 2 times in a policy year"
+    // --- IMPORTANT: DAILY UPDATES DATA SECTION (दैनिक अपडेट डेटा सेक्शन) ---
+    // YAHAN AAP APNE DAILY UPDATES DALEIN. (यहां आप अपने दैनिक अपडेट डालें।)
+    // Har company ke liye, updates ko array ke andar dalien. (हर कंपनी के लिए, अपडेट को एरे के अंदर डालें।)
+    // Naye updates ko array ke shuruat (top) mein dalien, taaki woh pehle dikhein. (नए अपडेट को एरे की शुरुआत (शीर्ष) में डालें, ताकि वह पहले दिखें।)
+    // Format: { date: "YYYY-MM-DD", update: "Your update text here" } (फॉर्मेट: { date: "YYYY-MM-DD", update: "आपका अपडेट टेक्स्ट यहां" })
+    const companyUpdates = {
+        "National": [],
+        "New India Assurance": [],
+        "Oriental": [],
+        "United India": [],
+        "Tata AIG": [{
+            "date": "2025-06-30",
+            "update": "TATA AIG Battery Protection Cover 1. Applicable for EV vehicles 2. Covers damage to battery, drive motor/electric motor, and includes chargers & cables as well (up to the IDV) 3. Provides coverage for water ingression, short circuit, or damages from accidental external factors 4. Counted as a claim 5. Allowed 2 times in a policy year"
+        }
+        ],
+        "ICICI Lombard": [{
+            "date": "2025-06-30",
+            "update": "ICICI Lombard Battery Protection 1. Provides coverage for damages arising from water ingression or short circuits, resulting in loss or damage to the battery, drive motor/electric motor, and HEV (Hybrid Electric Vehicle) system 2. Coverage extends up to the Insured Declared Value (IDV) 3. Counted as a claim with a limit of 1 time per policy year 4. Charging cables and chargers are not included under this protection cover 5. Applicable for both Hybrid and EV vehicles"
+        }
+        ],
+        "Zuno General": [],
+        "Cholamandalam MS": [],
+        "Future Generali": [],
+        "Magma": [],
+        "Raheja QBE": [],
+        "Kotak": [],
+        "SBI General": [{ date: "2025-08-11", update: "For all Pre issuance rejection: Please mark an email to customer regarding the refund process of 7 working days from the date of rejection" }],
+        "Shriram": [],
+        "IFFCO Tokio": [],
+        "Liberty Videocon": [],
+        "HDFC Ergo": [],
+        "Reliance": [
+            { date: "2025-06-12", update: "Unmasked KYC documents (Aadhar and PAN card) are needed for KYC in Reliance. Please ask the CX to share Aadhar card through Email." }
+        ],
+        "Bajaj Allianz": [],
+        "Royal Sundaram": [],
+        "Universal Sompo": [],
+        "Digit": [{ date: "2025-06-12", update: "if cx comes for odometere update in DIGIT , THese 4 things needs to be captured:- odomeret reading, engraved, chasis number, 360 degree view and Engiene compartment" }, {
+            "date": "2025-06-30",
+            "update": "Digit Battery Protection Add-on 1. Applicable for both Hybrid and EV vehicles 2. Covers damage to battery, drive motor/electric motor, and Hybrid Electric Vehicle (HEV), including chargers and cables as well (up to the IDV) 3. Provides coverage for water ingression, short circuit, or damages from accidental external factors 4. Counted as a claim 5. Allowed 2 times in a policy year"
+        }, { date: "2025-08-11", update: "For all Pre issuance rejection: Please mark an email to customer regarding the refund process of 7 working days from the date of rejection" }],
+        "BAJAJ CPA": [],
+        "DIGIT CPA": [],
+        "CHOLA CPA": [],
+        "KOTAK CPA": [],
+        "RELIENCE CPA": [],
+        "LIBERTY CPA": []
+    };
+    // --- END OF DAILY UPDATES DATA SECTION ---
+
+
+    // This variable will hold the snippet for display on the button.
+    let latestUpdateSnippetText = "";
+    let hasNewUpdate = false;
+
+    // Find the most recent update among all companies for the button snippet
+    // This will pick the first company in the list that has an update.
+    // If no updates are present in any company, hasNewUpdate will remain false.
+    // Sort all updates by date in descending order to get the latest one
+    const allUpdates = [];
+    for (const company in companyUpdates) {
+        if (companyUpdates.hasOwnProperty(company)) {
+            companyUpdates[company].forEach(updateItem => {
+                allUpdates.push({ company: company, date: updateItem.date, update: updateItem.update });
+            });
+        }
     }
-    ],
-    "ICICI Lombard": [{
-      "date": "2025-06-30",
-      "update": "ICICI Lombard Battery Protection 1. Provides coverage for damages arising from water ingression or short circuits, resulting in loss or damage to the battery, drive motor/electric motor, and HEV (Hybrid Electric Vehicle) system 2. Coverage extends up to the Insured Declared Value (IDV) 3. Counted as a claim with a limit of 1 time per policy year 4. Charging cables and chargers are not included under this protection cover 5. Applicable for both Hybrid and EV vehicles"
+
+    allUpdates.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (allUpdates.length > 0) {
+        const mostRecentUpdate = allUpdates[0];
+        latestUpdateSnippetText = `${mostRecentUpdate.company}: ${mostRecentUpdate.update}`;
+        hasNewUpdate = true;
     }
-    ],
-    "Zuno General": [],
-    "Cholamandalam MS": [],
-    "Future Generali": [],
-    "Magma": [],
-    "Raheja QBE": [],
-    "Kotak": [],
-    "SBI General": [{ date: "2025-08-11", update: "For all Pre issuance rejection: Please mark an email to customer regarding the refund process of 7 working days from the date of rejection" }],
-    "Shriram": [],
-    "IFFCO Tokio": [],
-    "Liberty Videocon": [],
-    "HDFC Ergo": [],
-    "Reliance": [
-      { date: "2025-06-12", update: "Unmasked KYC documents (Aadhar and PAN card) are needed for KYC in Reliance. Please ask the CX to share Aadhar card through Email." }
-    ],
-    "Bajaj Allianz": [],
-    "Royal Sundaram": [],
-    "Universal Sompo": [],
-    "Digit": [{ date: "2025-06-12", update: "if cx comes for odometere update in DIGIT , THese 4 things needs to be captured:- odomeret reading, engraved, chasis number, 360 degree view and Engiene compartment" }, {
-      "date": "2025-06-30",
-      "update": "Digit Battery Protection Add-on 1. Applicable for both Hybrid and EV vehicles 2. Covers damage to battery, drive motor/electric motor, and Hybrid Electric Vehicle (HEV), including chargers and cables as well (up to the IDV) 3. Provides coverage for water ingression, short circuit, or damages from accidental external factors 4. Counted as a claim 5. Allowed 2 times in a policy year"
-    }, { date: "2025-08-11", update: "For all Pre issuance rejection: Please mark an email to customer regarding the refund process of 7 working days from the date of rejection" }],
-    "BAJAJ CPA": [],
-    "DIGIT CPA": [],
-    "CHOLA CPA": [],
-    "KOTAK CPA": [],
-    "RELIENCE CPA": [],
-    "LIBERTY CPA": []
-  };
-  // --- END OF DAILY UPDATES DATA SECTION ---
 
 
-  // This variable will hold the snippet for display on the button.
-  let latestUpdateSnippetText = "";
-  let hasNewUpdate = false;
-
-  // Find the most recent update among all companies for the button snippet
-  // This will pick the first company in the list that has an update.
-  // If no updates are present in any company, hasNewUpdate will remain false.
-  // Sort all updates by date in descending order to get the latest one
-  const allUpdates = [];
-  for (const company in companyUpdates) {
-    if (companyUpdates.hasOwnProperty(company)) {
-      companyUpdates[company].forEach(updateItem => {
-        allUpdates.push({ company: company, date: updateItem.date, update: updateItem.update });
-      });
+    // Function to display the modal
+    function showUpdatesModal() {
+        if (updatesModal) updatesModal.classList.add('active');
+        populateUpdates(); // Populate updates when modal opens
+        // After showing, mark as seen for this session
+        sessionStorage.setItem('updatesSeen', 'true');
+        hideNewUpdateIndicatorAndSnippet(); // Hide indicator once modal is opened
+        hideAllMainContent(); // Hide other main content when updates modal is open
     }
-  }
 
-  allUpdates.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  if (allUpdates.length > 0) {
-    const mostRecentUpdate = allUpdates[0];
-    latestUpdateSnippetText = `${mostRecentUpdate.company}: ${mostRecentUpdate.update}`;
-    hasNewUpdate = true;
-  }
-
-
-  // Function to display the modal
-  function showUpdatesModal() {
-    if (updatesModal) updatesModal.classList.add('active');
-    populateUpdates(); // Populate updates when modal opens
-    // After showing, mark as seen for this session
-    sessionStorage.setItem('updatesSeen', 'true');
-    hideNewUpdateIndicatorAndSnippet(); // Hide indicator once modal is opened
-    hideAllMainContent(); // Hide other main content when updates modal is open
-  }
-
-  // Function to hide the modal
-  function closeUpdatesModal() {
-    if (updatesModal) updatesModal.classList.remove('active');
-    showAllMainContent(); // Show other main content when updates modal is closed
-  }
-
-  // Function to populate the updates in an accordion style
-  function populateUpdates() {
-    if (!updatesContainer) {
-      console.error("Error: updatesContainer element not found.");
-      return;
+    // Function to hide the modal
+    function closeUpdatesModal() {
+        if (updatesModal) updatesModal.classList.remove('active');
+        showAllMainContent(); // Show other main content when updates modal is closed
     }
-    updatesContainer.innerHTML = ''; // Clear previous content
-    // Dynamically add all company names as accordion headers
-    const allCompanies = [
-      "National", "New India Assurance", "Oriental", "United India", "Tata AIG",
-      "ICICI Lombard", "Zuno General", "Cholamandalam MS", "Future Generali",
-      "Magma", "Raheja QBE", "Kotak", "SBI General", "Shriram", "IFFCO Tokio",
-      "Liberty Videocon", "HDFC Ergo", "Reliance", "Bajaj Allianz", "Royal Sundaram",
-      "Universal Sompo", "Digit", "BAJAJ CPA", "DIGIT CPA", "CHOLA CPA",
-      "KOTAK CPA", "RELIENCE CPA", "LIBERTY CPA"
-    ];
 
-    allCompanies.forEach(company => {
-      const companyUpdatesList = companyUpdates[company] || []; // Use empty array if company not in data
-      // Sort updates for each company by date descending
-      companyUpdatesList.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Function to populate the updates in an accordion style
+    function populateUpdates() {
+        if (!updatesContainer) {
+            console.error("Error: updatesContainer element not found.");
+            return;
+        }
+        updatesContainer.innerHTML = ''; // Clear previous content
+        // Dynamically add all company names as accordion headers
+        const allCompanies = [
+            "National", "New India Assurance", "Oriental", "United India", "Tata AIG",
+            "ICICI Lombard", "Zuno General", "Cholamandalam MS", "Future Generali",
+            "Magma", "Raheja QBE", "Kotak", "SBI General", "Shriram", "IFFCO Tokio",
+            "Liberty Videocon", "HDFC Ergo", "Reliance", "Bajaj Allianz", "Royal Sundaram",
+            "Universal Sompo", "Digit", "BAJAJ CPA", "DIGIT CPA", "CHOLA CPA",
+            "KOTAK CPA", "RELIENCE CPA", "LIBERTY CPA"
+        ];
 
-      const accordionItem = document.createElement('div');
-      accordionItem.classList.add('accordion-item');
+        allCompanies.forEach(company => {
+            const companyUpdatesList = companyUpdates[company] || []; // Use empty array if company not in data
+            // Sort updates for each company by date descending
+            companyUpdatesList.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      const accordionHeader = document.createElement('div');
-      accordionHeader.classList.add('accordion-header');
-      accordionHeader.textContent = company; // Company name is always set
-      accordionHeader.dataset.company = company; // Store company name for identifier
+            const accordionItem = document.createElement('div');
+            accordionItem.classList.add('accordion-item');
 
-      const accordionContent = document.createElement('div');
-      accordionContent.classList.add('accordion-content');
-      const ul = document.createElement('ul');
+            const accordionHeader = document.createElement('div');
+            accordionHeader.classList.add('accordion-header');
+            accordionHeader.textContent = company; // Company name is always set
+            accordionHeader.dataset.company = company; // Store company name for identifier
 
-      if (companyUpdatesList.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = "No updates available yet."; // This text is added if no updates
-        ul.appendChild(li);
-      } else {
-        companyUpdatesList.forEach(updateItem => {
-          const li = document.createElement('li');
-          li.innerHTML = `<strong>${updateItem.date}:</strong> ${updateItem.update}`;
-          ul.appendChild(li);
+            const accordionContent = document.createElement('div');
+            accordionContent.classList.add('accordion-content');
+            const ul = document.createElement('ul');
+
+            if (companyUpdatesList.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = "No updates available yet."; // This text is added if no updates
+                ul.appendChild(li);
+            } else {
+                companyUpdatesList.forEach(updateItem => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${updateItem.date}:</strong> ${updateItem.update}`;
+                    ul.appendChild(li);
+                });
+            }
+
+            accordionContent.appendChild(ul);
+            accordionItem.appendChild(accordionHeader);
+            accordionItem.appendChild(accordionContent);
+            updatesContainer.appendChild(accordionItem);
         });
-      }
 
-      accordionContent.appendChild(ul);
-      accordionItem.appendChild(accordionHeader);
-      accordionItem.appendChild(accordionContent);
-      updatesContainer.appendChild(accordionItem);
-    });
-
-    // Add event listeners to all accordion headers
-    document.querySelectorAll('.accordion-header').forEach(header => {
-      header.addEventListener('click', function () {
-        const content = this.nextElementSibling;
-        // Toggle active class on header
-        this.classList.toggle('active');
-        // Toggle active class on content to control max-height and padding
-        content.classList.toggle('active');
-      });
-    });
-  }
-
-  // --- New Update Indicator Logic ---
-  function showNewUpdateIndicatorAndSnippet() {
-    // If there's an update and it hasn't been seen in this session
-    if (hasNewUpdate && !sessionStorage.getItem('updatesSeen')) {
-      if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = latestUpdateSnippetText;
-      if (newUpdateIndicator) newUpdateIndicator.style.display = 'block'; // Show the pulsating dot
-    } else {
-      if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = ''; // Clear snippet
-      if (newUpdateIndicator) newUpdateIndicator.style.display = 'none';
+        // Add event listeners to all accordion headers
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', function () {
+                const content = this.nextElementSibling;
+                // Toggle active class on header
+                this.classList.toggle('active');
+                // Toggle active class on content to control max-height and padding
+                content.classList.toggle('active');
+            });
+        });
     }
-  }
 
-  function hideNewUpdateIndicatorAndSnippet() {
-    if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = '';
-    if (newUpdateIndicator) newUpdateIndicator.style.display = 'none';
-  }
+    // --- New Update Indicator Logic ---
+    function showNewUpdateIndicatorAndSnippet() {
+        // If there's an update and it hasn't been seen in this session
+        if (hasNewUpdate && !sessionStorage.getItem('updatesSeen')) {
+            if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = latestUpdateSnippetText;
+            if (newUpdateIndicator) newUpdateIndicator.style.display = 'block'; // Show the pulsating dot
+        } else {
+            if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = ''; // Clear snippet
+            if (newUpdateIndicator) newUpdateIndicator.style.display = 'none';
+        }
+    }
 
-  // --- Event Listeners for the New Updates Feature ---
-  if (updatesButton) updatesButton.addEventListener('click', showUpdatesModal);
-  if (closeModalButton) closeModalButton.addEventListener('click', closeUpdatesModal);
-  // Close modal if clicked directly on the overlay background
-  if (updatesModal) {
-    updatesModal.addEventListener('click', function (event) {
-      if (event.target === updatesModal) { // Only closes if clicked on the dark background
-        closeUpdatesModal();
-      }
-    });
-  }
+    function hideNewUpdateIndicatorAndSnippet() {
+        if (latestUpdateSnippetElem) latestUpdateSnippetElem.textContent = '';
+        if (newUpdateIndicator) newUpdateIndicator.style.display = 'none';
+    }
 
-  // Initial call to display new update indicator/snippet on page load
-  showNewUpdateIndicatorAndSnippet();
+    // --- Event Listeners for the New Updates Feature ---
+    if (updatesButton) updatesButton.addEventListener('click', showUpdatesModal);
+    if (closeModalButton) closeModalButton.addEventListener('click', closeUpdatesModal);
+    // Close modal if clicked directly on the overlay background
+    if (updatesModal) {
+        updatesModal.addEventListener('click', function (event) {
+            if (event.target === updatesModal) { // Only closes if clicked on the dark background
+                closeUpdatesModal();
+            }
+        });
+    }
+
+    // Initial call to display new update indicator/snippet on page load
+    showNewUpdateIndicatorAndSnippet();
 });
 // Fill CSAT & Quality dropdowns + AHT
 window.onload = function () {
-  let csatSelect = document.getElementById("incentiveCSAT");
-  let qualitySelect = document.getElementById("incentiveQuality");
-  let minSelect = document.getElementById("incentiveAHTMin");
-  let secSelect = document.getElementById("incentiveAHTSec");
+    let csatSelect = document.getElementById("incentiveCSAT");
+    let qualitySelect = document.getElementById("incentiveQuality");
+    let minSelect = document.getElementById("incentiveAHTMin");
+    let secSelect = document.getElementById("incentiveAHTSec");
 
-  // Clear existing options to prevent duplication issues
-  csatSelect.innerHTML = '';
-  qualitySelect.innerHTML = '';
-  minSelect.innerHTML = '';
-  secSelect.innerHTML = '';
+    // Clear existing options to prevent duplication issues
+    csatSelect.innerHTML = '';
+    qualitySelect.innerHTML = '';
+    minSelect.innerHTML = '';
+    secSelect.innerHTML = '';
 
-  // CSAT 80–100
-  for (let i = 80; i <= 100; i++) {
-    csatSelect.innerHTML += `<option value="${i}">${i}%</option>`;
-    if (i < 100) {
-      csatSelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+    // CSAT 80–100
+    for (let i = 80; i <= 100; i++) {
+        csatSelect.innerHTML += `<option value="${i}">${i}%</option>`;
+        if (i < 100) {
+            csatSelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+        }
     }
-  }
-  csatSelect.value = "90";
+    csatSelect.value = "90";
 
-  // Quality 40–100
-  for (let i = 40; i <= 100; i++) {
-    qualitySelect.innerHTML += `<option value="${i}">${i}%</option>`;
-    if (i < 100) {
-      qualitySelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+    // Quality 40–100
+    for (let i = 40; i <= 100; i++) {
+        qualitySelect.innerHTML += `<option value="${i}">${i}%</option>`;
+        if (i < 100) {
+            qualitySelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+        }
     }
-  }
-  qualitySelect.value = "90";
+    qualitySelect.value = "90";
 
-  // AHT minutes (2–7 min)
-  for (let i = 2; i <= 7; i++) {
-    minSelect.innerHTML += `<option value="${i}">${i} Min</option>`;
-  }
-  minSelect.value = "4";
+    // AHT minutes (2–7 min)
+    for (let i = 2; i <= 7; i++) {
+        minSelect.innerHTML += `<option value="${i}">${i} Min</option>`;
+    }
+    minSelect.value = "4";
 
-  // AHT seconds (step of 10 sec)
-  // AHT seconds (1 to 59 sec)
-  for (let i = 0; i < 60; i++) {
-    secSelect.innerHTML += `<option value="${i}">${i} Sec</option>`;
-  }
-  secSelect.value = "30";
+    // AHT seconds (step of 10 sec)
+    // AHT seconds (1 to 59 sec)
+    for (let i = 0; i < 60; i++) {
+        secSelect.innerHTML += `<option value="${i}">${i} Sec</option>`;
+    }
+    secSelect.value = "30";
 };
 
 // Open Modal
 window.openIncentiveModal = function () {
-  document.getElementById("incentiveModal").style.display = "flex";
+    document.getElementById("incentiveModal").style.display = "flex";
 };
 
 // Close Modal
 window.closeIncentiveModal = function () {
-  document.getElementById("incentiveModal").style.display = "none";
+    document.getElementById("incentiveModal").style.display = "none";
 };
 
 // --- Helper Functions ---
 
 // Step 1: CSAT flat amount
 function getCSATFlatAmount(csatValue) {
-  let csat = parseFloat(csatValue);
-  let isPlus = csatValue.includes("+");
+    let csat = parseFloat(csatValue);
+    let isPlus = csatValue.includes("+");
 
-  if (csat <= 85 && !isPlus) return 0;
-  if (csat <= 87 && !isPlus) return 2000;
-  if (csat <= 90 && !isPlus) return 5000;
-  if (csat <= 92 && !isPlus) return 6000;
-  if (csat <= 95 && !isPlus) return 7000;
-  if (csat <= 97 && !isPlus) return 8000;
+    if (csat <= 85 && !isPlus) return 0;
+    if (csat <= 87 && !isPlus) return 2000;
+    if (csat <= 90 && !isPlus) return 5000;
+    if (csat <= 92 && !isPlus) return 6000;
+    if (csat <= 95 && !isPlus) return 7000;
+    if (csat <= 97 && !isPlus) return 8000;
 
-  // Logic for '+' values and scores > 97
-  if (csat > 97 || (isPlus && csat >= 97)) return 10000;
-  if (isPlus && csat >= 95) return 8000;
-  if (isPlus && csat >= 92) return 7000;
-  if (isPlus && csat >= 90) return 6000;
-  if (isPlus && csat >= 87) return 5000;
-  if (isPlus && csat >= 85) return 2000;
-  if (isPlus && csat < 85) return 0;
+    // Logic for '+' values and scores > 97
+    if (csat > 97 || (isPlus && csat >= 97)) return 10000;
+    if (isPlus && csat >= 95) return 8000;
+    if (isPlus && csat >= 92) return 7000;
+    if (isPlus && csat >= 90) return 6000;
+    if (isPlus && csat >= 87) return 5000;
+    if (isPlus && csat >= 85) return 2000;
+    if (isPlus && csat < 85) return 0;
 
-  return 0; // Default case
+    return 0; // Default case
 }
 
 // Step 2: Quality Bonus
 function getQualityBonus(qualityValue, csatFlatAmount) {
-  let quality = parseFloat(qualityValue);
-  let isPlus = qualityValue.includes("+");
+    let quality = parseFloat(qualityValue);
+    let isPlus = qualityValue.includes("+");
 
-  if (quality < 80 && !isPlus) return null; // Cancel incentive
-  if (quality <= 85 && !isPlus) return csatFlatAmount * 0.05;
-  if (quality <= 90 && !isPlus) return csatFlatAmount * 0.10;
+    if (quality < 80 && !isPlus) return null; // Cancel incentive
+    if (quality <= 85 && !isPlus) return csatFlatAmount * 0.05;
+    if (quality <= 90 && !isPlus) return csatFlatAmount * 0.10;
 
-  // Logic for '+' values and scores > 90
-  if (quality > 90 || (isPlus && quality >= 90)) return csatFlatAmount * 0.25;
-  if (isPlus && quality >= 85) return csatFlatAmount * 0.10;
-  if (isPlus && quality < 85 && quality >= 80) return csatFlatAmount * 0.05;
-  if (isPlus && quality < 80) return null;
+    // Logic for '+' values and scores > 90
+    if (quality > 90 || (isPlus && quality >= 90)) return csatFlatAmount * 0.25;
+    if (isPlus && quality >= 85) return csatFlatAmount * 0.10;
+    if (isPlus && quality < 85 && quality >= 80) return csatFlatAmount * 0.05;
+    if (isPlus && quality < 80) return null;
 
-  return csatFlatAmount * 0.25; // Default for >90
+    return csatFlatAmount * 0.25; // Default for >90
 }
 
 // Step 3: AHT Bonus (No change here)
 function getAHTBonus(aht, csatFlatAmount) {
-  if (aht <= 230) return csatFlatAmount * 0.25; // ≤ 3:50
-  else if (aht <= 290) return csatFlatAmount * 0.10; // 3:51 – 4:50
-  else if (aht <= 360) return csatFlatAmount * 0.05; // 4:51 – 6:00
-  else return 0; // > 6:00
+    if (aht <= 230) return csatFlatAmount * 0.25; // ≤ 3:50
+    else if (aht <= 290) return csatFlatAmount * 0.10; // 3:51 – 4:50
+    else if (aht <= 360) return csatFlatAmount * 0.05; // 4:51 – 6:00
+    else return 0; // > 6:00
 }
 
 // --- Main Logic ---
 window.calculateIncentive = function () {
-  let csatValue = document.getElementById("incentiveCSAT").value;
-  let qualityValue = document.getElementById("incentiveQuality").value;
-  let min = parseInt(document.getElementById("incentiveAHTMin").value);
-  let sec = parseInt(document.getElementById("incentiveAHTSec").value);
-  let escalation = document.getElementById("escalation").value;
-  let warning = parseInt(document.getElementById("warning").value);
+    let csatValue = document.getElementById("incentiveCSAT").value;
+    let qualityValue = document.getElementById("incentiveQuality").value;
+    let min = parseInt(document.getElementById("incentiveAHTMin").value);
+    let sec = parseInt(document.getElementById("incentiveAHTSec").value);
+    let escalation = document.getElementById("escalation").value;
+    let warning = parseInt(document.getElementById("warning").value);
 
-  let aht = min * 60 + sec; // total seconds
+    let aht = min * 60 + sec; // total seconds
 
-  // Get the original CSAT flat amount first
-  let csatFlatAmount = getCSATFlatAmount(csatValue);
+    // Get the original CSAT flat amount first
+    let csatFlatAmount = getCSATFlatAmount(csatValue);
 
-  // Then calculate the 70% CSAT bonus
-  let csatBonus = csatFlatAmount * 0.7;
+    // Then calculate the 70% CSAT bonus
+    let csatBonus = csatFlatAmount * 0.7;
 
-  // Calculate Quality & AHT bonuses based on the original flat amount
-  let qBonus = getQualityBonus(qualityValue, csatFlatAmount);
-  let ahtBonus = getAHTBonus(aht, csatFlatAmount);
+    // Calculate Quality & AHT bonuses based on the original flat amount
+    let qBonus = getQualityBonus(qualityValue, csatFlatAmount);
+    let ahtBonus = getAHTBonus(aht, csatFlatAmount);
 
-  // Check for quality rule (if < 80, incentive is null)
-  if (qBonus === null) {
-    document.getElementById("incentiveResult").innerHTML =
-      "<p style='color:red;'>❌ Incentive Cancelled (Quality < 80%)</p>";
-    return;
-  }
+    // Check for quality rule (if < 80, incentive is null)
+    if (qBonus === null) {
+        document.getElementById("incentiveResult").innerHTML =
+            "<p style='color:red;'>❌ Incentive Cancelled (Quality < 80%)</p>";
+        return;
+    }
 
-  // Calculate total before final deductions
-  let totalIncentive = csatBonus + qBonus + ahtBonus;
+    // Calculate total before final deductions
+    let totalIncentive = csatBonus + qBonus + ahtBonus;
 
-  // Step 4: Final Deductions
-  if (warning >= 1) {
-    totalIncentive = 0;
-  } else {
-    if (escalation == "1") totalIncentive *= 0.75;
-    else if (escalation == "2" || escalation == "2+") totalIncentive *= 0.5;
-  }
+    // Step 4: Final Deductions
+    if (warning >= 1) {
+        totalIncentive = 0;
+    } else {
+        if (escalation == "1") totalIncentive *= 0.75;
+        else if (escalation == "2" || escalation == "2+") totalIncentive *= 0.5;
+    }
 
-  document.getElementById(
-    "incentiveResult"
-  ).innerHTML = `<p>💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>`;
+    document.getElementById(
+        "incentiveResult"
+    ).innerHTML = `<p>💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>`;
 };
 // Highlight "NO" cells in ADP table
 document.addEventListener("DOMContentLoaded", () => {
-  const adpTable = document.querySelector(".manual-vi-page table");
-  if (adpTable) {
-    adpTable.querySelectorAll("td").forEach(td => {
-      if (td.textContent.trim().toUpperCase() === "NO") {
-        td.classList.add("bg-red-100", "text-red-700", "font-semibold");
-      }
-    });
-  }
+    const adpTable = document.querySelector(".manual-vi-page table");
+    if (adpTable) {
+        adpTable.querySelectorAll("td").forEach(td => {
+            if (td.textContent.trim().toUpperCase() === "NO") {
+                td.classList.add("bg-red-100", "text-red-700", "font-semibold");
+            }
+        });
+    }
 });
 // ✅ PB Wheels Popup Control
 window.openPBWheelsScript = function () {
-  const popup = document.getElementById("pbPopup");
-  const closeBtn = document.getElementById("closePopupBtn");
-  if (!popup || !closeBtn) return;
+    const popup = document.getElementById("pbPopup");
+    const closeBtn = document.getElementById("closePopupBtn");
+    if (!popup || !closeBtn) return;
 
-  // 🔹 Popup open karo
-  popup.classList.remove("hidden");
+    // 🔹 Popup open karo
+    popup.classList.remove("hidden");
 
-  // 🔹 Close button par click karne se band ho
-  closeBtn.onclick = () => popup.classList.add("hidden");
+    // 🔹 Close button par click karne se band ho
+    closeBtn.onclick = () => popup.classList.add("hidden");
 
-  // 🔹 Popup ke bahar click karne se bhi band ho
-  popup.addEventListener("click", (event) => {
-    // agar user ne background (black area) pe click kiya
-    if (event.target === popup) {
-      popup.classList.add("hidden");
-    }
-  });
+    // 🔹 Popup ke bahar click karne se bhi band ho
+    popup.addEventListener("click", (event) => {
+        // agar user ne background (black area) pe click kiya
+        if (event.target === popup) {
+            popup.classList.add("hidden");
+        }
+    });
 };
 
 // ========================================
@@ -13045,100 +13045,100 @@ window.openPBWheelsScript = function () {
 
 // Company lists for 2W and 4W
 const covCompanyLists = {
-  "2W": ["TATA", "SBI", "HDFC", "RSA", "ITGI (Iffco)", "Reliance", "SriRam", "USGI (Sompo)"],
-  "4W": ["SBI", "HDFC", "RSA", "ITGI (Iffco)", "USGI (Sompo)"]
+    "2W": ["TATA", "SBI", "HDFC", "RSA", "ITGI (Iffco)", "Reliance", "SriRam", "USGI (Sompo)"],
+    "4W": ["SBI", "HDFC", "RSA", "ITGI (Iffco)", "USGI (Sompo)"]
 };
 
 // Open COV Modal
 function openCOVModal() {
-  const modal = document.getElementById("covModal");
-  if (modal) {
-    modal.style.display = "flex";
-    // Reset content when opening
-    const covList = document.getElementById("covList");
-    if (covList) {
-      covList.innerHTML = '<p class="small">Select 2W or 4W to view companies.</p>';
+    const modal = document.getElementById("covModal");
+    if (modal) {
+        modal.style.display = "flex";
+        // Reset content when opening
+        const covList = document.getElementById("covList");
+        if (covList) {
+            covList.innerHTML = '<p class="small">Select 2W or 4W to view companies.</p>';
+        }
     }
-  }
 }
 
 // Close COV Modal
 function closeCOVModal() {
-  const modal = document.getElementById("covModal");
-  if (modal) {
-    modal.style.display = "none";
-  }
+    const modal = document.getElementById("covModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
 }
 
 // Show company list based on type (2W or 4W)
 function showCOVList(type) {
-  const covList = document.getElementById("covList");
-  if (!covList) return;
+    const covList = document.getElementById("covList");
+    if (!covList) return;
 
-  const companies = covCompanyLists[type];
-  if (companies && companies.length > 0) {
-    let html = `<ul class="cov-company-list">`;
-    companies.forEach(company => {
-      html += `<li>${company}</li>`;
-    });
-    html += `</ul>`;
-    covList.innerHTML = html;
-  } else {
-    covList.innerHTML = '<p class="small">No companies found.</p>';
-  }
+    const companies = covCompanyLists[type];
+    if (companies && companies.length > 0) {
+        let html = `<ul class="cov-company-list">`;
+        companies.forEach(company => {
+            html += `<li>${company}</li>`;
+        });
+        html += `</ul>`;
+        covList.innerHTML = html;
+    } else {
+        covList.innerHTML = '<p class="small">No companies found.</p>';
+    }
 }
 
 // Event Listeners for COV Modal
 document.addEventListener("DOMContentLoaded", () => {
-  // Open modal on button click
-  const btnCompanyOwned = document.getElementById("btnCompanyOwned");
-  if (btnCompanyOwned) {
-    btnCompanyOwned.addEventListener("click", openCOVModal);
-  }
+    // Open modal on button click
+    const btnCompanyOwned = document.getElementById("btnCompanyOwned");
+    if (btnCompanyOwned) {
+        btnCompanyOwned.addEventListener("click", openCOVModal);
+    }
 
-  // Close modal on close button click
-  const covClose = document.getElementById("covClose");
-  if (covClose) {
-    covClose.addEventListener("click", closeCOVModal);
-  }
+    // Close modal on close button click
+    const covClose = document.getElementById("covClose");
+    if (covClose) {
+        covClose.addEventListener("click", closeCOVModal);
+    }
 
-  // Close modal on outside click
-  const covModal = document.getElementById("covModal");
-  if (covModal) {
-    covModal.addEventListener("click", (event) => {
-      if (event.target === covModal) {
-        closeCOVModal();
-      }
-    });
-  }
+    // Close modal on outside click
+    const covModal = document.getElementById("covModal");
+    if (covModal) {
+        covModal.addEventListener("click", (event) => {
+            if (event.target === covModal) {
+                closeCOVModal();
+            }
+        });
+    }
 
-  // 2W button click
-  const btn2W = document.getElementById("btn2W");
-  if (btn2W) {
-    btn2W.addEventListener("click", () => {
-      btn2W.classList.add("active");
-      if (btn4W) btn4W.classList.remove("active");
-      showCOVList("2W");
-    });
-  }
+    // 2W button click
+    const btn2W = document.getElementById("btn2W");
+    if (btn2W) {
+        btn2W.addEventListener("click", () => {
+            btn2W.classList.add("active");
+            if (btn4W) btn4W.classList.remove("active");
+            showCOVList("2W");
+        });
+    }
 
-  // 4W button click
-  const btn4W = document.getElementById("btn4W");
-  if (btn4W) {
-    btn4W.addEventListener("click", () => {
-      btn4W.classList.add("active");
-      if (btn2W) btn2W.classList.remove("active");
-      showCOVList("4W");
-    });
-  }
+    // 4W button click
+    const btn4W = document.getElementById("btn4W");
+    if (btn4W) {
+        btn4W.addEventListener("click", () => {
+            btn4W.classList.add("active");
+            if (btn2W) btn2W.classList.remove("active");
+            showCOVList("4W");
+        });
+    }
 });
 
 // Close COV Modal on ESC key
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    const covModal = document.getElementById("covModal");
-    if (covModal && covModal.style.display === "flex") {
-      closeCOVModal();
+    if (event.key === "Escape") {
+        const covModal = document.getElementById("covModal");
+        if (covModal && covModal.style.display === "flex") {
+            closeCOVModal();
+        }
     }
-  }
 });
