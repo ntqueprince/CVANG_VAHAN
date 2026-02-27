@@ -13142,3 +13142,120 @@ document.addEventListener("keydown", (event) => {
         }
     }
 });
+
+// ========== CHAT FEATURE (Firebase) ==========
+const commentsRef = dbRef(db, 'comments');
+const chatCanvas = document.getElementById('chatCanvas');
+const chatMessages = document.getElementById('chatMessages');
+
+function toggleChat(show = null) {
+    const visible = !chatCanvas.classList.contains('translate-y-full');
+    const shouldShow = show !== null ? show : !visible;
+    chatCanvas.classList.toggle('translate-y-full', !shouldShow);
+    if (shouldShow) loadChatMessages();
+}
+
+// Expose to global scope for inline onclick handlers
+window.toggleChat = toggleChat;
+window.sendMessage = sendChatMessage;
+window.deleteMessage = deleteChatMessage;
+
+// Also attach via addEventListener for reliability
+const openChatBtn = document.getElementById('openChatBtn');
+if (openChatBtn) {
+    openChatBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleChat();
+    });
+}
+
+window.addEventListener('click', function (e) {
+    if (chatCanvas && !chatCanvas.contains(e.target) && openChatBtn && !openChatBtn.contains(e.target)) {
+        toggleChat(false);
+    }
+});
+
+function loadChatMessages() {
+    onValue(commentsRef, (snapshot) => {
+        chatMessages.innerHTML = '';
+        const data = snapshot.val();
+        if (!data) {
+            chatMessages.innerHTML = '<div class="p-3 rounded-md bg-gray-100 shadow-sm text-sm text-center">No messages yet.</div>';
+            return;
+        }
+        const messages = Object.entries(data)
+            .map(([key, val]) => ({ id: key, ...val }))
+            .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+        messages.forEach((msg, i) => {
+            const color = i % 2 === 0 ? 'bg-orange-100' : 'bg-blue-100';
+            const div = document.createElement('div');
+            div.className = `group relative p-3 rounded-md ${color} shadow-sm text-sm`;
+            div.innerHTML = `
+                <div class="flex justify-between">
+                    <div>${msg.message}</div>
+                    <button class="delete-msg-btn absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-xs text-red-500 hover:text-red-700" data-id="${msg.id}">❌</button>
+                </div>
+            `;
+            div.querySelector('.delete-msg-btn').addEventListener('click', () => deleteChatMessage(msg.id));
+            chatMessages.appendChild(div);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, (error) => {
+        console.error("Failed to load messages:", error);
+        chatMessages.innerHTML = '<div class="p-3 rounded-md bg-red-100 shadow-sm text-sm text-red-600 text-center">⚠️ Unable to connect to server. Please check your internet or try again later.</div>';
+    });
+}
+
+function sendChatMessage() {
+    const messageBox = document.getElementById('chatMessage');
+    const message = messageBox.value.trim();
+    if (!message) return alert("Please type something.");
+    messageBox.value = '';
+
+    push(commentsRef, {
+        message: message,
+        username: null,
+        timestamp: Date.now()
+    }).catch((error) => {
+        console.error("Failed to send message:", error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'p-2 rounded-md bg-red-100 text-red-600 text-xs text-center mt-1';
+        errorDiv.textContent = '⚠️ Failed to send. Server unreachable.';
+        chatMessages.appendChild(errorDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+}
+
+function deleteChatMessage(id) {
+    const confirmed = confirm("Delete this message?");
+    if (!confirmed) return;
+    remove(dbRef(db, `comments/${id}`))
+        .catch((error) => {
+            console.error("Failed to delete message:", error);
+            alert("⚠️ Could not delete message. Server unreachable.");
+        });
+}
+
+// Send button click listener
+const sendBtn = document.getElementById('sendChatBtn');
+if (sendBtn) {
+    sendBtn.addEventListener('click', sendChatMessage);
+}
+
+// Close chat button listener
+const closeChatBtn = document.getElementById('closeChatBtn');
+if (closeChatBtn) {
+    closeChatBtn.addEventListener('click', () => toggleChat());
+}
+
+// Enter to send, Shift+Enter for newline
+const chatInput = document.getElementById('chatMessage');
+if (chatInput) {
+    chatInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendChatMessage();
+        }
+    });
+}
