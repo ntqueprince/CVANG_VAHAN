@@ -13259,3 +13259,1111 @@ if (chatInput) {
         }
     });
 }
+
+// ========================================
+// 🎮 Memory Card Game Logic
+// ========================================
+
+const memoryGameOverlay = document.getElementById('memoryGameOverlay');
+const gameBoard = document.getElementById('gameBoard');
+const moveCountEl = document.getElementById('moveCount');
+const pairCountEl = document.getElementById('pairCount');
+const gameTimerEl = document.getElementById('gameTimer');
+const winMessage = document.getElementById('winMessage');
+const winStats = document.getElementById('winStats');
+
+// Game State
+let cards = [];
+let flippedCards = [];
+let matchedPairs = 0;
+let moves = 0;
+let timer = 0;
+let timerInterval = null;
+let isPlaying = false;
+let boardLocked = false;
+
+// Pair emojis for the game (8 pairs = 16 cards)
+const cardEmojis = ['🚀', '🌟', '💻', '🎮', '🔥', '💎', '🌈', '🍕'];
+
+// Initialize/Reset Game
+function initMemoryGame() {
+    // Reset state
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timer = 0;
+    moves = 0;
+    matchedPairs = 0;
+    flippedCards = [];
+    isPlaying = false;
+    boardLocked = false;
+
+    // Update UI
+    moveCountEl.textContent = moves;
+    pairCountEl.textContent = `${matchedPairs}/8`;
+    gameTimerEl.textContent = '0:00';
+    winMessage.classList.remove('show');
+    gameBoard.innerHTML = '';
+
+    // Create deck (2 of each emoji)
+    let deck = [...cardEmojis, ...cardEmojis];
+
+    // Shuffle deck (Fisher-Yates)
+    for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+
+    // Create UI cards
+    deck.forEach((emoji, index) => {
+        const card = document.createElement('div');
+        card.classList.add('memory-card');
+        card.dataset.emoji = emoji;
+        card.dataset.index = index;
+
+        card.innerHTML = `
+            <div class="memory-card-inner">
+                <div class="memory-card-front"></div>
+                <div class="memory-card-back">${emoji}</div>
+            </div>
+        `;
+
+        card.addEventListener('click', () => flipCard(card));
+        gameBoard.appendChild(card);
+    });
+}
+
+// Flip Card Logic
+function flipCard(card) {
+    if (boardLocked || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+    // Start timer on first move
+    if (!isPlaying) {
+        isPlaying = true;
+        timerInterval = setInterval(() => {
+            timer++;
+            const mins = Math.floor(timer / 60);
+            const secs = timer % 60;
+            gameTimerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    // Flip the card
+    card.classList.add('flipped');
+    flippedCards.push(card);
+
+    // If two cards are flipped, check for match
+    if (flippedCards.length === 2) {
+        moves++;
+        moveCountEl.textContent = moves;
+        checkMatch();
+    }
+}
+
+// Check Match Logic
+function checkMatch() {
+    boardLocked = true;
+    const [card1, card2] = flippedCards;
+    const isMatch = card1.dataset.emoji === card2.dataset.emoji;
+
+    if (isMatch) {
+        // They match!
+        setTimeout(() => {
+            card1.classList.add('matched');
+            card2.classList.add('matched');
+            matchedPairs++;
+            pairCountEl.textContent = `${matchedPairs}/8`;
+            resetBoard();
+
+            // Check win condition
+            if (matchedPairs === 8) {
+                gameWon();
+            }
+        }, 500); // Wait for flip animation
+    } else {
+        // Not a match
+        setTimeout(() => {
+            card1.classList.add('wrong');
+            card2.classList.add('wrong');
+
+            setTimeout(() => {
+                card1.classList.remove('wrong', 'flipped');
+                card2.classList.remove('wrong', 'flipped');
+                resetBoard();
+            }, 500); // Wait before un-flipping
+        }, 600); // Give player a moment to see cards
+    }
+}
+
+function resetBoard() {
+    flippedCards = [];
+    boardLocked = false;
+}
+
+// Win Logic (Memory Game)
+function gameWon() {
+    clearInterval(timerInterval);
+    setTimeout(() => {
+        const mins = Math.floor(timer / 60);
+        const secs = timer % 60;
+        const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+        winStats.innerHTML = `You completed the game in <strong>${moves} moves</strong><br>Time taken: <strong>${timeStr}</strong>`;
+        winMessage.classList.add('show');
+
+        // Check for Leaderboard
+        checkAndSaveScore('memory', moves, false); // Lower moves is better
+    }, 500); // Small delay after last match
+}
+
+// Modal Controls - Expose to global window object
+window.openMemoryGame = function () {
+    memoryGameOverlay.classList.add('active');
+    initMemoryGame(); // Start fresh every time it opens
+    loadLeaderboard('memory', 'moves (lower is better)');
+};
+
+window.closeMemoryGame = function () {
+    memoryGameOverlay.classList.remove('active');
+    clearInterval(timerInterval); // Stop timer if it's running
+};
+
+window.restartMemoryGame = function () {
+    initMemoryGame();
+};
+
+// Close modal on outside click or ESC key
+memoryGameOverlay.addEventListener('click', (e) => {
+    if (e.target === memoryGameOverlay) {
+        window.closeMemoryGame();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && memoryGameOverlay.classList.contains('active')) {
+        window.closeMemoryGame();
+    }
+});
+
+// ========================================
+// 🏆 Game Hub & Firebase Leaderboard System
+// ========================================
+
+const gameHubOverlay = document.getElementById('gameHubOverlay');
+
+window.openGameHub = function () {
+    gameHubOverlay.classList.add('active');
+};
+
+window.closeGameHub = function () {
+    gameHubOverlay.classList.remove('active');
+};
+
+window.backToHub = function (overlayId) {
+    document.getElementById(overlayId).classList.remove('active');
+    // Stop any running intervals depending on the game
+    if (overlayId === 'snakeGameOverlay') clearInterval(snakeInterval);
+    if (overlayId === 'reactionGameOverlay') { clearTimeout(reactionTimeout); isReactionWaiting = false; }
+    if (overlayId === 'whackGameOverlay') { clearInterval(moleInterval); clearInterval(whackTimerInterval); }
+    if (overlayId === 'memoryGameOverlay') clearInterval(timerInterval);
+    if (overlayId === 'bounceGameOverlay') clearInterval(bounceInterval);
+    if (overlayId === 'starsGameOverlay') clearInterval(starsInterval);
+
+    // Bring back hub
+    openGameHub();
+};
+
+window.launchGame = function (gameType) {
+    closeGameHub();
+    if (gameType === 'memory') {
+        window.openMemoryGame();
+    } else if (gameType === 'snake') {
+        document.getElementById('snakeGameOverlay').classList.add('active');
+        loadLeaderboard('snake', 'points');
+        window.startSnakeGame();
+    } else if (gameType === 'reaction') {
+        document.getElementById('reactionGameOverlay').classList.add('active');
+        document.getElementById('reactionResult').textContent = '';
+        const ra = document.getElementById('reactionArea');
+        ra.style.backgroundColor = '#ef4444'; // reset to red
+        ra.textContent = "Click to Start";
+        loadLeaderboard('reaction', 'ms');
+    } else if (gameType === 'whack') {
+        document.getElementById('whackGameOverlay').classList.add('active');
+        loadLeaderboard('whack', 'moles');
+        window.startWhackGame();
+    } else if (gameType === 'bounce') {
+        document.getElementById('bounceGameOverlay').classList.add('active');
+        loadLeaderboard('bounce', 'pts');
+        window.startBounceGame();
+    } else if (gameType === 'stars') {
+        document.getElementById('starsGameOverlay').classList.add('active');
+        loadLeaderboard('stars', 'pts');
+        window.startStarsGame();
+    }
+};
+
+// --- Firebase Leaderboard Logic ---
+// We'll store leaderboards under 'leaderboards' node in Firebase
+const leaderboardsRef = dbRef(db, 'leaderboards');
+
+function loadLeaderboard(gameId, unit) {
+    const listElementId = `${gameId}LeaderboardList`;
+    const listEl = document.getElementById(listElementId);
+    if (!listEl) return;
+
+    listEl.innerHTML = '<li class="text-center text-gray-400 text-sm">Loading scores...</li>';
+
+    const gameBoardRef = dbRef(db, `leaderboards/${gameId}`);
+    onValue(gameBoardRef, (snapshot) => {
+        const data = snapshot.val();
+        listEl.innerHTML = '';
+
+        if (!data) {
+            listEl.innerHTML = '<li class="text-center text-gray-400 text-sm">No high scores yet! Be the first!</li>';
+            return;
+        }
+
+        // Convert to array and sort
+        const scoresArray = Object.values(data);
+
+        if (gameId === 'memory' || gameId === 'reaction') {
+            // Lower is better (Moves or MS)
+            scoresArray.sort((a, b) => a.score - b.score);
+        } else {
+            // Higher is better (Snake points, Moles hit)
+            scoresArray.sort((a, b) => b.score - a.score);
+        }
+
+        // Take top 3
+        const top3 = scoresArray.slice(0, 3);
+
+        top3.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.className = `rank-${index + 1}`;
+            li.innerHTML = `<span>#${index + 1} ${item.name}</span> <span>${item.score} ${unit}</span>`;
+            listEl.appendChild(li);
+        });
+
+    }, { onlyOnce: true });
+}
+
+function checkAndSaveScore(gameId, newScore, isHigherBetter = true) {
+    const gameBoardRef = dbRef(db, `leaderboards/${gameId}`);
+
+    // Temporary listener to get current top scores
+    onValue(gameBoardRef, (snapshot) => {
+        const data = snapshot.val();
+        let shouldSave = false;
+
+        if (!data) {
+            shouldSave = true; // No scores yet
+        } else {
+            const scoresArray = Object.values(data);
+            if (scoresArray.length < 3) {
+                shouldSave = true; // Less than 3 scores
+            } else {
+                // Sort current scores
+                if (isHigherBetter) {
+                    scoresArray.sort((a, b) => b.score - a.score);
+                    // Beat the 3rd place?
+                    if (newScore > scoresArray[2].score) shouldSave = true;
+                } else {
+                    scoresArray.sort((a, b) => a.score - b.score);
+                    // Beat the 3rd place (lower is better)?
+                    if (newScore < scoresArray[2].score) shouldSave = true;
+                }
+            }
+        }
+
+        if (shouldSave) {
+            // Save directly without name prompt
+            push(gameBoardRef, {
+                name: 'Player',
+                score: newScore,
+                date: Date.now()
+            });
+            // Refresh leaderboard display immediately
+            let unit = '';
+            if (gameId === 'memory') unit = 'moves';
+            if (gameId === 'snake') unit = 'points';
+            if (gameId === 'reaction') unit = 'ms';
+            if (gameId === 'whack') unit = 'moles';
+            if (gameId === 'bounce') unit = 'pts';
+            if (gameId === 'stars') unit = 'pts';
+            loadLeaderboard(gameId, unit);
+        }
+    }, { onlyOnce: true });
+}
+
+
+// ========================================
+// 🐍 Snake Game Logic
+// ========================================
+let snakeCanvas, snakeCtx;
+let snakeArea = 500; // Increased to 500
+let gridSize = 25; // 20x20 grid for 500 canvas
+let snake = [];
+let food = {};
+let dx = gridSize;
+let dy = 0;
+let snakeScore = 0;
+let snakeInterval;
+let snakeSpeed = 150;
+let gameOverSnake = false;
+let isSnakePaused = false;
+let speedBurst = false;
+
+window.startSnakeGame = function () {
+    snakeCanvas = document.getElementById('snakeCanvas');
+    snakeCtx = snakeCanvas.getContext('2d');
+
+    // Reset state
+    snake = [
+        { x: 250, y: 250 },
+        { x: 225, y: 250 },
+        { x: 200, y: 250 }
+    ];
+    dx = gridSize;
+    dy = 0;
+    snakeScore = 0;
+    snakeSpeed = 150;
+    gameOverSnake = false;
+    isSnakePaused = false;
+    speedBurst = false;
+    document.getElementById('snakeScore').textContent = snakeScore;
+    document.getElementById('snakePauseOverlay').classList.add('hidden');
+    document.getElementById('snakeGameOverOverlay').classList.add('hidden');
+
+    createFood();
+    if (snakeInterval) clearInterval(snakeInterval);
+    snakeInterval = setInterval(mainSnake, snakeSpeed);
+}
+
+window.toggleSnakePause = function () {
+    if (gameOverSnake || !snakeInterval) return;
+
+    isSnakePaused = !isSnakePaused;
+    const overlay = document.getElementById('snakePauseOverlay');
+
+    if (isSnakePaused) {
+        clearInterval(snakeInterval);
+        overlay.classList.remove('hidden');
+    } else {
+        snakeInterval = setInterval(mainSnake, speedBurst ? 40 : snakeSpeed);
+        overlay.classList.add('hidden');
+    }
+}
+
+function mainSnake() {
+    if (gameOverSnake || isSnakePaused) return;
+
+    if (hasGameEnded()) {
+        gameOverSnake = true;
+        clearInterval(snakeInterval);
+
+        // Custom Game Over UI
+        document.getElementById('snakeFinalScore').textContent = snakeScore;
+        document.getElementById('snakeGameOverOverlay').classList.remove('hidden');
+
+        checkAndSaveScore('snake', snakeScore, true); // Higher is better
+        return;
+    }
+
+    clearCanvas();
+    drawFood();
+    advanceSnake();
+    drawSnake();
+}
+
+function clearCanvas() {
+    snakeCtx.fillStyle = '#111827'; // tailwind gray-900 equivalent set via JS usually, but matching canvas bg
+    snakeCtx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+    snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height); // explicit fill
+}
+
+function drawSnake() {
+    snake.forEach(drawSnakePart);
+}
+
+function drawSnakePart(snakePart) {
+    snakeCtx.fillStyle = '#4ade80'; // snake color
+    snakeCtx.strokeStyle = '#166534';
+    snakeCtx.fillRect(snakePart.x, snakePart.y, gridSize, gridSize);
+    snakeCtx.strokeRect(snakePart.x, snakePart.y, gridSize, gridSize);
+}
+
+function advanceSnake() {
+    let newX = snake[0].x + dx;
+    let newY = snake[0].y + dy;
+
+    // Wall Wrap Logic (Opposite side)
+    if (newX < 0) newX = snakeArea - gridSize;
+    else if (newX >= snakeArea) newX = 0;
+
+    if (newY < 0) newY = snakeArea - gridSize;
+    else if (newY >= snakeArea) newY = 0;
+
+    const head = { x: newX, y: newY };
+    snake.unshift(head);
+
+    const hasEatenFood = head.x === food.x && head.y === food.y;
+    if (hasEatenFood) {
+        snakeScore += 10;
+        document.getElementById('snakeScore').textContent = snakeScore;
+        createFood();
+        // Speed up very slightly
+        if (snakeSpeed > 60) {
+            snakeSpeed -= 2;
+            if (!speedBurst && !isSnakePaused && !gameOverSnake) {
+                clearInterval(snakeInterval);
+                snakeInterval = setInterval(mainSnake, snakeSpeed);
+            }
+        }
+    } else {
+        snake.pop();
+    }
+}
+
+function createFood() {
+    food.x = Math.round((Math.random() * (snakeArea - gridSize)) / gridSize) * gridSize;
+    food.y = Math.round((Math.random() * (snakeArea - gridSize)) / gridSize) * gridSize;
+
+    // ensure food isnt on snake
+    let onSnake = false;
+    snake.forEach(function has_snake_eaten_food(part) {
+        if (part.x === food.x && part.y === food.y) onSnake = true;
+    });
+    if (onSnake) createFood();
+}
+
+function drawFood() {
+    snakeCtx.fillStyle = '#ef4444'; // red
+    snakeCtx.strokeStyle = '#991b1b'; // darker red
+    snakeCtx.fillRect(food.x, food.y, gridSize, gridSize);
+    snakeCtx.strokeRect(food.x, food.y, gridSize, gridSize);
+}
+
+function hasGameEnded() {
+    // Only Self collision
+    for (let i = 4; i < snake.length; i++) {
+        if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true;
+    }
+    return false;
+}
+
+document.addEventListener("keydown", function (event) {
+    // Only process if snake overlay is active
+    if (!document.getElementById('snakeGameOverlay').classList.contains('active')) return;
+
+    // Spacebar Pause/Resume
+    if (event.code === 'Space') {
+        event.preventDefault();
+        window.toggleSnakePause();
+        return;
+    }
+
+    if (isSnakePaused || gameOverSnake) return;
+
+    const LEFT_KEY = 37; const A_KEY = 65;
+    const RIGHT_KEY = 39; const D_KEY = 68;
+    const UP_KEY = 38; const W_KEY = 87;
+    const DOWN_KEY = 40; const S_KEY = 83;
+
+    const keyPressed = event.keyCode;
+    const isDirectionKey = [37, 38, 39, 40, 65, 68, 87, 83].includes(keyPressed);
+
+    const goingUp = dy === -gridSize;
+    const goingDown = dy === gridSize;
+    const goingRight = dx === gridSize;
+    const goingLeft = dx === -gridSize;
+
+    if ((keyPressed === LEFT_KEY || keyPressed === A_KEY) && !goingRight) { dx = -gridSize; dy = 0; }
+    if ((keyPressed === UP_KEY || keyPressed === W_KEY) && !goingDown) { dx = 0; dy = -gridSize; }
+    if ((keyPressed === RIGHT_KEY || keyPressed === D_KEY) && !goingLeft) { dx = gridSize; dy = 0; }
+    if ((keyPressed === DOWN_KEY || keyPressed === S_KEY) && !goingUp) { dx = 0; dy = gridSize; }
+
+    // Speed burst on arrow key hold
+    if (isDirectionKey) {
+        if (!speedBurst) {
+            speedBurst = true;
+            clearInterval(snakeInterval);
+            snakeInterval = setInterval(mainSnake, 40); // Fast speed
+        }
+
+        // Prevent scrolling default behavior
+        if ([37, 38, 39, 40, 32].indexOf(event.keyCode) > -1) {
+            event.preventDefault();
+        }
+    }
+});
+
+// Remove speed burst on key up
+document.addEventListener("keyup", function (event) {
+    if (!document.getElementById('snakeGameOverlay').classList.contains('active') || isSnakePaused || gameOverSnake) return;
+
+    const isDirectionKey = [37, 38, 39, 40, 65, 68, 87, 83].includes(event.keyCode);
+    if (isDirectionKey && speedBurst) {
+        speedBurst = false;
+        clearInterval(snakeInterval);
+        snakeInterval = setInterval(mainSnake, snakeSpeed); // Normal speed
+    }
+});
+
+
+// ========================================
+// ⚡ Reaction Time Game Logic
+// ========================================
+let reactionTimeout;
+let reactionStartTime;
+let isReactionWaiting = false;
+let isReactionReady = false;
+
+window.handleReactionClick = function () {
+    const area = document.getElementById('reactionArea');
+    const resText = document.getElementById('reactionResult');
+
+    if (!isReactionWaiting && !isReactionReady) {
+        // Start phase
+        area.style.backgroundColor = '#ef4444'; // Red
+        area.textContent = "Wait for Green...";
+        resText.textContent = "";
+        isReactionWaiting = true;
+
+        const randomTime = Math.floor(Math.random() * 3000) + 1500; // 1.5s to 4.5s
+
+        reactionTimeout = setTimeout(() => {
+            isReactionWaiting = false;
+            isReactionReady = true;
+            area.style.backgroundColor = '#22c55e'; // Green
+            area.textContent = "CLICK NOW!";
+            reactionStartTime = Date.now();
+        }, randomTime);
+
+    } else if (isReactionWaiting) {
+        // Clicked too early
+        clearTimeout(reactionTimeout);
+        isReactionWaiting = false;
+        area.style.backgroundColor = '#ef4444'; // Red
+        area.textContent = "Too early! Click to try again.";
+        resText.textContent = "Failed - Jumped the gun!";
+
+    } else if (isReactionReady) {
+        // Clicked on green
+        const endTime = Date.now();
+        const reactionTime = endTime - reactionStartTime;
+        isReactionReady = false;
+
+        area.style.backgroundColor = '#3b82f6'; // Blue
+        area.textContent = "Click to go again";
+        resText.innerHTML = `Reaction Time: <strong>${reactionTime} ms</strong>`;
+
+        checkAndSaveScore('reaction', reactionTime, false); // Lower ms is better
+    }
+}
+
+
+// ========================================
+// 🔨 Whack-a-Mole Game Logic
+// ========================================
+let moles;
+let whackScore = 0;
+let lastMoleIdx = -1;
+let moleInterval;
+let whackTimer = 30; // 30 seconds
+let whackTimerInterval;
+let isWhackPlaying = false;
+
+window.startWhackGame = function () {
+    if (isWhackPlaying) return;
+
+    moles = document.querySelectorAll('.mole');
+    whackScore = 0;
+    whackTimer = 30;
+    isWhackPlaying = true;
+
+    document.getElementById('whackScore').textContent = whackScore;
+    document.getElementById('whackTime').textContent = `${whackTimer}s`;
+
+    moleInterval = setInterval(randomMole, 800);
+    whackTimerInterval = setInterval(() => {
+        whackTimer--;
+        document.getElementById('whackTime').textContent = `${whackTimer}s`;
+        if (whackTimer <= 0) {
+            endWhackGame();
+        }
+    }, 1000);
+}
+
+function randomMole() {
+    // Hide all moles first manually in case animation lag
+    moles.forEach(m => m.classList.remove('up'));
+
+    let randomIdx;
+    do {
+        randomIdx = Math.floor(Math.random() * moles.length);
+    } while (randomIdx === lastMoleIdx);
+
+    lastMoleIdx = randomIdx;
+    moles[randomIdx].classList.add('up');
+
+    // Auto hide after some time
+    setTimeout(() => {
+        moles[randomIdx].classList.remove('up');
+    }, 700);
+}
+
+window.whackMole = function (idx) {
+    if (!isWhackPlaying) return;
+    const mole = document.getElementById(`mole-${idx}`);
+
+    if (mole.classList.contains('up')) {
+        whackScore++;
+        document.getElementById('whackScore').textContent = whackScore;
+        mole.classList.remove('up');
+        // add quick visual feedback on the hole container
+        mole.parentElement.style.backgroundColor = '#ec4899'; // pink brief flash
+        setTimeout(() => mole.parentElement.style.backgroundColor = '#451a03', 150);
+    }
+}
+
+function endWhackGame() {
+    clearInterval(moleInterval);
+    clearInterval(whackTimerInterval);
+    isWhackPlaying = false;
+    moles.forEach(m => m.classList.remove('up'));
+
+    alert(`Time's UP! You whacked ${whackScore} moles!`);
+    checkAndSaveScore('whack', whackScore, true); // Higher is better
+}
+
+// ========================================
+// 🎾 Bounce Ball Game Logic
+// ========================================
+let bounceCanvas, bounceCtx;
+let bounceInterval;
+let gameOverBounce = false;
+let isBouncePaused = false;
+let bounceScore = 0;
+
+const ball = {
+    x: 200,
+    y: 200,
+    radius: 10,
+    dx: 4,
+    dy: -4,
+    speed: 4,
+    color: '#06b6d4' // cyan-500
+};
+
+const paddle = {
+    width: 100,
+    height: 14,
+    x: 200,
+    y: 470,
+    dx: 10,
+    color: '#0ea5e9' // sky-500
+};
+
+let rightPressed = false;
+let leftPressed = false;
+
+window.startBounceGame = function () {
+    bounceCanvas = document.getElementById('bounceCanvas');
+    bounceCtx = bounceCanvas.getContext('2d');
+
+    // Reset State
+    ball.x = bounceCanvas.width / 2;
+    ball.y = bounceCanvas.height / 2;
+    ball.speed = 4;
+    ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+    ball.dy = -ball.speed;
+
+    paddle.x = (bounceCanvas.width - paddle.width) / 2;
+
+    bounceScore = 0;
+    gameOverBounce = false;
+    isBouncePaused = false;
+    rightPressed = false;
+    leftPressed = false;
+
+    document.getElementById('bounceScore').textContent = bounceScore;
+    document.getElementById('bouncePauseOverlay').classList.add('hidden');
+    document.getElementById('bounceGameOverOverlay').classList.add('hidden');
+
+    if (bounceInterval) clearInterval(bounceInterval);
+    bounceInterval = setInterval(drawBounceGame, 16); // ~60fps
+}
+
+window.toggleBouncePause = function () {
+    if (gameOverBounce || !bounceInterval) return;
+
+    isBouncePaused = !isBouncePaused;
+    const overlay = document.getElementById('bouncePauseOverlay');
+
+    if (isBouncePaused) {
+        clearInterval(bounceInterval);
+        overlay.classList.remove('hidden');
+    } else {
+        bounceInterval = setInterval(drawBounceGame, 16);
+        overlay.classList.add('hidden');
+    }
+}
+
+function drawBall() {
+    bounceCtx.beginPath();
+    bounceCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    bounceCtx.fillStyle = ball.color;
+    bounceCtx.fill();
+    bounceCtx.closePath();
+}
+
+function drawPaddle() {
+    bounceCtx.beginPath();
+    bounceCtx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, 6);
+    bounceCtx.fillStyle = paddle.color;
+    bounceCtx.fill();
+    bounceCtx.closePath();
+}
+
+function drawBounceGame() {
+    if (gameOverBounce || isBouncePaused) return;
+
+    bounceCtx.fillStyle = '#111827';
+    bounceCtx.fillRect(0, 0, bounceCanvas.width, bounceCanvas.height);
+
+    drawBall();
+    drawPaddle();
+
+    // Wall Collision (Left & Right)
+    if (ball.x + ball.dx > bounceCanvas.width - ball.radius || ball.x + ball.dx < ball.radius) {
+        ball.dx = -ball.dx;
+    }
+
+    // Wall Collision (Top)
+    if (ball.y + ball.dy < ball.radius) {
+        ball.dy = -ball.dy;
+    }
+    // Paddle Collision or Bottom Edge
+    else if (ball.y + ball.dy > bounceCanvas.height - ball.radius - paddle.height) {
+        if (ball.x > paddle.x - ball.radius && ball.x < paddle.x + paddle.width + ball.radius && ball.y < paddle.y) {
+
+            // Rebound physics
+            let hitPoint = ball.x - (paddle.x + paddle.width / 2);
+            let normalizedHit = hitPoint / (paddle.width / 2); // -1 to 1
+
+            ball.dy = -ball.dy;
+            ball.dx = normalizedHit * ball.speed * 1.2;
+
+            bounceScore += 1;
+            document.getElementById('bounceScore').textContent = bounceScore;
+
+            if (bounceScore % 5 === 0) {
+                ball.speed += 0.5;
+                const currentSpeedSq = ball.dx * ball.dx + ball.dy * ball.dy;
+                const speedScale = ball.speed / Math.sqrt(currentSpeedSq);
+                ball.dx *= speedScale;
+                ball.dy *= speedScale;
+
+                if (paddle.width > 40) paddle.width -= 2;
+            }
+            ball.y = paddle.y - ball.radius;
+
+        } else if (ball.y + ball.dy > bounceCanvas.height - ball.radius) {
+            gameOverBounce = true;
+            clearInterval(bounceInterval);
+
+            document.getElementById('bounceFinalScore').textContent = bounceScore;
+            document.getElementById('bounceGameOverOverlay').classList.remove('hidden');
+
+            checkAndSaveScore('bounce', bounceScore, true);
+            return;
+        }
+    }
+
+    // Move Ball
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // Move Paddle
+    if (rightPressed && paddle.x < bounceCanvas.width - paddle.width) {
+        paddle.x += paddle.dx;
+    } else if (leftPressed && paddle.x > 0) {
+        paddle.x -= paddle.dx;
+    }
+}
+
+document.addEventListener("mousemove", function (e) {
+    const overlay = document.getElementById('bounceGameOverlay');
+    if (!overlay || !overlay.classList.contains('active') || isBouncePaused || gameOverBounce) return;
+
+    if (bounceCanvas) {
+        const rect = bounceCanvas.getBoundingClientRect();
+        const relativeX = e.clientX - rect.left;
+
+        if (relativeX > 0 && relativeX < bounceCanvas.width) {
+            paddle.x = relativeX - paddle.width / 2;
+            if (paddle.x < 0) paddle.x = 0;
+            if (paddle.x + paddle.width > bounceCanvas.width) paddle.x = bounceCanvas.width - paddle.width;
+        }
+    }
+});
+
+document.addEventListener("keydown", function (e) {
+    const overlay = document.getElementById('bounceGameOverlay');
+    if (!overlay || !overlay.classList.contains('active')) return;
+
+    if (e.code === 'Space') {
+        e.preventDefault();
+        window.toggleBouncePause();
+        return;
+    }
+
+    if (isBouncePaused || gameOverBounce) return;
+
+    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
+    else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
+
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+});
+
+document.addEventListener("keyup", function (e) {
+    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
+    else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
+});
+
+
+// ========================================
+// ✨ Falling Stars Game Logic
+// ========================================
+let starsCanvas, starsCtx;
+let starsInterval;
+let gameOverStars = false;
+let isStarsPaused = false;
+let starsScore = 0;
+let starsLives = 3;
+
+let items = []; // falling objects
+let starsFrame = 0;
+let starsDifficulty = 1;
+
+const basket = {
+    width: 70,
+    height: 22,
+    x: 215,
+    y: 460,
+    color: '#f472b6' // pink-400
+};
+
+let basketTargetX = 215; // For smooth following
+
+window.startStarsGame = function () {
+    starsCanvas = document.getElementById('starsCanvas');
+    starsCtx = starsCanvas.getContext('2d');
+
+    starsScore = 0;
+    starsLives = 3;
+    items = [];
+    starsFrame = 0;
+    starsDifficulty = 1;
+    gameOverStars = false;
+    isStarsPaused = false;
+    basketTargetX = (starsCanvas.width - basket.width) / 2;
+    basket.x = basketTargetX;
+
+    updateStarsUI();
+    document.getElementById('starsPauseOverlay').classList.add('hidden');
+    document.getElementById('starsGameOverOverlay').classList.add('hidden');
+
+    if (starsInterval) clearInterval(starsInterval);
+    starsInterval = setInterval(drawStarsGame, 20); // 50fps
+}
+
+window.toggleStarsPause = function () {
+    if (gameOverStars || !starsInterval) return;
+
+    isStarsPaused = !isStarsPaused;
+    const overlay = document.getElementById('starsPauseOverlay');
+
+    if (isStarsPaused) {
+        clearInterval(starsInterval);
+        overlay.classList.remove('hidden');
+    } else {
+        starsInterval = setInterval(drawStarsGame, 20);
+        overlay.classList.add('hidden');
+    }
+}
+
+function updateStarsUI() {
+    document.getElementById('starsScore').textContent = starsScore;
+    let heartStr = '';
+    for (let i = 0; i < starsLives; i++) heartStr += '💖';
+    document.getElementById('starsLives').textContent = `Lives: ${heartStr}`;
+}
+
+function spawnItem() {
+    const isBomb = Math.random() < 0.2 + (starsDifficulty * 0.05); // More bombs as diff increases
+    const isGolden = !isBomb && Math.random() < 0.1; // Rare golden star
+
+    let type = 'star';
+    let color = '#fef08a'; // yellow-200
+    let points = 1;
+    let radius = 8;
+
+    if (isBomb) {
+        type = 'bomb';
+        color = '#ef4444'; // red-500
+        points = -1;
+        radius = 10;
+    } else if (isGolden) {
+        type = 'golden';
+        color = '#a855f7'; // purple-500
+        points = 5;
+        radius = 12;
+    }
+
+    items.push({
+        x: Math.random() * (starsCanvas.width - radius * 2) + radius,
+        y: -20,
+        radius: radius,
+        speed: (Math.random() * 2 + 2) + starsDifficulty,
+        type: type,
+        color: color,
+        points: points
+    });
+}
+
+function drawStarsGame() {
+    if (gameOverStars || isStarsPaused) return;
+
+    starsFrame++;
+
+    // Increase difficulty every 500 frames (~10s) up to a max limit
+    if (starsFrame % 500 === 0 && starsDifficulty < 5) {
+        starsDifficulty += 0.5;
+        // shrink basket slightly
+        if (basket.width > 30) basket.width -= 5;
+    }
+
+    // Spawn items based on difficulty rate
+    let spawnRate = Math.max(20, 50 - (starsDifficulty * 5));
+    if (starsFrame % spawnRate === 0) {
+        spawnItem();
+    }
+
+    starsCtx.fillStyle = '#111827';
+    starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
+
+    // Smooth basket movement (Lerp)
+    basket.x += (basketTargetX - basket.x) * 0.2;
+
+    // Draw Basket
+    starsCtx.fillStyle = basket.color;
+    starsCtx.beginPath();
+    starsCtx.moveTo(basket.x, basket.y);
+    starsCtx.lineTo(basket.x + basket.width, basket.y);
+    starsCtx.lineTo(basket.x + basket.width - 5, basket.y + basket.height);
+    starsCtx.lineTo(basket.x + 5, basket.y + basket.height);
+    starsCtx.closePath();
+    starsCtx.fill();
+
+    // Move & Draw Items
+    for (let i = items.length - 1; i >= 0; i--) {
+        let it = items[i];
+        it.y += it.speed;
+
+        // Draw item
+        starsCtx.beginPath();
+        if (it.type === 'star' || it.type === 'golden') {
+            // Draw a basic star shape using arc for simplicity but distinct color
+            starsCtx.fillStyle = it.color;
+            starsCtx.arc(it.x, it.y, it.radius, 0, Math.PI * 2);
+            starsCtx.fill();
+        } else {
+            // Draw Bomb
+            starsCtx.fillStyle = it.color;
+            starsCtx.arc(it.x, it.y, it.radius, 0, Math.PI * 2);
+            starsCtx.fill();
+            // Bomb fuse
+            starsCtx.strokeStyle = '#d1d5db';
+            starsCtx.beginPath();
+            starsCtx.moveTo(it.x, it.y - it.radius);
+            starsCtx.lineTo(it.x + 5, it.y - it.radius - 5);
+            starsCtx.stroke();
+        }
+
+        // Collision detection with basket
+        if (it.y + it.radius >= basket.y && it.y - it.radius <= basket.y + basket.height) {
+            if (it.x + it.radius >= basket.x && it.x - it.radius <= basket.x + basket.width) {
+                // Caught!
+                if (it.type === 'bomb') {
+                    starsLives--;
+                    // Flash screen red
+                    starsCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+                    starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
+                } else {
+                    starsScore += it.points;
+                }
+
+                updateStarsUI();
+                items.splice(i, 1);
+
+                if (starsLives <= 0) {
+                    gameOverStarsPhase();
+                    return;
+                }
+                continue;
+            }
+        }
+
+        // Missed item (hit floor)
+        if (it.y > starsCanvas.height + it.radius) {
+            if (it.type === 'star' || it.type === 'golden') {
+                // Penalize for missing good items by losing half a life, or just ignore. 
+                // Let's just deduct a point so it's not too punishing, but prevent going negative.
+                if (starsScore > 0) {
+                    starsScore--;
+                    updateStarsUI();
+                }
+            }
+            items.splice(i, 1);
+        }
+    }
+}
+
+function gameOverStarsPhase() {
+    gameOverStars = true;
+    clearInterval(starsInterval);
+
+    document.getElementById('starsFinalScore').textContent = starsScore;
+    document.getElementById('starsGameOverOverlay').classList.remove('hidden');
+
+    checkAndSaveScore('stars', starsScore, true);
+}
+
+// Controls
+document.addEventListener("mousemove", function (e) {
+    const overlay = document.getElementById('starsGameOverlay');
+    if (!overlay || !overlay.classList.contains('active') || isStarsPaused || gameOverStars) return;
+
+    if (starsCanvas) {
+        const rect = starsCanvas.getBoundingClientRect();
+        const relativeX = e.clientX - rect.left;
+
+        if (relativeX > 0 && relativeX < starsCanvas.width) {
+            basketTargetX = relativeX - basket.width / 2;
+            if (basketTargetX < 0) basketTargetX = 0;
+            if (basketTargetX + basket.width > starsCanvas.width) basketTargetX = starsCanvas.width - basket.width;
+        }
+    }
+});
+
+document.addEventListener("keydown", function (e) {
+    const overlay = document.getElementById('starsGameOverlay');
+    if (!overlay || !overlay.classList.contains('active')) return;
+
+    if (e.code === 'Space') {
+        e.preventDefault();
+        window.toggleStarsPause();
+    }
+});
