@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <!-- #region 🔒 NAVIGATION BUTTONS -->
     <div class="flex flex-wrap gap-4 justify-center p-10 bg-gradient-to-tr from-blue-100 to-purple-100">
         <button class="animated-btn bg-gradient-to-r from-blue-500 to-blue-700" onclick="openCSATModal()">CSAT
             Calculator</button>
@@ -41,7 +42,7 @@
         <button class="animated-btn bg-gradient-to-r from-indigo-600 to-blue-800"
             onclick="window.open('https://ntqueprince.github.io/json_converter/', '_blank')">JSON-CHANGER</button>
         <button class="animated-btn bg-gradient-to-r from-violet-500 to-purple-700"
-    onclick="window.open('https://ntqueprince.github.io/ocr/', '_blank')">📄 OCR</button>
+            onclick="window.open('https://ntqueprince.github.io/ocr/', '_blank')">📄 OCR</button>
         <button class="animated-btn bg-gradient-to-r from-rose-500 to-red-700" onclick="openGameHub()">🎮 Game
             Hub</button>
         <button class="secondary cov-btn" id="btnCompanyOwned">Company Owned Not Allowed</button>
@@ -90,6 +91,8 @@
             </div>
         </div>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 CSAT CALCULATOR MODAL -->
     <div class="csat-modal" id="csatModal">
         <div class="csat-modal-content">
             <h4>CSAT Calculator</h4>
@@ -149,6 +152,8 @@
             </div>
         </div>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 UPDATES MODAL -->
     <div class="modal-overlay" id="updatesModal">
         <div class="modal-content">
             <span class="modal-close-button" id="closeModalButton">×</span>
@@ -158,6 +163,8 @@
             </div>
         </div>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 ENDORSEMENT PAGE -->
     <div class="endorsement-page" id="endorsementPage">
         <div class="endorsement-container">
             <h1>ENDORSEMENT</h1>
@@ -174,6 +181,8 @@
             <div class="output" id="output"></div>
         </div>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 MANUAL-VI & CLAIM COVERAGE PAGE -->
     <div class="manual-vi-page" id="manualVIPage">
         <button class="back-btn" onclick="closeManualVIPage()">Back to Main Page</button>
         <!-- New "Claim Coverage" button with green color -->
@@ -418,6 +427,8 @@
             </div>
         </div>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 CLAIM COUNT & NSTP SECTION -->
     <!-- New Claim_Count & NSTP Section (Insurance Comparison Dashboard) -->
     <div class="claim-count-nstp-page" id="claimCountNSTPPage">
         <div class="container mx-auto p-4 bg-white rounded-2xl shadow-2xl max-w-7xl w-full border-4 border-transparent bg-clip-border bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
@@ -457,6 +468,8 @@
         </div>
         <button class="back-btn" onclick="closeClaimCountNSTPPage()">Back to Main Page</button>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 INSPECTION WAIVER PAGE -->
     <!-- New Inspection Waiver Page -->
     <div class="inspection-waiver-page" id="inspectionWaiverPage">
         <div class="inspection-waiver-container">
@@ -478,6 +491,8 @@
             <button class="back-btn" onclick="closeInspectionWaiverPage()">Back to Main Page</button>
         </div>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 RSA & CONTACT PAGE -->
     <!-- New RSA & Contact Page -->
     <div class="rsa-contact-page" id="rsaContactPage">
         <div class="rsa-contact-container">
@@ -506,6 +521,8 @@
             <button class="back-btn" onclick="closeRSAPage()">Back to Main Page</button>
         </div>
     </div>
+    <!-- #endregion -->
+    <!-- #region 🔒 COMPANY OWNED MODAL -->
     <!-- Company Owned Modal -->
     <div class="modalOverlay" id="covModal">
         <div class="modalBox">
@@ -802,6 +819,20 @@
                     <span class="text-3xl">✨</span>
                     <span>Falling Stars</span>
                 </button>
+                <button class="game-select-btn bg-gradient-to-r from-orange-500 to-red-600" onclick="launchGame('aim')">
+                    <span class="text-3xl">🎯</span>
+                    <span>Aim Trainer</span>
+                </button>
+                <button class="game-select-btn bg-gradient-to-r from-sky-500 to-blue-700"
+                    onclick="launchGame('flappy')">
+                    <span class="text-3xl">🐦</span>
+                    <span>Flappy Bird</span>
+                </button>
+                <button class="game-select-btn bg-gradient-to-r from-violet-500 to-pink-600"
+                    onclick="launchGame('colormatch')">
+                    <span class="text-3xl">🎨</span>
+                    <span>Color Match</span>
+                </button>
             </div>
             <div class="memory-game-buttons mt-6">
                 <button class="mem-btn mem-btn-close w-full" onclick="closeGameHub()">✖ Close Hub</button>
@@ -1009,6 +1040,22 @@
                     </div>
                     <p class="text-xs text-gray-400 mb-3">Keep the ball bouncing!<br>Arrow Keys or Mouse to move
                         paddle.<br>Press <b>SPACE</b> to Pause.</p>
+                    <div class="mb-3">
+                        <p class="text-xs text-gray-300 font-bold mb-1 text-center">🎯 Select Level</p>
+                        <div class="flex gap-1">
+                            <button id="bounceEasyBtn"
+                                class="flex-1 px-2 py-1 text-xs font-bold rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all ring-2 ring-green-400"
+                                onclick="event.stopPropagation(); setBounceLevel('easy')">Easy</button>
+                            <button id="bounceMediumBtn"
+                                class="flex-1 px-2 py-1 text-xs font-bold rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white transition-all ring-0"
+                                onclick="event.stopPropagation(); setBounceLevel('medium')">Medium</button>
+                            <button id="bounceHardBtn"
+                                class="flex-1 px-2 py-1 text-xs font-bold rounded-lg bg-red-600 hover:bg-red-700 text-white transition-all ring-0"
+                                onclick="event.stopPropagation(); setBounceLevel('hard')">Hard</button>
+                        </div>
+                        <p class="text-xs text-center mt-1" id="bounceLevelInfo" style="color: #4ade80;">Easy — 1x pts
+                        </p>
+                    </div>
                     <div class="leaderboard-section p-3 bg-gray-800 rounded-xl border border-gray-700 mb-3">
                         <h4 class="text-center text-yellow-400 font-bold mb-2 text-sm">🏆 Top 3 Scores</h4>
                         <ul id="bounceLeaderboardList" class="leaderboard-list">
@@ -1076,6 +1123,212 @@
                             onclick="startStarsGame()">▶️ Start</button>
                         <button class="mem-btn mem-btn-close bg-gray-600 hover:bg-gray-700 w-full"
                             onclick="backToHub('starsGameOverlay')">⬅ Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎯 Aim Trainer Modal -->
+    <div class="memory-game-overlay" id="aimGameOverlay">
+        <div class="memory-game-container game-side-layout" style="max-width: 900px;">
+            <div class="memory-game-header">
+                <h2>🎯 Aim Trainer</h2>
+                <p class="memory-game-subtitle text-xs text-gray-400">Created by Shivang</p>
+            </div>
+            <div class="game-row-layout">
+                <div class="game-canvas-container flex justify-center relative">
+                    <canvas id="aimCanvas" width="500" height="500"
+                        class="bg-gray-900 border-2 border-orange-500 rounded-lg shadow-lg"
+                        style="max-width:100%; height:auto; cursor: crosshair;"></canvas>
+                    <div id="aimGameOverOverlay"
+                        class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center rounded-lg hidden"
+                        style="backdrop-filter: blur(2px);">
+                        <h3 class="text-red-500 text-4xl font-bold mb-2">TIME'S UP!</h3>
+                        <p class="text-white text-lg mb-1">Score: <span id="aimFinalScore"
+                                class="text-orange-400 font-bold">0</span></p>
+                        <p class="text-white text-lg mb-4">Accuracy: <span id="aimFinalAccuracy"
+                                class="text-green-400 font-bold">0%</span></p>
+                        <button class="mem-btn mem-btn-restart bg-orange-600 hover:bg-orange-700 px-6 py-2"
+                            onclick="event.stopPropagation(); startAimGame()">🔄 Play Again</button>
+                    </div>
+                </div>
+                <div class="game-sidebar">
+                    <div class="flex justify-between px-2 mb-2">
+                        <span class="text-white font-bold text-sm">Score: <span id="aimScore"
+                                class="text-orange-400">0</span></span>
+                        <span class="text-white font-bold text-sm">Best: <span id="aimHighScore"
+                                class="text-yellow-400">0</span></span>
+                    </div>
+                    <div class="flex justify-between px-2 mb-2">
+                        <span class="text-white font-bold text-sm">⏱ Time: <span id="aimTimer"
+                                class="text-red-400">30</span>s</span>
+                        <span class="text-white font-bold text-sm">🎯 <span id="aimAccuracy"
+                                class="text-green-400">0%</span></span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3">⚡ Targets disappear in 1.5s!<br>
+                        Miss = <span class="text-red-400">-3 pts</span> penalty.<br>
+                        Smaller target = More points.<br>
+                        Gets harder as you score! 🔥</p>
+                    <div class="leaderboard-section p-3 bg-gray-800 rounded-xl border border-gray-700 mb-3">
+                        <h4 class="text-center text-yellow-400 font-bold mb-2 text-sm">🏆 Top 3 Scores</h4>
+                        <ul id="aimLeaderboardList" class="leaderboard-list">
+                            <li class="text-center text-gray-400 text-sm">Loading...</li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button class="mem-btn mem-btn-restart bg-orange-600 hover:bg-orange-700 w-full"
+                            onclick="startAimGame()">▶️ Play</button>
+                        <button class="mem-btn mem-btn-close bg-gray-600 hover:bg-gray-700 w-full"
+                            onclick="backToHub('aimGameOverlay')">⬅ Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🐦 Flappy Bird Modal -->
+    <div class="memory-game-overlay" id="flappyGameOverlay">
+        <div class="memory-game-container game-side-layout" style="max-width: 900px;">
+            <div class="memory-game-header">
+                <h2>🐦 Flappy Bird</h2>
+                <p class="memory-game-subtitle text-xs text-gray-400">Created by Shivang</p>
+            </div>
+            <div class="game-row-layout">
+                <div class="game-canvas-container flex justify-center relative" onclick="flappyFlap()">
+                    <canvas id="flappyCanvas" width="500" height="500"
+                        class="bg-gray-900 border-2 border-sky-500 rounded-lg shadow-lg"
+                        style="max-width:100%; height:auto; cursor: pointer;"></canvas>
+                    <div id="flappyGameOverOverlay"
+                        class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center rounded-lg hidden"
+                        style="backdrop-filter: blur(2px);">
+                        <h3 class="text-red-500 text-4xl font-bold mb-2">GAME OVER</h3>
+                        <p class="text-white text-xl mb-4">Score: <span id="flappyFinalScore"
+                                class="text-sky-400 font-bold">0</span></p>
+                        <button class="mem-btn mem-btn-restart bg-sky-600 hover:bg-sky-700 px-6 py-2"
+                            onclick="event.stopPropagation(); startFlappyGame()">🔄 Play Again</button>
+                    </div>
+                    <div id="flappyStartOverlay"
+                        class="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center rounded-lg"
+                        style="backdrop-filter: blur(2px);">
+                        <span class="text-white text-3xl font-bold mb-2">🐦 TAP TO FLY</span>
+                        <span class="text-gray-300 text-sm">Click or press SPACE</span>
+                    </div>
+                </div>
+                <div class="game-sidebar">
+                    <div class="flex justify-between px-2 mb-3">
+                        <span class="text-white font-bold text-sm">Score: <span id="flappyScore"
+                                class="text-sky-400">0</span></span>
+                        <span class="text-white font-bold text-sm">Best: <span id="flappyHighScore"
+                                class="text-yellow-400">0</span></span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3">Tap/Click/Space to fly up!<br>
+                        Avoid the pipes.<br>
+                        Each pipe = <b>+1 point</b>.</p>
+                    <div class="mb-3">
+                        <p class="text-xs text-gray-300 font-bold mb-1 text-center">🎯 Select Level</p>
+                        <div class="flex gap-1">
+                            <button id="flappyEasyBtn"
+                                class="flex-1 px-2 py-1 text-xs font-bold rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all ring-0"
+                                onclick="event.stopPropagation(); setFlappyLevel('easy')">Easy</button>
+                            <button id="flappyMediumBtn"
+                                class="flex-1 px-2 py-1 text-xs font-bold rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white transition-all ring-2 ring-yellow-400"
+                                onclick="event.stopPropagation(); setFlappyLevel('medium')">Medium</button>
+                            <button id="flappyHardBtn"
+                                class="flex-1 px-2 py-1 text-xs font-bold rounded-lg bg-red-600 hover:bg-red-700 text-white transition-all ring-0"
+                                onclick="event.stopPropagation(); setFlappyLevel('hard')">Hard</button>
+                        </div>
+                        <p class="text-xs text-center mt-1" id="flappyLevelInfo" style="color: #facc15;">Medium</p>
+                    </div>
+                    <div class="leaderboard-section p-3 bg-gray-800 rounded-xl border border-gray-700 mb-3">
+                        <h4 class="text-center text-yellow-400 font-bold mb-2 text-sm">🏆 Top 3 Scores</h4>
+                        <ul id="flappyLeaderboardList" class="leaderboard-list">
+                            <li class="text-center text-gray-400 text-sm">Loading...</li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button class="mem-btn mem-btn-restart bg-sky-600 hover:bg-sky-700 w-full"
+                            onclick="startFlappyGame()">▶️ Play</button>
+                        <button class="mem-btn mem-btn-close bg-gray-600 hover:bg-gray-700 w-full"
+                            onclick="backToHub('flappyGameOverlay')">⬅ Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎨 Color Match Modal -->
+    <div class="memory-game-overlay" id="colormatchGameOverlay">
+        <div class="memory-game-container game-side-layout" style="max-width: 900px;">
+            <div class="memory-game-header">
+                <h2>🎨 Color Match</h2>
+                <p class="memory-game-subtitle text-xs text-gray-400">Created by Shivang</p>
+            </div>
+            <div class="game-row-layout">
+                <div class="game-canvas-container flex justify-center relative">
+                    <div id="colorMatchArea"
+                        class="w-full bg-gray-900 border-2 border-violet-500 rounded-lg shadow-lg flex flex-col items-center justify-center"
+                        style="min-height: 400px; max-width: 500px;">
+                        <p class="text-gray-400 text-sm mb-2" id="colorMatchInstruction">What COLOR is the word
+                            displayed in?</p>
+                        <div id="colorWord" class="text-6xl font-black mb-8 select-none"
+                            style="color: #ef4444; text-shadow: 0 0 20px rgba(0,0,0,0.5);">RED</div>
+                        <div class="grid grid-cols-2 gap-3 w-full px-6" id="colorButtons">
+                            <button
+                                class="color-match-btn rounded-xl py-4 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95"
+                                style="background: #ef4444;" onclick="pickColor('red')">RED</button>
+                            <button
+                                class="color-match-btn rounded-xl py-4 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95"
+                                style="background: #3b82f6;" onclick="pickColor('blue')">BLUE</button>
+                            <button
+                                class="color-match-btn rounded-xl py-4 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95"
+                                style="background: #22c55e;" onclick="pickColor('green')">GREEN</button>
+                            <button
+                                class="color-match-btn rounded-xl py-4 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95"
+                                style="background: #eab308;" onclick="pickColor('yellow')">YELLOW</button>
+                        </div>
+                        <div id="colorMatchGameOver"
+                            class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center rounded-lg hidden"
+                            style="backdrop-filter: blur(2px);">
+                            <h3 class="text-red-500 text-4xl font-bold mb-2">TIME'S UP!</h3>
+                            <p class="text-white text-lg mb-1">Score: <span id="colorMatchFinalScore"
+                                    class="text-violet-400 font-bold">0</span></p>
+                            <p class="text-white text-lg mb-4">Accuracy: <span id="colorMatchFinalAccuracy"
+                                    class="text-green-400 font-bold">0%</span></p>
+                            <button class="mem-btn mem-btn-restart bg-violet-600 hover:bg-violet-700 px-6 py-2"
+                                onclick="startColorMatchGame()">🔄 Play Again</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="game-sidebar">
+                    <div class="flex justify-between px-2 mb-2">
+                        <span class="text-white font-bold text-sm">Score: <span id="colorMatchScore"
+                                class="text-violet-400">0</span></span>
+                        <span class="text-white font-bold text-sm">Best: <span id="colorMatchHighScore"
+                                class="text-yellow-400">0</span></span>
+                    </div>
+                    <div class="flex justify-between px-2 mb-2">
+                        <span class="text-white font-bold text-sm">⏱ <span id="colorMatchTimer"
+                                class="text-red-400">30</span>s</span>
+                        <span class="text-white font-bold text-sm">🔥 Streak: <span id="colorMatchStreak"
+                                class="text-orange-400">0</span></span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3">Word dikha hai ek color me —<br>
+                        <b>Wo COLOR select karo</b> jis me word<br>
+                        likha hai, word padho mat!<br>
+                        Streak bonus: 3+ = <span class="text-green-400">2x pts</span>!
+                    </p>
+                    <div class="leaderboard-section p-3 bg-gray-800 rounded-xl border border-gray-700 mb-3">
+                        <h4 class="text-center text-yellow-400 font-bold mb-2 text-sm">🏆 Top 3 Scores</h4>
+                        <ul id="colormatchLeaderboardList" class="leaderboard-list">
+                            <li class="text-center text-gray-400 text-sm">Loading...</li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button class="mem-btn mem-btn-restart bg-violet-600 hover:bg-violet-700 w-full"
+                            onclick="startColorMatchGame()">▶️ Play</button>
+                        <button class="mem-btn mem-btn-close bg-gray-600 hover:bg-gray-700 w-full"
+                            onclick="backToHub('colormatchGameOverlay')">⬅ Back</button>
                     </div>
                 </div>
             </div>
