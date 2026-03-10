@@ -1,3 +1,4 @@
+// #region 🔒 FIREBASE & IMAGE UPLOAD
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getDatabase, ref as dbRef, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
@@ -19,7 +20,7 @@ const db = getDatabase(app);
 const imagesRef = dbRef(db, 'images');
 
 // Cloudinary configuration (from structure.html)
-const cloudName = 'duiskktjx'; // Replace with your Cloudinary cloud name
+const cloudName = 'dpzn1ym6x'; // Replace with your Cloudinary cloud name
 const uploadPreset = 'anonymous_upload'; // Replace with your Cloudinary upload preset
 // ✅ Handle paste event for images
 document.addEventListener("paste", function (event) {
@@ -302,6 +303,9 @@ function loadImages() {
     });
 }
 
+// #endregion
+
+// #region 🔒 CSAT CALCULATOR
 // CSAT Calculator Functions
 window.openCSATModal = function () {
     document.getElementById('csatModal').style.display = 'flex';
@@ -391,6 +395,9 @@ document.getElementById('csatModal').addEventListener('click', function (event) 
     }
 });
 
+// #endregion
+
+// #region 🔒 ENDORSEMENT PAGE
 // ENDORSEMENT Full-Page Functionality
 window.openEndorsementPage = function () {
     document.getElementById('endorsementPage').style.display = 'block';
@@ -427,6 +434,9 @@ document.getElementById('endorsementPage').addEventListener('click', function (e
     }
 });
 
+// #endregion
+
+// #region 🔒 MANUAL-VI & CLAIM COVERAGE
 // MANUAL-VI Full-Page Functionality
 window.openManualVIPage = function () {
     document.getElementById('manualVIPage').style.display = 'block';
@@ -500,6 +510,9 @@ document.getElementById('claimCoverageOverlay').addEventListener('click', functi
 });
 
 
+// #endregion
+
+// #region 🔒 CLAIM COUNT & NSTP
 // New Claim_Count & NSTP Page Functionality
 window.openClaimCountNSTPPage = function () {
     document.getElementById('claimCountNSTPPage').style.display = 'block';
@@ -537,6 +550,9 @@ document.getElementById('claimCountNSTPPage').addEventListener('click', function
     }
 });
 
+// #endregion
+
+// #region 🔒 INSPECTION WAIVER PAGE
 // New Inspection Waiver Page Functionality
 window.openInspectionWaiverPage = function () {
     document.getElementById('inspectionWaiverPage').style.display = 'block';
@@ -572,6 +588,9 @@ document.getElementById('inspectionWaiverPage').addEventListener('click', functi
     }
 });
 
+// #endregion
+
+// #region 🔒 RSA & CONTACT PAGE
 // New RSA & Contact Page Functionality
 window.openRSAPage = function () {
     document.getElementById('rsaContactPage').style.display = 'block';
@@ -608,6 +627,9 @@ document.getElementById('rsaContactPage').addEventListener('click', function (ev
     }
 });
 
+// #endregion
+
+// #region 🔒 VISIBILITY HELPERS
 // Helper functions to manage visibility
 function hideAllMainContent() {
     const uploadSection = document.querySelector('.upload-section');
@@ -665,7 +687,9 @@ function showAllMainContent() {
     if (notebookButton) notebookButton.style.display = 'flex';
 }
 
-// Endorsement Data and Logic
+// #endregion
+
+// #region 🔒 ENDORSEMENT DATA (JSON)
 const insurerDropdown = document.querySelector('.endorsement-page #insurer');
 const requirementDropdown = document.querySelector('.endorsement-page #requirement');
 const outputBox = document.querySelector('.endorsement-page #output');
@@ -12559,7 +12583,9 @@ function populateInspectionWaiverTable(data) {
     });
 }
 
-// Data for RSA & Contact
+// #endregion
+
+// #region 🔒 RSA & CONTACT DATA
 // Function to clean numbers and replace commas with slashes
 function cleanAndFormatNumber(numberString) {
     if (!numberString) return "";
@@ -12659,6 +12685,9 @@ function setupRSADashboardListeners() {
 // Page load hone par images ko shuruat mein load karein
 loadImages();
 
+// #endregion
+
+// #region 🔒 UPDATES BUTTON & MODAL
 // --- NEW JAVASCRIPT FOR UPDATES BUTTON AND MODAL ---
 document.addEventListener('DOMContentLoaded', function () {
     const updatesButton = document.getElementById('companyUpdatesButton');
@@ -13466,6 +13495,9 @@ window.backToHub = function (overlayId) {
     if (overlayId === 'memoryGameOverlay') clearInterval(timerInterval);
     if (overlayId === 'bounceGameOverlay') clearInterval(bounceInterval);
     if (overlayId === 'starsGameOverlay') clearInterval(starsInterval);
+    if (overlayId === 'aimGameOverlay') { clearInterval(aimTimerInterval); aimGameActive = false; }
+    if (overlayId === 'flappyGameOverlay') { if (flappyAnimFrame) cancelAnimationFrame(flappyAnimFrame); flappyGameActive = false; }
+    if (overlayId === 'colormatchGameOverlay') { clearInterval(colorMatchTimerInterval); colorMatchActive = false; }
 
     // Bring back hub
     openGameHub();
@@ -13498,6 +13530,18 @@ window.launchGame = function (gameType) {
         document.getElementById('starsGameOverlay').classList.add('active');
         loadLeaderboard('stars', 'pts');
         window.startStarsGame();
+    } else if (gameType === 'aim') {
+        document.getElementById('aimGameOverlay').classList.add('active');
+        loadLeaderboard('aim', 'pts');
+        window.startAimGame();
+    } else if (gameType === 'flappy') {
+        document.getElementById('flappyGameOverlay').classList.add('active');
+        loadLeaderboard('flappy', 'pts');
+        window.startFlappyGame();
+    } else if (gameType === 'colormatch') {
+        document.getElementById('colormatchGameOverlay').classList.add('active');
+        loadLeaderboard('colormatch', 'pts');
+        window.startColorMatchGame();
     }
 };
 
@@ -13589,6 +13633,9 @@ function checkAndSaveScore(gameId, newScore, isHigherBetter = true) {
             if (gameId === 'whack') unit = 'moles';
             if (gameId === 'bounce') unit = 'pts';
             if (gameId === 'stars') unit = 'pts';
+            if (gameId === 'aim') unit = 'pts';
+            if (gameId === 'flappy') unit = 'pts';
+            if (gameId === 'colormatch') unit = 'pts';
             loadLeaderboard(gameId, unit);
         }
     }, { onlyOnce: true });
@@ -13944,6 +13991,14 @@ let gameOverBounce = false;
 let isBouncePaused = false;
 let bounceScore = 0;
 
+// Level System
+let bounceLevel = 'easy';
+const bounceLevels = {
+    easy: { speed: 4, paddleWidth: 120, pointMultiplier: 1, shrinkRate: 1, speedUp: 0.3, color: '#4ade80', label: 'Easy — 1x pts', ballColor: '#86efac', paddleColor: '#4ade80', borderColor: '#4ade80', bgColor: '#0a1f0a' },
+    medium: { speed: 8, paddleWidth: 90, pointMultiplier: 2, shrinkRate: 2, speedUp: 0.6, color: '#facc15', label: 'Medium — 2x pts', ballColor: '#22c55e', paddleColor: '#16a34a', borderColor: '#16a34a', bgColor: '#0a170a' },
+    hard: { speed: 14, paddleWidth: 45, pointMultiplier: 5, shrinkRate: 4, speedUp: 1.2, color: '#f87171', label: 'Hard — 5x pts \ud83d\udd25', ballColor: '#15803d', paddleColor: '#166534', borderColor: '#14532d', bgColor: '#030f03' }
+};
+
 const ball = {
     x: 200,
     y: 200,
@@ -13966,17 +14021,52 @@ const paddle = {
 let rightPressed = false;
 let leftPressed = false;
 
+window.setBounceLevel = function (level) {
+    bounceLevel = level;
+    const info = bounceLevels[level];
+
+    // Update UI highlights
+    ['bounceEasyBtn', 'bounceMediumBtn', 'bounceHardBtn'].forEach(id => {
+        document.getElementById(id).classList.remove('ring-2', 'ring-green-400', 'ring-yellow-400', 'ring-red-400');
+        document.getElementById(id).classList.add('ring-0');
+    });
+
+    const btnId = level === 'easy' ? 'bounceEasyBtn' : level === 'medium' ? 'bounceMediumBtn' : 'bounceHardBtn';
+    const ringColor = level === 'easy' ? 'ring-green-400' : level === 'medium' ? 'ring-yellow-400' : 'ring-red-400';
+    document.getElementById(btnId).classList.remove('ring-0');
+    document.getElementById(btnId).classList.add('ring-2', ringColor);
+
+    // Update info text
+    const infoElem = document.getElementById('bounceLevelInfo');
+    infoElem.textContent = info.label;
+    infoElem.style.color = info.color;
+
+    // Update canvas border color to match level theme
+    const canvas = document.getElementById('bounceCanvas');
+    if (canvas) {
+        canvas.style.borderColor = info.borderColor;
+    }
+
+    // Auto-restart game with new level settings
+    window.startBounceGame();
+}
+
 window.startBounceGame = function () {
     bounceCanvas = document.getElementById('bounceCanvas');
     bounceCtx = bounceCanvas.getContext('2d');
 
-    // Reset State
+    const levelConfig = bounceLevels[bounceLevel];
+
+    // Reset State based on level
     ball.x = bounceCanvas.width / 2;
     ball.y = bounceCanvas.height / 2;
-    ball.speed = 4;
+    ball.speed = levelConfig.speed;
     ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
     ball.dy = -ball.speed;
+    ball.color = levelConfig.ballColor;
 
+    paddle.width = levelConfig.paddleWidth;
+    paddle.color = levelConfig.paddleColor;
     paddle.x = (bounceCanvas.width - paddle.width) / 2;
 
     bounceScore = 0;
@@ -14027,7 +14117,7 @@ function drawPaddle() {
 function drawBounceGame() {
     if (gameOverBounce || isBouncePaused) return;
 
-    bounceCtx.fillStyle = '#111827';
+    bounceCtx.fillStyle = bounceLevels[bounceLevel].bgColor;
     bounceCtx.fillRect(0, 0, bounceCanvas.width, bounceCanvas.height);
 
     drawBall();
@@ -14043,31 +14133,35 @@ function drawBounceGame() {
         ball.dy = -ball.dy;
     }
     // Paddle Collision or Bottom Edge
-    else if (ball.y + ball.dy > bounceCanvas.height - ball.radius - paddle.height) {
-        if (ball.x > paddle.x - ball.radius && ball.x < paddle.x + paddle.width + ball.radius && ball.y < paddle.y) {
+    else if (ball.y + ball.dy + ball.radius >= paddle.y) {
+        // Check if ball is within paddle's horizontal range
+        if (ball.x + ball.radius > paddle.x && ball.x - ball.radius < paddle.x + paddle.width) {
 
             // Rebound physics
             let hitPoint = ball.x - (paddle.x + paddle.width / 2);
             let normalizedHit = hitPoint / (paddle.width / 2); // -1 to 1
 
-            ball.dy = -ball.dy;
+            ball.dy = -Math.abs(ball.dy); // Always bounce UP
             ball.dx = normalizedHit * ball.speed * 1.2;
 
-            bounceScore += 1;
+            const levelConfig = bounceLevels[bounceLevel];
+            bounceScore += levelConfig.pointMultiplier;
             document.getElementById('bounceScore').textContent = bounceScore;
 
-            if (bounceScore % 5 === 0) {
-                ball.speed += 0.5;
+            if (bounceScore % (5 * levelConfig.pointMultiplier) === 0) {
+                ball.speed += levelConfig.speedUp;
                 const currentSpeedSq = ball.dx * ball.dx + ball.dy * ball.dy;
                 const speedScale = ball.speed / Math.sqrt(currentSpeedSq);
                 ball.dx *= speedScale;
                 ball.dy *= speedScale;
 
-                if (paddle.width > 40) paddle.width -= 2;
+                if (paddle.width > 40) paddle.width -= levelConfig.shrinkRate;
             }
+            // Clamp ball above paddle to prevent pass-through
             ball.y = paddle.y - ball.radius;
 
         } else if (ball.y + ball.dy > bounceCanvas.height - ball.radius) {
+            // Ball missed paddle and hit the bottom — Game Over
             gameOverBounce = true;
             clearInterval(bounceInterval);
 
@@ -14367,3 +14461,579 @@ document.addEventListener("keydown", function (e) {
         window.toggleStarsPause();
     }
 });
+// #endregion
+
+// #region 🔒 AIM TRAINER GAME
+// ========================================
+// 🎯 Aim Trainer Game Logic
+// ========================================
+let aimCanvas, aimCtx;
+let aimTimerInterval;
+let aimGameActive = false;
+let aimScore = 0;
+let aimTimeLeft = 30;
+let aimHits = 0;
+let aimMisses = 0;
+let aimTarget = null;
+let aimAnimations = []; // for hit effects
+const AIM_TARGET_LIFETIME = 1500; // target disappears after 1.5 seconds!
+const AIM_MISS_PENALTY = 3; // lose 3 pts for miss
+
+function spawnAimTarget() {
+    // Targets get smaller as score increases (progressive difficulty)
+    const difficultyBonus = Math.min(aimScore * 0.15, 12);
+    const minRadius = Math.max(6, 10 - difficultyBonus * 0.3);
+    const maxRadius = Math.max(18, 30 - difficultyBonus);
+    const radius = minRadius + Math.random() * (maxRadius - minRadius);
+    const x = radius + Math.random() * (aimCanvas.width - radius * 2);
+    const y = radius + Math.random() * (aimCanvas.height - radius * 2);
+
+    // Color based on size — smaller = more red/valuable
+    const sizeRatio = (radius - minRadius) / (maxRadius - minRadius + 0.01);
+    const r = Math.floor(255 - sizeRatio * 100);
+    const g = Math.floor(80 + sizeRatio * 120);
+    const b = Math.floor(50 + sizeRatio * 50);
+
+    aimTarget = { x, y, radius, color: `rgb(${r},${g},${b})`, spawnTime: Date.now() };
+}
+
+function getAimPoints(radius) {
+    // Smaller targets = more points (8 to 30)
+    return Math.max(8, Math.round(35 - radius * 0.9));
+}
+
+function drawAimGame() {
+    if (!aimCtx) return;
+    aimCtx.fillStyle = '#111827';
+    aimCtx.fillRect(0, 0, aimCanvas.width, aimCanvas.height);
+
+    // Draw grid lines for aim feel
+    aimCtx.strokeStyle = 'rgba(255,255,255,0.03)';
+    aimCtx.lineWidth = 1;
+    for (let i = 0; i < aimCanvas.width; i += 50) {
+        aimCtx.beginPath();
+        aimCtx.moveTo(i, 0);
+        aimCtx.lineTo(i, aimCanvas.height);
+        aimCtx.stroke();
+        aimCtx.beginPath();
+        aimCtx.moveTo(0, i);
+        aimCtx.lineTo(aimCanvas.width, i);
+        aimCtx.stroke();
+    }
+
+    // Draw target
+    if (aimTarget) {
+        // Check if target expired (auto-disappear)
+        const timeAlive = Date.now() - aimTarget.spawnTime;
+        if (timeAlive > AIM_TARGET_LIFETIME) {
+            // Target expired = counts as miss!
+            aimMisses++;
+            aimAnimations.push({ x: aimTarget.x, y: aimTarget.y, radius: aimTarget.radius, time: Date.now(), hit: false, points: 0 });
+            const accuracy = aimHits + aimMisses > 0 ? Math.round((aimHits / (aimHits + aimMisses)) * 100) : 0;
+            document.getElementById('aimAccuracy').textContent = accuracy + '%';
+            spawnAimTarget();
+        }
+
+        // Timer ring (shrinks as time runs out)
+        const lifeRatio = Math.max(0, 1 - timeAlive / AIM_TARGET_LIFETIME);
+        aimCtx.beginPath();
+        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius + 6, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * lifeRatio);
+        aimCtx.strokeStyle = lifeRatio > 0.4 ? `rgba(74,222,128,${lifeRatio})` : `rgba(239,68,68,${1 - lifeRatio})`;
+        aimCtx.lineWidth = 3;
+        aimCtx.stroke();
+        // Outer glow
+        aimCtx.beginPath();
+        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius + 4, 0, Math.PI * 2);
+        aimCtx.fillStyle = 'rgba(255, 100, 50, 0.15)';
+        aimCtx.fill();
+
+        // Main circle
+        aimCtx.beginPath();
+        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius, 0, Math.PI * 2);
+        aimCtx.fillStyle = aimTarget.color;
+        aimCtx.fill();
+
+        // Inner ring
+        aimCtx.beginPath();
+        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius * 0.5, 0, Math.PI * 2);
+        aimCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+        aimCtx.lineWidth = 2;
+        aimCtx.stroke();
+
+        // Bullseye dot
+        aimCtx.beginPath();
+        aimCtx.arc(aimTarget.x, aimTarget.y, 3, 0, Math.PI * 2);
+        aimCtx.fillStyle = '#fff';
+        aimCtx.fill();
+
+        // Points label
+        const pts = getAimPoints(aimTarget.radius);
+        aimCtx.fillStyle = '#fff';
+        aimCtx.font = 'bold 11px sans-serif';
+        aimCtx.textAlign = 'center';
+        aimCtx.fillText(`+${pts}`, aimTarget.x, aimTarget.y - aimTarget.radius - 8);
+    }
+
+    // Draw hit animations
+    aimAnimations = aimAnimations.filter(a => {
+        const elapsed = Date.now() - a.time;
+        if (elapsed > 400) return false;
+        const alpha = 1 - elapsed / 400;
+        const expand = a.radius + elapsed * 0.15;
+
+        aimCtx.beginPath();
+        aimCtx.arc(a.x, a.y, expand, 0, Math.PI * 2);
+        aimCtx.strokeStyle = a.hit ? `rgba(74,222,128,${alpha})` : `rgba(239,68,68,${alpha})`;
+        aimCtx.lineWidth = 3;
+        aimCtx.stroke();
+
+        if (a.hit) {
+            aimCtx.fillStyle = `rgba(74,222,128,${alpha})`;
+            aimCtx.font = `bold ${14 + elapsed * 0.03}px sans-serif`;
+            aimCtx.textAlign = 'center';
+            aimCtx.fillText(`+${a.points}`, a.x, a.y - expand - 5);
+        }
+        return true;
+    });
+
+    if (aimGameActive) {
+        requestAnimationFrame(drawAimGame);
+    }
+}
+
+window.startAimGame = function () {
+    aimCanvas = document.getElementById('aimCanvas');
+    aimCtx = aimCanvas.getContext('2d');
+
+    aimScore = 0;
+    aimTimeLeft = 30;
+    aimHits = 0;
+    aimMisses = 0;
+    aimGameActive = true;
+    aimAnimations = [];
+
+    document.getElementById('aimScore').textContent = aimScore;
+    document.getElementById('aimTimer').textContent = aimTimeLeft;
+    document.getElementById('aimAccuracy').textContent = '0%';
+    document.getElementById('aimGameOverOverlay').classList.add('hidden');
+
+    spawnAimTarget();
+
+    if (aimTimerInterval) clearInterval(aimTimerInterval);
+    aimTimerInterval = setInterval(() => {
+        aimTimeLeft--;
+        document.getElementById('aimTimer').textContent = aimTimeLeft;
+
+        if (aimTimeLeft <= 0) {
+            clearInterval(aimTimerInterval);
+            aimGameActive = false;
+
+            const accuracy = aimHits + aimMisses > 0 ? Math.round((aimHits / (aimHits + aimMisses)) * 100) : 0;
+            document.getElementById('aimFinalScore').textContent = aimScore;
+            document.getElementById('aimFinalAccuracy').textContent = accuracy + '%';
+            document.getElementById('aimGameOverOverlay').classList.remove('hidden');
+
+            checkAndSaveScore('aim', aimScore, true);
+        }
+    }, 1000);
+
+    drawAimGame();
+}
+
+// Handle clicks on canvas
+document.addEventListener('DOMContentLoaded', function () {
+    const setupAimCanvas = () => {
+        const canvas = document.getElementById('aimCanvas');
+        if (!canvas) return;
+
+        canvas.addEventListener('click', function (e) {
+            if (!aimGameActive || !aimTarget) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clickX = (e.clientX - rect.left) * scaleX;
+            const clickY = (e.clientY - rect.top) * scaleY;
+
+            const dist = Math.sqrt((clickX - aimTarget.x) ** 2 + (clickY - aimTarget.y) ** 2);
+
+            if (dist <= aimTarget.radius) {
+                // HIT!
+                const points = getAimPoints(aimTarget.radius);
+                aimScore += points;
+                aimHits++;
+                aimAnimations.push({ x: aimTarget.x, y: aimTarget.y, radius: aimTarget.radius, time: Date.now(), hit: true, points });
+
+                document.getElementById('aimScore').textContent = aimScore;
+                spawnAimTarget();
+            } else {
+                // MISS — penalty!
+                aimMisses++;
+                aimScore = Math.max(0, aimScore - AIM_MISS_PENALTY);
+                document.getElementById('aimScore').textContent = aimScore;
+                aimAnimations.push({ x: clickX, y: clickY, radius: 10, time: Date.now(), hit: false, points: 0 });
+            }
+
+            // Update accuracy
+            const accuracy = aimHits + aimMisses > 0 ? Math.round((aimHits / (aimHits + aimMisses)) * 100) : 0;
+            document.getElementById('aimAccuracy').textContent = accuracy + '%';
+        });
+    };
+    setupAimCanvas();
+});
+// #endregion
+
+// #region 🔒 FLAPPY BIRD GAME
+// ========================================
+// 🐦 Flappy Bird Game Logic
+// ========================================
+let flappyCanvas, flappyCtx;
+let flappyInterval;
+let flappyGameActive = false;
+let flappyGameOver = false;
+let flappyStarted = false;
+let flappyScore = 0;
+let flappyLastTime = 0;
+let flappyAnimFrame = null;
+
+// Level System
+let flappyLevel = 'medium';
+const flappyLevels = {
+    easy: { gravity: 0.25, flapForce: -5.5, pipeSpeed: 1.8, pipeGap: 175, pipeInterval: 110, color: '#4ade80', label: 'Easy — Slow & Wide' },
+    medium: { gravity: 0.35, flapForce: -6.5, pipeSpeed: 2.5, pipeGap: 145, pipeInterval: 90, color: '#facc15', label: 'Medium — Normal' },
+    hard: { gravity: 0.50, flapForce: -8.0, pipeSpeed: 4.0, pipeGap: 110, pipeInterval: 65, color: '#f87171', label: 'Hard — Fast & Tight 🔥' }
+};
+
+const bird = { x: 80, y: 250, width: 30, height: 24, velocity: 0, gravity: 0.35, flapForce: -6.5 };
+let pipes = [];
+const PIPE_WIDTH = 50;
+let currentPipeGap = 145;
+let currentPipeSpeed = 2.5;
+let currentPipeInterval = 90;
+let pipeTimer = 0;
+
+function resetBird() {
+    bird.y = 250;
+    bird.velocity = 0;
+    pipes = [];
+    pipeTimer = 0;
+}
+
+window.setFlappyLevel = function (level) {
+    flappyLevel = level;
+    const info = flappyLevels[level];
+
+    // Update UI highlights
+    ['flappyEasyBtn', 'flappyMediumBtn', 'flappyHardBtn'].forEach(id => {
+        document.getElementById(id).classList.remove('ring-2', 'ring-green-400', 'ring-yellow-400', 'ring-red-400');
+        document.getElementById(id).classList.add('ring-0');
+    });
+
+    const btnId = level === 'easy' ? 'flappyEasyBtn' : level === 'medium' ? 'flappyMediumBtn' : 'flappyHardBtn';
+    const ringColor = level === 'easy' ? 'ring-green-400' : level === 'medium' ? 'ring-yellow-400' : 'ring-red-400';
+    document.getElementById(btnId).classList.remove('ring-0');
+    document.getElementById(btnId).classList.add('ring-2', ringColor);
+
+    const infoElem = document.getElementById('flappyLevelInfo');
+    infoElem.textContent = info.label;
+    infoElem.style.color = info.color;
+
+    // Auto-restart
+    window.startFlappyGame();
+}
+
+window.flappyFlap = function () {
+    if (flappyGameOver) return;
+    if (!flappyStarted) {
+        flappyStarted = true;
+        document.getElementById('flappyStartOverlay').classList.add('hidden');
+    }
+    bird.velocity = bird.flapForce;
+}
+
+window.startFlappyGame = function () {
+    flappyCanvas = document.getElementById('flappyCanvas');
+    flappyCtx = flappyCanvas.getContext('2d');
+
+    const levelConfig = flappyLevels[flappyLevel];
+
+    // Apply level settings
+    bird.gravity = levelConfig.gravity;
+    bird.flapForce = levelConfig.flapForce;
+    currentPipeSpeed = levelConfig.pipeSpeed;
+    currentPipeGap = levelConfig.pipeGap;
+    currentPipeInterval = levelConfig.pipeInterval;
+
+    flappyScore = 0;
+    flappyGameOver = false;
+    flappyGameActive = true;
+    flappyStarted = false;
+    flappyLastTime = 0;
+    resetBird();
+
+    document.getElementById('flappyScore').textContent = 0;
+    document.getElementById('flappyGameOverOverlay').classList.add('hidden');
+    document.getElementById('flappyStartOverlay').classList.remove('hidden');
+
+    if (flappyAnimFrame) cancelAnimationFrame(flappyAnimFrame);
+    flappyAnimFrame = requestAnimationFrame(flappyGameLoop);
+}
+
+function flappyGameLoop(timestamp) {
+    if (!flappyGameActive) return;
+    if (!flappyLastTime) flappyLastTime = timestamp;
+    const delta = Math.min((timestamp - flappyLastTime) / 16.67, 2); // normalize to ~60fps, cap at 2x
+    flappyLastTime = timestamp;
+
+    drawFlappyGame(delta);
+
+    if (flappyGameActive && !flappyGameOver) {
+        flappyAnimFrame = requestAnimationFrame(flappyGameLoop);
+    }
+}
+
+function drawFlappyGame(delta) {
+    if (!flappyCtx) return;
+    const d = delta || 1;
+    const W = flappyCanvas.width;
+    const H = flappyCanvas.height;
+
+    // Sky gradient background
+    const grad = flappyCtx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0c4a6e');
+    grad.addColorStop(1, '#164e63');
+    flappyCtx.fillStyle = grad;
+    flappyCtx.fillRect(0, 0, W, H);
+
+    // Ground
+    flappyCtx.fillStyle = '#854d0e';
+    flappyCtx.fillRect(0, H - 30, W, 30);
+    flappyCtx.fillStyle = '#65a30d';
+    flappyCtx.fillRect(0, H - 30, W, 6);
+
+    if (flappyStarted && !flappyGameOver) {
+        // Gravity with delta-time
+        bird.velocity += bird.gravity * d;
+        bird.y += bird.velocity * d;
+
+        // Pipes
+        pipeTimer++;
+        if (pipeTimer > currentPipeInterval) {
+            pipeTimer = 0;
+            const topHeight = 60 + Math.random() * (H - currentPipeGap - 120);
+            pipes.push({ x: W, topHeight, passed: false });
+        }
+
+        for (let i = pipes.length - 1; i >= 0; i--) {
+            pipes[i].x -= currentPipeSpeed * d;
+
+            // Score when passed
+            if (!pipes[i].passed && pipes[i].x + PIPE_WIDTH < bird.x) {
+                pipes[i].passed = true;
+                flappyScore++;
+                document.getElementById('flappyScore').textContent = flappyScore;
+            }
+
+            // Remove off-screen pipes
+            if (pipes[i].x + PIPE_WIDTH < 0) {
+                pipes.splice(i, 1);
+            }
+        }
+
+        // Collision detection
+        const birdTop = bird.y;
+        const birdBot = bird.y + bird.height;
+        const birdRight = bird.x + bird.width;
+
+        // Floor/ceiling
+        if (birdBot >= H - 30 || birdTop <= 0) {
+            endFlappyGame();
+        }
+
+        // Pipe collision
+        for (const pipe of pipes) {
+            if (birdRight > pipe.x && bird.x < pipe.x + PIPE_WIDTH) {
+                if (birdTop < pipe.topHeight || birdBot > pipe.topHeight + currentPipeGap) {
+                    endFlappyGame();
+                }
+            }
+        }
+    }
+
+    // Draw pipes
+    for (const pipe of pipes) {
+        // Top pipe
+        flappyCtx.fillStyle = '#16a34a';
+        flappyCtx.fillRect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
+        flappyCtx.fillStyle = '#15803d';
+        flappyCtx.fillRect(pipe.x - 4, pipe.topHeight - 20, PIPE_WIDTH + 8, 20);
+
+        // Bottom pipe
+        const bottomY = pipe.topHeight + currentPipeGap;
+        flappyCtx.fillStyle = '#16a34a';
+        flappyCtx.fillRect(pipe.x, bottomY, PIPE_WIDTH, H - bottomY - 30);
+        flappyCtx.fillStyle = '#15803d';
+        flappyCtx.fillRect(pipe.x - 4, bottomY, PIPE_WIDTH + 8, 20);
+    }
+
+    // Draw bird
+    flappyCtx.fillStyle = '#facc15';
+    flappyCtx.beginPath();
+    const angle = Math.min(Math.max(bird.velocity * 3, -30), 60) * Math.PI / 180;
+    flappyCtx.save();
+    flappyCtx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
+    flappyCtx.rotate(angle);
+    flappyCtx.ellipse(0, 0, bird.width / 2, bird.height / 2, 0, 0, Math.PI * 2);
+    flappyCtx.fill();
+
+    // Eye
+    flappyCtx.fillStyle = '#fff';
+    flappyCtx.beginPath();
+    flappyCtx.arc(8, -4, 5, 0, Math.PI * 2);
+    flappyCtx.fill();
+    flappyCtx.fillStyle = '#000';
+    flappyCtx.beginPath();
+    flappyCtx.arc(9, -4, 2.5, 0, Math.PI * 2);
+    flappyCtx.fill();
+
+    // Beak
+    flappyCtx.fillStyle = '#f97316';
+    flappyCtx.beginPath();
+    flappyCtx.moveTo(bird.width / 2, 0);
+    flappyCtx.lineTo(bird.width / 2 + 10, 3);
+    flappyCtx.lineTo(bird.width / 2, 6);
+    flappyCtx.closePath();
+    flappyCtx.fill();
+    flappyCtx.restore();
+
+    // Score display on canvas
+    flappyCtx.fillStyle = '#fff';
+    flappyCtx.font = 'bold 36px sans-serif';
+    flappyCtx.textAlign = 'center';
+    flappyCtx.fillText(flappyScore, W / 2, 50);
+}
+
+function endFlappyGame() {
+    flappyGameOver = true;
+    if (flappyAnimFrame) cancelAnimationFrame(flappyAnimFrame);
+    flappyGameActive = false;
+
+    document.getElementById('flappyFinalScore').textContent = flappyScore;
+    document.getElementById('flappyGameOverOverlay').classList.remove('hidden');
+
+    checkAndSaveScore('flappy', flappyScore, true);
+}
+
+// Keyboard support for Flappy
+document.addEventListener('keydown', function (e) {
+    const overlay = document.getElementById('flappyGameOverlay');
+    if (!overlay || !overlay.classList.contains('active')) return;
+    if (e.code === 'Space') {
+        e.preventDefault();
+        window.flappyFlap();
+    }
+});
+// #endregion
+
+// #region 🔒 COLOR MATCH GAME
+// ========================================
+// 🎨 Color Match Game Logic
+// ========================================
+let colorMatchTimerInterval;
+let colorMatchActive = false;
+let colorMatchScore = 0;
+let colorMatchTimeLeft = 30;
+let colorMatchHits = 0;
+let colorMatchMisses = 0;
+let colorMatchStreak = 0;
+let currentColorAnswer = '';
+
+const CM_COLORS = [
+    { name: 'red', hex: '#ef4444' },
+    { name: 'blue', hex: '#3b82f6' },
+    { name: 'green', hex: '#22c55e' },
+    { name: 'yellow', hex: '#eab308' }
+];
+
+function generateColorMatchRound() {
+    // Pick a random WORD (text content)
+    const wordColor = CM_COLORS[Math.floor(Math.random() * CM_COLORS.length)];
+    // Pick a DIFFERENT display color
+    let displayColor;
+    do {
+        displayColor = CM_COLORS[Math.floor(Math.random() * CM_COLORS.length)];
+    } while (displayColor.name === wordColor.name);
+
+    currentColorAnswer = displayColor.name; // correct answer is the DISPLAY color
+
+    const wordElem = document.getElementById('colorWord');
+    wordElem.textContent = wordColor.name.toUpperCase();
+    wordElem.style.color = displayColor.hex;
+    wordElem.style.textShadow = `0 0 30px ${displayColor.hex}40`;
+}
+
+window.pickColor = function (colorName) {
+    if (!colorMatchActive) return;
+
+    if (colorName === currentColorAnswer) {
+        // CORRECT!
+        colorMatchHits++;
+        colorMatchStreak++;
+        const streakBonus = colorMatchStreak >= 3 ? 2 : 1;
+        colorMatchScore += 10 * streakBonus;
+
+        // Flash green on word
+        const wordElem = document.getElementById('colorWord');
+        wordElem.style.textShadow = '0 0 40px #22c55e';
+        setTimeout(() => { wordElem.style.textShadow = `0 0 30px ${currentColorAnswer}40`; }, 150);
+    } else {
+        // WRONG!
+        colorMatchMisses++;
+        colorMatchStreak = 0;
+        colorMatchScore = Math.max(0, colorMatchScore - 5);
+
+        // Flash red
+        const wordElem = document.getElementById('colorWord');
+        wordElem.style.textShadow = '0 0 40px #ef4444';
+        setTimeout(() => { wordElem.style.textShadow = `0 0 30px ${currentColorAnswer}40`; }, 150);
+    }
+
+    document.getElementById('colorMatchScore').textContent = colorMatchScore;
+    document.getElementById('colorMatchStreak').textContent = colorMatchStreak;
+    generateColorMatchRound();
+}
+
+window.startColorMatchGame = function () {
+    colorMatchScore = 0;
+    colorMatchTimeLeft = 30;
+    colorMatchHits = 0;
+    colorMatchMisses = 0;
+    colorMatchStreak = 0;
+    colorMatchActive = true;
+
+    document.getElementById('colorMatchScore').textContent = 0;
+    document.getElementById('colorMatchTimer').textContent = 30;
+    document.getElementById('colorMatchStreak').textContent = 0;
+    document.getElementById('colorMatchGameOver').classList.add('hidden');
+
+    generateColorMatchRound();
+
+    if (colorMatchTimerInterval) clearInterval(colorMatchTimerInterval);
+    colorMatchTimerInterval = setInterval(() => {
+        colorMatchTimeLeft--;
+        document.getElementById('colorMatchTimer').textContent = colorMatchTimeLeft;
+
+        if (colorMatchTimeLeft <= 0) {
+            clearInterval(colorMatchTimerInterval);
+            colorMatchActive = false;
+
+            const accuracy = colorMatchHits + colorMatchMisses > 0 ? Math.round((colorMatchHits / (colorMatchHits + colorMatchMisses)) * 100) : 0;
+            document.getElementById('colorMatchFinalScore').textContent = colorMatchScore;
+            document.getElementById('colorMatchFinalAccuracy').textContent = accuracy + '%';
+            document.getElementById('colorMatchGameOver').classList.remove('hidden');
+
+            checkAndSaveScore('colormatch', colorMatchScore, true);
+        }
+    }, 1000);
+}
+// #endregion
