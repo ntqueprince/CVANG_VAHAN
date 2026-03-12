@@ -11236,12 +11236,12 @@ const endorsementData = [
         "InsurerRequirement": "UnitedPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
         "Insurer": "United",
         "Requirement": "Post Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
-        "Endorsement type": "",
-        "Documents or any other requirement": "Customer consent & Alternate policy",
-        "TAT": "SRS / 10 Days",
-        "Charges / Deduction": "Deduction",
-        "Inspection": "",
-        "Any Exception": "Only third Party policy cannot be cancelled\r\n\r\nFor comprehensive: TP (Third Party) amount will be retained, and the OD (Own Damage) part will be refunded based on the usage of the policy.",
+        "Endorsement type": "Not Possible",
+        "Documents or any other requirement": "Not Possible",
+        "TAT": "Not Possible",
+        "Charges / Deduction": "Not Possible",
+        "Inspection": "Not Possible",
+        "Any Exception": "",
         "Declaration format (if declaration required)": ""
     },
     {
