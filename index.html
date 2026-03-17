@@ -543,6 +543,41 @@
         </div>
     </div>
 
+    <!-- Quick Links Script (standalone, not dependent on module) -->
+    <script>
+        function openQuickLinks() {
+            var password = prompt('🔒 Enter Password to open Quick Links:');
+            if (password !== 'shivangpb') {
+                if (password !== null) alert('❌ Wrong Password!');
+                return;
+            }
+
+            // chrome://flags - copy to clipboard
+            try {
+                navigator.clipboard.writeText('chrome://flags/');
+                alert('✅ "chrome://flags/" copied to clipboard!\nPaste it in a new tab.\n\nAll other links will now open.');
+            } catch (e) {
+                prompt('⚠️ Copy this URL manually and paste in a new tab:', 'chrome://flags/');
+            }
+
+            // Reversed order: matrix → sheets → forms → textbook → CVANG → chat → BMS (last)
+            var links = [
+                'https://matrixdashboard.policybazaar.com/admin/realtimedashboard',
+                'https://docs.google.com/spreadsheets/d/1wq1xc_L5DHRzYnHXeHc6SRaum8BBwWn5ntKbZafVHtk/edit?gid=0#gid=0',
+                'https://docs.google.com/forms/d/e/1FAIpQLScliXNbSsS85LhQiiFDkQXGBgJIHon2ByR9Wm0X9j4BUqedVg/formResponse',
+                'https://ntqueprince.github.io/textbook/',
+                'https://ntqueprince.github.io/CVANG_VAHAN/',
+                'https://chatinternal.policybazaar.com/channel/6854fee0f93b60e3e7de14ca',
+                'https://bms.policybazaar.com/dashboardV3'
+            ];
+
+            links.forEach(function (url, i) {
+                setTimeout(function () {
+                    window.open(url, '_blank');
+                }, i * 300);
+            });
+        }
+    </script>
     <script type="module" src="script.js"></script>
     <!-- Floating Chat Button -->
     <button id="openChatBtn"
