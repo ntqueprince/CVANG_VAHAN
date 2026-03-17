@@ -15037,3 +15037,42 @@ window.startColorMatchGame = function () {
     }, 1000);
 }
 // #endregion
+
+// ========================================
+// 🚀 Quick Links - Open All Regular Links
+// ========================================
+window.openQuickLinks = function () {
+    const password = prompt('🔒 Enter Password to open Quick Links:');
+    if (password !== 'shivangpb') {
+        if (password !== null) alert('❌ Wrong Password!');
+        return;
+    }
+
+    // Links in order: chrome://flags first, then others, BMS dashboard last
+    // Reversed order: chrome://flags (clipboard) → matrix → sheets → forms → textbook → CVANG → chat → BMS (last)
+    const links = [
+        'https://matrixdashboard.policybazaar.com/admin/realtimedashboard',
+        'https://docs.google.com/spreadsheets/d/1wq1xc_L5DHRzYnHXeHc6SRaum8BBwWn5ntKbZafVHtk/edit?gid=0#gid=0',
+        'https://docs.google.com/forms/d/e/1FAIpQLScliXNbSsS85LhQiiFDkQXGBgJIHon2ByR9Wm0X9j4BUqedVg/formResponse',
+        'https://ntqueprince.github.io/textbook/',
+        'https://ntqueprince.github.io/CVANG_VAHAN/',
+        'https://chatinternal.policybazaar.com/channel/6854fee0f93b60e3e7de14ca',
+        'https://bms.policybazaar.com/dashboardV3'
+    ];
+
+    // Note: chrome://flags/ cannot be opened via window.open() due to browser security.
+    // Copy it to clipboard so user can paste in address bar.
+    try {
+        navigator.clipboard.writeText('chrome://flags/');
+        alert('✅ "chrome://flags/" copied to clipboard!\nPaste it in a new tab.\n\nAll other links will now open.');
+    } catch (e) {
+        prompt('⚠️ Copy this URL manually and paste in a new tab:', 'chrome://flags/');
+    }
+
+    // Open all links with slight delay to avoid popup blocker
+    links.forEach((url, i) => {
+        setTimeout(() => {
+            window.open(url, '_blank');
+        }, i * 300);
+    });
+};
