@@ -1581,7 +1581,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "For Ticketing associate: Raise endorsement with XML sheet",
+        "Any Exception": "For Ticketing associate: Raise endorsement with XML sheet\r\nIf the NCB needs to be updated to 0%, an inspection is mandatory.",
         "Declaration format (if declaration required)": ""
     },
     {
