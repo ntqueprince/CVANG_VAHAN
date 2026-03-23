@@ -13542,6 +13542,9 @@ window.launchGame = function (gameType) {
         document.getElementById('colormatchGameOverlay').classList.add('active');
         loadLeaderboard('colormatch', 'pts');
         window.startColorMatchGame();
+    } else if (gameType === 'airforce') {
+        document.getElementById('airforceGameOverlay').classList.add('active');
+        loadLeaderboard('airforce', 'pts');
     }
 };
 
@@ -15076,3 +15079,960 @@ window.openQuickLinks = function () {
         }, i * 300);
     });
 };
+
+// =========================================================
+// ✈️ AIR FORCE SHOOTER GAME — Full Canvas Game Engine
+// =========================================================
+(function () {
+    'use strict';
+
+    const CW = 480, CH = 600;
+    let canvas, ctx, animFrame;
+    let gameRunning = false;
+    let score, lives, currentLevel, kills, highScore;
+    let player, bullets, enemies, particles, powerups, stars;
+    let keysDown = {};
+    let autoFireTimer = 0;
+
+    // Audio Context
+    let bgmAudioCtx = null;
+    function playAirforceSound(type) {
+        if (!bgmAudioCtx) {
+            bgmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (bgmAudioCtx.state === 'suspended') bgmAudioCtx.resume();
+        
+        let osc = bgmAudioCtx.createOscillator();
+        let gain = bgmAudioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(bgmAudioCtx.destination);
+        
+        let now = bgmAudioCtx.currentTime;
+        
+        if (type === 'shoot') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+            gain.gain.setValueAtTime(0.02, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } else if (type === 'explosion') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'powerup') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.linearRampToValueAtTime(800, now + 0.1);
+            osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'gameover') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 1.0);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+            osc.start(now);
+            osc.stop(now + 1.0);
+        }
+    }
+    let rapidFireEnd = 0;
+    let shieldEnd = 0;
+    let magnetEnd = 0;
+    let enemySpawnTimer = 0;
+    let waveEnemiesLeft = 0;
+    let waveTransition = 0;
+    let frameCount = 0;
+
+    // Ranks
+    const RANKS = [
+        { score: 0, name: 'Cadet' },
+        { score: 500, name: 'Lieutenant' },
+        { score: 1500, name: 'Captain' },
+        { score: 3000, name: 'Major' },
+        { score: 5000, name: 'Colonel' },
+        { score: 8000, name: 'General' },
+        { score: 12000, name: 'Air Marshal' },
+        { score: 20000, name: 'Supreme Commander' }
+    ];
+
+    function getRank(s) {
+        let r = RANKS[0].name;
+        for (let i = 0; i < RANKS.length; i++) {
+            if (s >= RANKS[i].score) r = RANKS[i].name;
+        }
+        return r;
+    }
+
+    // Colors
+    const COLORS = {
+        player: '#06b6d4',
+        playerGlow: 'rgba(6,182,212,0.3)',
+        bullet: '#fbbf24',
+        enemyBullet: '#ef4444',
+        enemy1: '#ef4444',
+        enemy2: '#f97316',
+        enemy3: '#8b5cf6',
+        boss: '#dc2626',
+        kamikaze: '#f59e0b',
+        shield: 'rgba(6,182,212,0.25)',
+        explosion: ['#fbbf24', '#ef4444', '#f97316', '#fff', '#06b6d4']
+    };
+
+    // Init stars for scrolling background
+    function initStars() {
+        stars = [];
+        for (let i = 0; i < 80; i++) {
+            stars.push({
+                x: Math.random() * CW,
+                y: Math.random() * CH,
+                s: Math.random() * 2 + 0.5,
+                speed: Math.random() * 2 + 0.5
+            });
+        }
+    }
+
+    function updateStars() {
+        for (let i = 0; i < stars.length; i++) {
+            stars[i].y += stars[i].speed;
+            if (stars[i].y > CH) {
+                stars[i].y = 0;
+                stars[i].x = Math.random() * CW;
+            }
+        }
+    }
+
+    function drawStars() {
+        for (let i = 0; i < stars.length; i++) {
+            let s = stars[i];
+            ctx.fillStyle = `rgba(255,255,255,${0.3 + s.s * 0.2})`;
+            ctx.fillRect(s.x, s.y, s.s, s.s);
+        }
+    }
+
+    // Player
+    function createPlayer() {
+        return {
+            x: CW / 2,
+            y: CH - 70,
+            w: 36,
+            h: 40,
+            speed: 5,
+            invincible: 0
+        };
+    }
+
+    function drawPlayer() {
+        let p = player;
+        let px = p.x, py = p.y;
+
+        // Invincibility flash
+        if (p.invincible > 0 && Math.floor(frameCount / 4) % 2 === 0) return;
+
+        // Shield aura
+        if (shieldEnd > Date.now()) {
+            ctx.beginPath();
+            ctx.arc(px, py - 5, 30, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.shield;
+            ctx.fill();
+            ctx.strokeStyle = '#06b6d4';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Engine glow
+        ctx.beginPath();
+        ctx.ellipse(px, py + 18, 6, 12 + Math.sin(frameCount * 0.3) * 4, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(px, py + 15, 3, 6 + Math.sin(frameCount * 0.5) * 3, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+
+        // Jet body
+        ctx.beginPath();
+        ctx.moveTo(px, py - 22);        // nose
+        ctx.lineTo(px - 6, py - 8);     // left inner
+        ctx.lineTo(px - 18, py + 14);   // left wing tip
+        ctx.lineTo(px - 8, py + 10);    // left wing inner
+        ctx.lineTo(px - 6, py + 18);    // left tail
+        ctx.lineTo(px, py + 14);        // bottom center
+        ctx.lineTo(px + 6, py + 18);    // right tail
+        ctx.lineTo(px + 8, py + 10);    // right wing inner
+        ctx.lineTo(px + 18, py + 14);   // right wing tip
+        ctx.lineTo(px + 6, py - 8);     // right inner
+        ctx.closePath();
+        ctx.fillStyle = COLORS.player;
+        ctx.fill();
+        ctx.strokeStyle = '#0e7490';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Cockpit
+        ctx.beginPath();
+        ctx.ellipse(px, py - 6, 4, 7, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#164e63';
+        ctx.fill();
+
+        // Rapid fire indicator
+        if (rapidFireEnd > Date.now()) {
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('⚡', px, py - 28);
+        }
+    }
+
+    function updatePlayer() {
+        let p = player;
+        let sp = p.speed;
+        if (keysDown['ArrowLeft'] || keysDown['a']) p.x -= sp;
+        if (keysDown['ArrowRight'] || keysDown['d']) p.x += sp;
+        if (keysDown['ArrowUp'] || keysDown['w']) p.y -= sp;
+        if (keysDown['ArrowDown'] || keysDown['s']) p.y += sp;
+        // Clamp
+        p.x = Math.max(20, Math.min(CW - 20, p.x));
+        p.y = Math.max(30, Math.min(CH - 30, p.y));
+        if (p.invincible > 0) p.invincible--;
+    }
+
+    // Bullets
+    function shoot() {
+        let rapid = rapidFireEnd > Date.now();
+        let bSpeed = -10;
+        bullets.push({ x: player.x, y: player.y - 22, w: 3, h: 10, speed: bSpeed, type: 'player' });
+        if (rapid) {
+            bullets.push({ x: player.x - 10, y: player.y - 15, w: 3, h: 8, speed: bSpeed, type: 'player' });
+            bullets.push({ x: player.x + 10, y: player.y - 15, w: 3, h: 8, speed: bSpeed, type: 'player' });
+        }
+        playAirforceSound('shoot');
+    }
+
+    function updateBullets() {
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            let b = bullets[i];
+            b.y += b.speed;
+            if (b.y < -10 || b.y > CH + 10 || b.x < -10 || b.x > CW + 10) {
+                bullets.splice(i, 1);
+            }
+        }
+    }
+
+    function drawBullets() {
+        for (let i = 0; i < bullets.length; i++) {
+            let b = bullets[i];
+            if (b.type === 'player') {
+                ctx.fillStyle = COLORS.bullet;
+                ctx.shadowColor = '#fbbf24';
+                ctx.shadowBlur = 6;
+                ctx.fillRect(b.x - b.w / 2, b.y, b.w, b.h);
+                ctx.shadowBlur = 0;
+            } else {
+                ctx.fillStyle = COLORS.enemyBullet;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    // Enemies
+    const LEVEL_SPEED_MULT = [0, 0.4, 0.7, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4]; // Level 1-10 speed multipliers
+    const LEVEL_SPAWN_MULT = [0, 1.6, 1.3, 1.0, 0.85, 0.7, 0.6, 0.5, 0.45, 0.4, 0.35]; // Level 1-10 spawn rate multipliers
+
+    function spawnEnemy() {
+        let types = ['fighter', 'bomber'];
+        if (currentLevel >= 2) types.push('kamikaze');
+        if (currentLevel >= 3) types.push('stealth');
+        if (currentLevel >= 4) types.push('stealth', 'kamikaze');
+        if (currentLevel >= 5 && Math.random() < (0.05 + currentLevel * 0.02)) types.push('boss');
+
+        let type = types[Math.floor(Math.random() * types.length)];
+        let mult = LEVEL_SPEED_MULT[currentLevel];
+        let e = {
+            x: Math.random() * (CW - 60) + 30,
+            y: -40,
+            type: type,
+            hp: 1,
+            speed: (1.5 + currentLevel * 0.2) * mult,
+            shootTimer: 0,
+            w: 28,
+            h: 28,
+            angle: 0
+        };
+
+        if (type === 'bomber') { e.hp = 3; e.speed = 1 * mult; e.w = 34; e.h = 34; }
+        else if (type === 'stealth') { e.hp = 2; e.speed = 2.5 * mult; }
+        else if (type === 'boss') { e.hp = 10 + currentLevel * 4; e.speed = 0.8 * mult; e.w = 50; e.h = 50; }
+        else if (type === 'kamikaze') { e.hp = 1; e.speed = (3 + currentLevel * 0.3) * mult; }
+
+        enemies.push(e);
+    }
+
+    function updateEnemies() {
+        let now = Date.now();
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            let e = enemies[i];
+
+            if (e.type === 'kamikaze') {
+                // Chase player
+                let dx = player.x - e.x;
+                let dy = player.y - e.y;
+                let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                e.x += (dx / dist) * e.speed;
+                e.y += (dy / dist) * e.speed;
+                e.angle = Math.atan2(dy, dx) + Math.PI / 2;
+            } else if (e.type === 'stealth') {
+                // Zigzag
+                e.y += e.speed;
+                e.x += Math.sin(frameCount * 0.05 + i) * 2;
+            } else {
+                e.y += e.speed;
+                e.x += Math.sin(frameCount * 0.02 + i * 2) * 1;
+            }
+
+            // Enemy shooting (not kamikaze)
+            if (e.type !== 'kamikaze' && e.y > 50 && e.y < CH - 100) {
+                e.shootTimer++;
+                let fireRate = e.type === 'boss' ? 30 : (e.type === 'bomber' ? 80 : 120);
+                if (e.shootTimer >= fireRate) {
+                    e.shootTimer = 0;
+                    let dx2 = player.x - e.x;
+                    let dy2 = player.y - e.y;
+                    let d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2) || 1;
+                    bullets.push({
+                        x: e.x, y: e.y + e.h / 2, w: 4, h: 4,
+                        speed: 4,
+                        vx: (dx2 / d2) * 4,
+                        vy: (dy2 / d2) * 4,
+                        type: 'enemy'
+                    });
+                    if (e.type === 'boss') {
+                        // Boss shoots triple
+                        bullets.push({ x: e.x - 15, y: e.y + e.h / 2, w: 4, h: 4, speed: 4, vx: 0, vy: 4, type: 'enemy' });
+                        bullets.push({ x: e.x + 15, y: e.y + e.h / 2, w: 4, h: 4, speed: 4, vx: 0, vy: 4, type: 'enemy' });
+                    }
+                }
+            }
+
+            // Remove if off screen
+            if (e.y > CH + 50 || e.x < -60 || e.x > CW + 60) {
+                enemies.splice(i, 1);
+            }
+        }
+    }
+
+    function drawEnemy(e) {
+        let ex = e.x, ey = e.y;
+        ctx.save();
+        if (e.type === 'kamikaze') {
+            ctx.translate(ex, ey);
+            ctx.rotate(e.angle || 0);
+            ctx.translate(-ex, -ey);
+        }
+        if (e.type === 'fighter') {
+            // Small red jet
+            ctx.beginPath();
+            ctx.moveTo(ex, ey + 16);
+            ctx.lineTo(ex - 5, ey + 4);
+            ctx.lineTo(ex - 14, ey - 10);
+            ctx.lineTo(ex - 6, ey - 6);
+            ctx.lineTo(ex, ey - 16);
+            ctx.lineTo(ex + 6, ey - 6);
+            ctx.lineTo(ex + 14, ey - 10);
+            ctx.lineTo(ex + 5, ey + 4);
+            ctx.closePath();
+            ctx.fillStyle = COLORS.enemy1;
+            ctx.fill();
+            ctx.strokeStyle = '#991b1b';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        } else if (e.type === 'bomber') {
+            // Fat orange bomber
+            ctx.beginPath();
+            ctx.moveTo(ex, ey + 18);
+            ctx.lineTo(ex - 10, ey + 6);
+            ctx.lineTo(ex - 20, ey - 8);
+            ctx.lineTo(ex - 8, ey - 4);
+            ctx.lineTo(ex, ey - 18);
+            ctx.lineTo(ex + 8, ey - 4);
+            ctx.lineTo(ex + 20, ey - 8);
+            ctx.lineTo(ex + 10, ey + 6);
+            ctx.closePath();
+            ctx.fillStyle = COLORS.enemy2;
+            ctx.fill();
+            ctx.strokeStyle = '#9a3412';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        } else if (e.type === 'stealth') {
+            // Purple stealth - semi transparent
+            ctx.globalAlpha = 0.5 + Math.sin(frameCount * 0.1) * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(ex, ey + 14);
+            ctx.lineTo(ex - 16, ey - 6);
+            ctx.lineTo(ex, ey - 14);
+            ctx.lineTo(ex + 16, ey - 6);
+            ctx.closePath();
+            ctx.fillStyle = COLORS.enemy3;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        } else if (e.type === 'boss') {
+            // Big red boss
+            ctx.beginPath();
+            ctx.moveTo(ex, ey + 28);
+            ctx.lineTo(ex - 14, ey + 10);
+            ctx.lineTo(ex - 28, ey - 5);
+            ctx.lineTo(ex - 18, ey - 15);
+            ctx.lineTo(ex, ey - 28);
+            ctx.lineTo(ex + 18, ey - 15);
+            ctx.lineTo(ex + 28, ey - 5);
+            ctx.lineTo(ex + 14, ey + 10);
+            ctx.closePath();
+            ctx.fillStyle = COLORS.boss;
+            ctx.fill();
+            ctx.strokeStyle = '#7f1d1d';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // HP bar
+            let hpW = 40;
+            let maxHp = 10 + wave * 2;
+            ctx.fillStyle = '#374151';
+            ctx.fillRect(ex - hpW / 2, ey - 35, hpW, 4);
+            ctx.fillStyle = '#22c55e';
+            ctx.fillRect(ex - hpW / 2, ey - 35, hpW * (e.hp / maxHp), 4);
+        } else if (e.type === 'kamikaze') {
+            // Yellow triangle
+            ctx.beginPath();
+            ctx.moveTo(ex, ey - 14);
+            ctx.lineTo(ex - 10, ey + 12);
+            ctx.lineTo(ex + 10, ey + 12);
+            ctx.closePath();
+            ctx.fillStyle = COLORS.kamikaze;
+            ctx.fill();
+            // Engine trail
+            ctx.beginPath();
+            ctx.arc(ex, ey + 16, 4 + Math.sin(frameCount * 0.4) * 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function drawEnemies() {
+        for (let i = 0; i < enemies.length; i++) {
+            drawEnemy(enemies[i]);
+        }
+    }
+
+    // Particles
+    function spawnExplosion(x, y, count, colors) {
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                life: 25 + Math.random() * 20,
+                maxLife: 45,
+                size: 2 + Math.random() * 4,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+    }
+
+    function updateParticles() {
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.96;
+            p.vy *= 0.96;
+            p.life--;
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+    }
+
+    function drawParticles() {
+        for (let i = 0; i < particles.length; i++) {
+            let p = particles[i];
+            ctx.globalAlpha = p.life / p.maxLife;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * (p.life / p.maxLife), 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    // Power-ups
+    function spawnPowerup(x, y) {
+        let types = ['shield', 'rapid', 'bomb', 'magnet', 'life'];
+        let t = types[Math.floor(Math.random() * types.length)];
+        let emojis = { shield: '🛡️', rapid: '⚡', bomb: '💣', magnet: '🧲', life: '❤️' };
+        powerups.push({
+            x: x, y: y, type: t,
+            emoji: emojis[t],
+            speed: 1.5, size: 16,
+            glow: 0
+        });
+    }
+
+    function updatePowerups() {
+        for (let i = powerups.length - 1; i >= 0; i--) {
+            let pu = powerups[i];
+            pu.y += pu.speed;
+            pu.glow += 0.1;
+
+            // Magnet effect
+            if (magnetEnd > Date.now()) {
+                let dx = player.x - pu.x;
+                let dy = player.y - pu.y;
+                let d = Math.sqrt(dx * dx + dy * dy) || 1;
+                if (d < 200) {
+                    pu.x += (dx / d) * 3;
+                    pu.y += (dy / d) * 3;
+                }
+            }
+
+            // Collect
+            let dx = player.x - pu.x;
+            let dy = player.y - pu.y;
+            if (Math.sqrt(dx * dx + dy * dy) < 25) {
+                collectPowerup(pu);
+                powerups.splice(i, 1);
+                continue;
+            }
+
+            if (pu.y > CH + 20) powerups.splice(i, 1);
+        }
+    }
+
+    function collectPowerup(pu) {
+        let now = Date.now();
+        if (pu.type === 'shield') {
+            shieldEnd = now + 8000;
+        } else if (pu.type === 'rapid') {
+            rapidFireEnd = now + 6000;
+        } else if (pu.type === 'bomb') {
+            // Kill all enemies on screen
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                spawnExplosion(e.x, e.y, 10, COLORS.explosion);
+                score += e.type === 'boss' ? 50 : 10;
+                kills++;
+            }
+            enemies = [];
+            // Big explosion flash
+            spawnExplosion(CW / 2, CH / 2, 30, ['#fff', '#fbbf24']);
+            playAirforceSound('explosion');
+        } else if (pu.type === 'magnet') {
+            magnetEnd = now + 10000;
+        } else if (pu.type === 'life') {
+            lives = Math.min(lives + 1, 5);
+        }
+        spawnExplosion(pu.x, pu.y, 8, ['#fff', '#fbbf24', '#06b6d4']);
+        playAirforceSound('powerup');
+    }
+
+    function drawPowerups() {
+        for (let i = 0; i < powerups.length; i++) {
+            let pu = powerups[i];
+            // Glow circle
+            ctx.beginPath();
+            ctx.arc(pu.x, pu.y, pu.size + 4 + Math.sin(pu.glow) * 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(251,191,36,0.15)';
+            ctx.fill();
+            // BG circle
+            ctx.beginPath();
+            ctx.arc(pu.x, pu.y, pu.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fill();
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            // Emoji
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(pu.emoji, pu.x, pu.y);
+        }
+    }
+
+    // Collisions
+    function checkCollisions() {
+        // Player bullets vs enemies
+        for (let bi = bullets.length - 1; bi >= 0; bi--) {
+            let b = bullets[bi];
+            if (b.type !== 'player') continue;
+            for (let ei = enemies.length - 1; ei >= 0; ei--) {
+                let e = enemies[ei];
+                let dx = b.x - e.x;
+                let dy = b.y - e.y;
+                if (Math.abs(dx) < e.w / 2 + 4 && Math.abs(dy) < e.h / 2 + 6) {
+                    e.hp--;
+                    bullets.splice(bi, 1);
+                    if (e.hp <= 0) {
+                        let pts = e.type === 'boss' ? 100 : (e.type === 'bomber' ? 30 : (e.type === 'stealth' ? 25 : 10));
+                        score += pts;
+                        kills++;
+                        waveEnemiesLeft--;
+                        spawnExplosion(e.x, e.y, e.type === 'boss' ? 30 : 12, COLORS.explosion);
+                        playAirforceSound('explosion');
+                        // Drop powerup chance
+                        if (Math.random() < (e.type === 'boss' ? 1 : 0.15)) {
+                            spawnPowerup(e.x, e.y);
+                        }
+                        enemies.splice(ei, 1);
+                    } else {
+                        spawnExplosion(b.x, b.y, 3, ['#fff']);
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Enemy bullets vs player
+        if (player.invincible <= 0) {
+            for (let bi = bullets.length - 1; bi >= 0; bi--) {
+                let b = bullets[bi];
+                if (b.type !== 'enemy') continue;
+                // Update enemy bullet position with vx/vy
+                if (b.vx !== undefined) {
+                    b.x += b.vx;
+                    b.y += b.vy;
+                    b.speed = 0; // already moved by vx/vy
+                }
+                let dx = b.x - player.x;
+                let dy = b.y - player.y;
+                if (Math.abs(dx) < 14 && Math.abs(dy) < 18) {
+                    bullets.splice(bi, 1);
+                    if (shieldEnd > Date.now()) {
+                        shieldEnd = 0; // shield absorbs hit
+                        spawnExplosion(player.x, player.y, 8, ['#06b6d4', '#fff']);
+                        playAirforceSound('explosion');
+                    } else {
+                        playerHit();
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Enemies vs player (collision)
+        if (player.invincible <= 0) {
+            for (let ei = enemies.length - 1; ei >= 0; ei--) {
+                let e = enemies[ei];
+                let dx = e.x - player.x;
+                let dy = e.y - player.y;
+                if (Math.abs(dx) < (e.w / 2 + 14) && Math.abs(dy) < (e.h / 2 + 18)) {
+                    if (shieldEnd > Date.now()) {
+                        shieldEnd = 0;
+                        spawnExplosion(e.x, e.y, 15, COLORS.explosion);
+                        playAirforceSound('explosion');
+                        enemies.splice(ei, 1);
+                        kills++;
+                        score += 5;
+                    } else {
+                        spawnExplosion(e.x, e.y, 12, COLORS.explosion);
+                        playAirforceSound('explosion');
+                        enemies.splice(ei, 1);
+                        playerHit();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    function playerHit() {
+        lives--;
+        player.invincible = 90; // ~1.5 sec
+        spawnExplosion(player.x, player.y, 15, ['#ef4444', '#fff', '#fbbf24']);
+        playAirforceSound('explosion');
+        if (lives <= 0) {
+            gameOver();
+        }
+    }
+
+    // Level system
+    function startLevel(n) {
+        currentLevel = Math.min(n, 10);
+        if (n > 10) currentLevel = 10; // Stay at max level
+        waveEnemiesLeft = 10 + currentLevel * 5; 
+        if (currentLevel === 10) waveEnemiesLeft += 20; // Extra enemies on final level
+        enemySpawnTimer = 0;
+        waveTransition = 120; // 2 sec transition
+    }
+
+    function updateLevelSystem() {
+        if (waveTransition > 0) {
+            waveTransition--;
+            return;
+        }
+        if (waveEnemiesLeft > 0 || enemies.length > 0) {
+            enemySpawnTimer++;
+            let baseSpawnRate = Math.max(20, 60 - currentLevel * 5);
+            let spawnRate = baseSpawnRate * LEVEL_SPAWN_MULT[currentLevel];
+            if (enemySpawnTimer >= spawnRate && waveEnemiesLeft > 0) {
+                enemySpawnTimer = 0;
+                spawnEnemy();
+                waveEnemiesLeft--;
+            }
+        } else {
+            // Level cleared
+            if (currentLevel < 10) {
+                startLevel(currentLevel + 1);
+            } else {
+                startLevel(11); // Continue at maximum difficulty
+            }
+        }
+    }
+
+    // HUD
+    function drawHUD() {
+        // Level transition text
+        if (waveTransition > 0) {
+            ctx.fillStyle = `rgba(6,182,212,${waveTransition / 120})`;
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('LEVEL ' + currentLevel, CW / 2, CH / 2 - 10);
+            ctx.font = '14px sans-serif';
+            ctx.fillStyle = `rgba(255,255,255,${waveTransition / 120})`;
+            if (currentLevel === 10) {
+                ctx.fillStyle = `rgba(220,38,38,${waveTransition / 120})`;
+                ctx.fillText('FINAL MISSION!', CW / 2, CH / 2 + 20);
+            } else {
+                ctx.fillText('Get Ready!', CW / 2, CH / 2 + 20);
+            }
+        }
+
+        // Top HUD bar
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(0, 0, CW, 28);
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#06b6d4';
+        ctx.fillText('Score: ' + score, 8, 18);
+        ctx.fillStyle = '#ef4444';
+        let hearts = '';
+        for (let i = 0; i < lives; i++) hearts += '❤️';
+        ctx.fillText(hearts, CW / 2 - 30, 19);
+        ctx.fillStyle = '#f97316';
+        ctx.textAlign = 'right';
+        ctx.fillText('LVL ' + currentLevel, CW - 8, 18);
+    }
+
+    // Update sidebar HUD
+    function updateSidebarHUD() {
+        let scoreEl = document.getElementById('airforceScore');
+        let livesEl = document.getElementById('airforceLives');
+        let levelEl = document.getElementById('airforceLevel');
+        let rankEl = document.getElementById('airforceRank');
+        if (scoreEl) scoreEl.textContent = score;
+        if (livesEl) livesEl.textContent = lives;
+        if (levelEl) levelEl.textContent = currentLevel;
+        if (rankEl) rankEl.textContent = getRank(score);
+    }
+
+    // Game Over
+    function gameOver() {
+        gameRunning = false;
+        playAirforceSound('gameover');
+        if (animFrame) cancelAnimationFrame(animFrame);
+
+        // Save high score
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('airforceHighScore', highScore);
+        }
+        let hsEl = document.getElementById('airforceHighScore');
+        if (hsEl) hsEl.textContent = highScore;
+
+        // Show game over overlay
+        document.getElementById('airforceGameOverOverlay').classList.remove('hidden');
+        document.getElementById('airforceFinalScore').textContent = score;
+        document.getElementById('airforceFinalLevel').textContent = currentLevel;
+        document.getElementById('airforceFinalKills').textContent = kills;
+
+        // Save to Firebase leaderboard
+        try {
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (user && user.name && typeof window.saveLeaderboardScore === 'function') {
+                window.saveLeaderboardScore('airforce', user.name, score);
+            }
+        } catch (e) { }
+
+        updateSidebarHUD();
+    }
+
+    // Main game loop
+    function gameLoop() {
+        if (!gameRunning) return;
+
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, CW, CH);
+
+        updateStars();
+        drawStars();
+
+        updatePlayer();
+        drawPlayer();
+
+        // Auto-fire
+        autoFireTimer++;
+        let fireRate = rapidFireEnd > Date.now() ? 5 : 12;
+        if (autoFireTimer >= fireRate) {
+            autoFireTimer = 0;
+            shoot();
+        }
+
+        updateBullets();
+        drawBullets();
+
+        updateLevelSystem();
+        updateEnemies();
+        drawEnemies();
+
+        updatePowerups();
+        drawPowerups();
+
+        checkCollisions();
+
+        updateParticles();
+        drawParticles();
+
+        drawHUD();
+
+        frameCount++;
+        if (frameCount % 15 === 0) updateSidebarHUD();
+
+        animFrame = requestAnimationFrame(gameLoop);
+    }
+
+    // Start game
+    window.startAirforceGame = function () {
+        canvas = document.getElementById('airforceCanvas');
+        if (!canvas) return;
+        ctx = canvas.getContext('2d');
+
+        // Hide overlays
+        document.getElementById('airforceGameOverOverlay').classList.add('hidden');
+        document.getElementById('airforceStartScreen').classList.add('hidden');
+
+        score = 0;
+        lives = 3;
+        currentLevel = 1;
+        kills = 0;
+        frameCount = 0;
+        autoFireTimer = 0;
+        rapidFireEnd = 0;
+        shieldEnd = 0;
+        magnetEnd = 0;
+
+        player = createPlayer();
+        bullets = [];
+        enemies = [];
+        particles = [];
+        powerups = [];
+        keysDown = {};
+
+        highScore = parseInt(localStorage.getItem('airforceHighScore')) || 0;
+        let hsEl = document.getElementById('airforceHighScore');
+        if (hsEl) hsEl.textContent = highScore;
+
+        initStars();
+        startLevel(1);
+
+        if (animFrame) cancelAnimationFrame(animFrame);
+        gameRunning = true;
+        gameLoop();
+    };
+
+    // Keyboard handlers
+    function onKeyDown(e) {
+        if (!gameRunning) return;
+        let overlay = document.getElementById('airforceGameOverlay');
+        if (!overlay || !overlay.classList.contains('active')) return;
+
+        let k = e.key;
+        keysDown[k] = true;
+
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(k)) {
+            e.preventDefault();
+        }
+    }
+
+    function onKeyUp(e) {
+        keysDown[e.key] = false;
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    // Mouse controls
+    document.addEventListener('mousemove', function (e) {
+        if (!gameRunning) return;
+        let overlay = document.getElementById('airforceGameOverlay');
+        if (!overlay || !overlay.classList.contains('active')) return;
+        
+        let canvasEl = document.getElementById('airforceCanvas');
+        if (!canvasEl) return;
+        let rect = canvasEl.getBoundingClientRect();
+        if (e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            
+            let scaleX = canvasEl.width / rect.width;
+            let scaleY = canvasEl.height / rect.height;
+            let mx = (e.clientX - rect.left) * scaleX;
+            let my = (e.clientY - rect.top) * scaleY;
+            
+            player.x = Math.max(20, Math.min(CW - 20, mx));
+            player.y = Math.max(30, Math.min(CH - 30, my));
+        }
+    });
+
+    // Touch controls for mobile
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', function (e) {
+        if (!gameRunning) return;
+        let overlay = document.getElementById('airforceGameOverlay');
+        if (!overlay || !overlay.classList.contains('active')) return;
+        let t = e.touches[0];
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+        if (!gameRunning) return;
+        let overlay = document.getElementById('airforceGameOverlay');
+        if (!overlay || !overlay.classList.contains('active')) return;
+        let t = e.touches[0];
+        let dx = t.clientX - touchStartX;
+        let dy = t.clientY - touchStartY;
+        player.x += dx * 0.5;
+        player.y += dy * 0.5;
+        player.x = Math.max(20, Math.min(CW - 20, player.x));
+        player.y = Math.max(30, Math.min(CH - 30, player.y));
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
+    }, { passive: true });
+
+    // Cleanup on close
+    const origBackToHub = window.backToHub;
+    window.backToHub = function (overlayId) {
+        if (overlayId === 'airforceGameOverlay') {
+            gameRunning = false;
+            if (animFrame) cancelAnimationFrame(animFrame);
+            keysDown = {};
+        }
+        if (origBackToHub) origBackToHub(overlayId);
+    };
+})();
