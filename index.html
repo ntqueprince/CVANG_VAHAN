@@ -565,11 +565,41 @@
                 <!-- Keys will be injected here by JS -->
             </div>
 
-            <div style="margin-top:20px; display:flex; justify-content:center; align-items:center; gap:10px;">
+            <div style="margin-top:20px; display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
                 <span style="color:#9ca3af; font-size:14px;">🔊 Volume:</span>
                 <input type="range" id="pianoVolume" min="0" max="100" value="50"
                     style="width:120px; accent-color:#f3f4f6;">
+                <span style="color:#9ca3af; font-size:14px; margin-left:16px;">⚡ Speed:</span>
+                <select id="pianoSpeed" style="background:#374151; color:#f3f4f6; border:1px solid #4b5563; border-radius:6px; padding:4px 8px; font-size:13px; cursor:pointer;">
+                    <option value="0.5">0.5x Slow</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x Normal</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x Fast</option>
+                    <option value="2">2x</option>
+                </select>
             </div>
+
+            <!-- 🎵 Demo Songs -->
+            <div style="margin-top:16px; padding:0 4px;" id="demoSongsSection">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="color:#d1d5db; font-size:13px; font-weight:600;">🎵 Famous Tunes</span>
+                    <span id="nowPlayingLabel" style="color:#a78bfa; font-size:11px; font-weight:600; display:none;"></span>
+                </div>
+                <div id="demoSongsList" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center;"></div>
+                <!-- Selected Song Keys -->
+                <div id="songKeysSection" style="margin-top:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span id="selectedSongTitle" style="color:#fbbf24; font-size:13px; font-weight:700;"></span>
+                        <div style="display:flex; gap:6px;">
+                            <button id="songPlayBtn" onclick="playSelectedSong()" style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer; font-weight:700;">▶ Play</button>
+                            <button id="songStopBtn" onclick="stopDemoSong()" style="display:none; background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border:none; border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer; font-weight:700;">⏹ Stop</button>
+                        </div>
+                    </div>
+                    <div id="songKeysGrid" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; padding:8px; background:rgba(15,23,42,0.4); border-radius:10px;"></div>
+                </div>
+            </div>
+            <p style="color:#6b7280; font-size:11px; margin:14px 0 0 0; font-style:italic;">Created by Shivang</p>
         </div>
     </div>
 
@@ -599,6 +629,11 @@
             transform: translateY(2px);
         }
 
+        .white-key.highlight-next {
+            background: linear-gradient(to bottom, #fef3c7 0%, #fde68a 100%) !important;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+        }
+
         .key-label {
             position: absolute;
             bottom: 8px;
@@ -618,6 +653,75 @@
         .white-key.active .key-label {
             transform: translateX(-50%) scale(0.9);
             box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .song-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(55,65,81,0.6);
+            border: 1px solid rgba(75,85,99,0.5);
+            color: #e5e7eb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .song-pill:hover {
+            background: rgba(99,102,241,0.3);
+            border-color: rgba(129,140,248,0.5);
+        }
+        .song-pill.active {
+            background: rgba(16,185,129,0.3);
+            border-color: rgba(52,211,153,0.6);
+            color: #6ee7b7;
+        }
+        .song-pill.selected {
+            background: rgba(251,191,36,0.2);
+            border-color: rgba(251,191,36,0.5);
+            color: #fbbf24;
+        }
+        .key-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 5px;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transition: transform 0.12s;
+        }
+        .key-badge:hover { transform: scale(1.15); }
+        .key-badge:active { transform: scale(0.9); }
+        .practice-key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            color: #fff;
+            border: none;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            transition: transform 0.12s, box-shadow 0.15s;
+            user-select: none;
+        }
+        .practice-key:hover {
+            transform: scale(1.15);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .practice-key:active {
+            transform: scale(0.9);
         }
     </style>
 
@@ -732,6 +836,7 @@
         function closePiano() {
             document.getElementById('pianoOverlay').style.display = 'none';
             isPianoOpen = false;
+            if (typeof stopDemoSong === 'function') stopDemoSong();
         }
 
         var keyMap = {};
@@ -823,6 +928,205 @@
             if (e.target && e.target.id === 'pianoOverlay') {
                 closePiano();
             }
+        });
+
+        // ====== 🎵 DEMO SONGS ======
+        // Keys: A=C3..M=C4, O=D4, Q=E4, R=F4, T=G4, V=A4, X=B4, Y=C5
+        var demoSongTimeout = null;
+        var demoSongPlaying = false;
+
+        var demoSongs = {
+            'Twinkle Twinkle': { emoji:'⭐', notes:[
+                ['m',400],['m',400],['t',400],['t',400],['v',400],['v',400],['t',800],
+                ['r',400],['r',400],['q',400],['q',400],['o',400],['o',400],['m',800],
+                ['t',400],['t',400],['r',400],['r',400],['q',400],['q',400],['o',800],
+                ['t',400],['t',400],['r',400],['r',400],['q',400],['q',400],['o',800],
+                ['m',400],['m',400],['t',400],['t',400],['v',400],['v',400],['t',800],
+                ['r',400],['r',400],['q',400],['q',400],['o',400],['o',400],['m',800]
+            ]},
+            'Happy Birthday': { emoji:'🎂', notes:[
+                ['t',300],['t',200],['v',500],['t',500],['y',500],['x',900],
+                ['t',300],['t',200],['v',500],['t',500],['z',500],['y',900],
+                ['t',300],['t',200],['t',500],['q',500],['y',500],['x',500],['v',800],
+                ['r',300],['r',200],['q',500],['y',500],['v',500],['t',900]
+            ]},
+            'Jingle Bells': { emoji:'🔔', notes:[
+                ['q',400],['q',400],['q',800],['q',400],['q',400],['q',800],
+                ['q',400],['t',400],['m',400],['o',400],['q',1000],
+                ['r',400],['r',400],['r',400],['r',400],['r',400],['q',400],['q',400],
+                ['q',200],['q',200],['o',400],['o',400],['q',400],['o',800],['t',800]
+            ]},
+            'Ode to Joy': { emoji:'🎼', notes:[
+                ['q',400],['q',400],['r',400],['t',400],['t',400],['r',400],['q',400],['o',400],
+                ['m',400],['m',400],['o',400],['q',400],['q',600],['o',200],['o',800],
+                ['q',400],['q',400],['r',400],['t',400],['t',400],['r',400],['q',400],['o',400],
+                ['m',400],['m',400],['o',400],['q',400],['o',600],['m',200],['m',800]
+            ]},
+            'Mary Had a Lamb': { emoji:'🐑', notes:[
+                ['q',400],['o',400],['m',400],['o',400],['q',400],['q',400],['q',800],
+                ['o',400],['o',400],['o',800],['q',400],['t',400],['t',800],
+                ['q',400],['o',400],['m',400],['o',400],['q',400],['q',400],['q',400],['q',400],
+                ['o',400],['o',400],['q',400],['o',400],['m',800]
+            ]},
+            'London Bridge': { emoji:'🌉', notes:[
+                ['t',400],['v',300],['t',400],['r',400],['q',400],['r',400],['t',600],
+                ['o',400],['q',400],['r',600],['q',400],['r',400],['t',600],
+                ['t',400],['v',300],['t',400],['r',400],['q',400],['r',400],['t',600],
+                ['o',400],['t',400],['q',400],['o',400],['m',800]
+            ]},
+            'Do Re Mi': { emoji:'🎵', notes:[
+                ['m',500],['o',400],['q',500],['m',300],['q',300],['m',300],['q',600],
+                ['o',500],['q',400],['r',200],['r',200],['q',300],['o',300],['r',600],
+                ['q',500],['r',400],['t',500],['q',300],['t',300],['q',300],['t',600],
+                ['r',500],['t',400],['v',200],['v',200],['t',300],['r',300],['v',600]
+            ]},
+            'Fur Elise': { emoji:'🎹', notes:[
+                ['q',300],['p',300],['q',300],['p',300],['q',300],['l',300],['o',300],['m',300],
+                ['j',600],['e',300],['h',300],['j',600],
+                ['l',300],['q',300],['l',600],['l',300],['p',300],['q',300],
+                ['q',300],['p',300],['q',300],['p',300],['q',300],['l',300],['o',300],['m',300],
+                ['j',600],['e',300],['h',300],['j',800]
+            ]},
+            'Sa Re Ga Ma': { emoji:'🌺', notes:[
+                ['m',500],['o',500],['q',500],['r',500],['t',500],['v',500],['x',500],['y',500],
+                ['y',500],['x',500],['v',500],['t',500],['r',500],['q',500],['o',500],['m',500],
+                ['m',300],['o',300],['q',300],['r',300],['t',400],['t',400],
+                ['r',300],['q',300],['o',300],['m',300],['m',800]
+            ]},
+            'Row Row Boat': { emoji:'⛵', notes:[
+                ['m',600],['m',600],['m',400],['o',200],['q',600],
+                ['q',400],['o',200],['q',400],['r',200],['t',800],
+                ['y',200],['y',200],['y',200],['t',200],['t',200],['t',200],['q',200],['q',200],['q',200],['m',200],['m',200],['m',200],
+                ['t',400],['r',200],['q',400],['o',200],['m',800]
+            ]}
+        };
+
+        var keyColors = {
+            'a':'#ef4444','b':'#f97316','c':'#f59e0b','d':'#84cc16','e':'#22c55e','f':'#10b981','g':'#14b8a6',
+            'h':'#06b6d4','i':'#0ea5e9','j':'#3b82f6','k':'#6366f1','l':'#8b5cf6','m':'#a855f7','n':'#d946ef',
+            'o':'#ec4899','p':'#f43f5e','q':'#ef4444','r':'#f97316','s':'#f59e0b','t':'#84cc16','u':'#22c55e',
+            'v':'#10b981','w':'#14b8a6','x':'#06b6d4','y':'#0ea5e9','z':'#3b82f6'
+        };
+
+        function renderDemoSongs() {
+            var list = document.getElementById('demoSongsList');
+            if (!list) return;
+            list.innerHTML = '';
+            var names = Object.keys(demoSongs);
+            for (var i = 0; i < names.length; i++) {
+                var name = names[i];
+                var song = demoSongs[name];
+                var pill = document.createElement('span');
+                pill.className = 'song-pill';
+                pill.setAttribute('data-song', name);
+                pill.innerHTML = song.emoji + ' ' + name;
+                list.appendChild(pill);
+            }
+            list.addEventListener('click', function(e) {
+                var pill = e.target.closest('.song-pill');
+                if (pill) selectSong(pill.getAttribute('data-song'));
+            });
+        }
+
+        var selectedSong = '';
+
+        function selectSong(name) {
+            var song = demoSongs[name];
+            if (!song) return;
+            selectedSong = name;
+
+            // Highlight active pill
+            var pills = document.querySelectorAll('.song-pill');
+            for (var i = 0; i < pills.length; i++) {
+                pills[i].classList.remove('selected');
+                if (pills[i].getAttribute('data-song') === name) pills[i].classList.add('selected');
+            }
+
+            // Update title
+            document.getElementById('selectedSongTitle').textContent = song.emoji + ' ' + name;
+
+            // Render big keys
+            var grid = document.getElementById('songKeysGrid');
+            grid.innerHTML = '';
+            for (var i = 0; i < song.notes.length; i++) {
+                var k = song.notes[i][0];
+                var btn = document.createElement('button');
+                btn.className = 'practice-key';
+                btn.textContent = k.toUpperCase();
+                btn.style.background = keyColors[k] || '#6366f1';
+                btn.onclick = (function(key) {
+                    return function() {
+                        var el = document.querySelector('.piano-key[data-key="' + key + '"]');
+                        if (el && keyMap[key]) playPianoNote(keyMap[key], el);
+                    };
+                })(k);
+                grid.appendChild(btn);
+            }
+        }
+
+        window.playSelectedSong = function() {
+            if (selectedSong) playDemoSong(selectedSong);
+        };
+
+        function playDemoSong(name) {
+            stopDemoSong();
+            var song = demoSongs[name];
+            if (!song) return;
+            demoSongPlaying = true;
+            selectSong(name);
+
+            // Show stop, hide play
+            document.getElementById('songPlayBtn').style.display = 'none';
+            document.getElementById('songStopBtn').style.display = 'inline-block';
+
+            var label = document.getElementById('nowPlayingLabel');
+            label.style.display = 'inline';
+            label.textContent = '▶ ' + name;
+
+            var notes = song.notes;
+            var speed = parseFloat(document.getElementById('pianoSpeed').value) || 1;
+            var idx = 0;
+
+            function next() {
+                if (!demoSongPlaying || idx >= notes.length) { stopDemoSong(); return; }
+                var k = notes[idx][0], dur = notes[idx][1] / speed;
+                var el = document.querySelector('.piano-key[data-key="' + k + '"]');
+                if (el && keyMap[k]) playPianoNote(keyMap[k], el);
+                idx++;
+                if (idx < notes.length) highlightNextKey(notes[idx][0]);
+                demoSongTimeout = setTimeout(next, dur);
+            }
+            next();
+        }
+
+        function highlightNextKey(k) {
+            var all = document.querySelectorAll('.piano-key');
+            for (var i = 0; i < all.length; i++) all[i].classList.remove('highlight-next');
+            var el = document.querySelector('.piano-key[data-key="' + k + '"]');
+            if (el) el.classList.add('highlight-next');
+        }
+
+        window.stopDemoSong = function() {
+            demoSongPlaying = false;
+            if (demoSongTimeout) { clearTimeout(demoSongTimeout); demoSongTimeout = null; }
+            var pills = document.querySelectorAll('.song-pill');
+            for (var i = 0; i < pills.length; i++) pills[i].classList.remove('active');
+            var all = document.querySelectorAll('.piano-key');
+            for (var i = 0; i < all.length; i++) all[i].classList.remove('highlight-next');
+            var label = document.getElementById('nowPlayingLabel');
+            if (label) { label.style.display = 'none'; label.textContent = ''; }
+            // Show play, hide stop
+            var playBtn = document.getElementById('songPlayBtn');
+            var stopBtn = document.getElementById('songStopBtn');
+            if (playBtn) playBtn.style.display = 'inline-block';
+            if (stopBtn) stopBtn.style.display = 'none';
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderDemoSongs();
+            // Auto-select first song
+            var firstSong = Object.keys(demoSongs)[0];
+            if (firstSong) selectSong(firstSong);
         });
     </script>
     <script type="module" src="script.js"></script>
@@ -1115,6 +1419,10 @@
                     onclick="launchGame('colormatch')">
                     <span class="text-3xl">🎨</span>
                     <span>Color Match</span>
+                </button>
+                <button class="game-select-btn bg-gradient-to-r from-slate-600 to-gray-900" onclick="launchGame('airforce')">
+                    <span class="text-3xl">✈️</span>
+                    <span>Air Force</span>
                 </button>
             </div>
             <div class="memory-game-buttons mt-6">
@@ -1618,6 +1926,87 @@
         </div>
     </div>
 
+    <!-- ✈️ Air Force Shooter Game Modal -->
+    <div class="memory-game-overlay" id="airforceGameOverlay">
+        <div class="memory-game-container game-side-layout" style="max-width: 900px;">
+            <div class="memory-game-header">
+                <h2>✈️ Air Force Shooter</h2>
+                <p class="memory-game-subtitle text-xs text-gray-400">Created by Shivang</p>
+            </div>
+            <div class="game-row-layout">
+                <!-- Left: Canvas -->
+                <div class="game-canvas-container flex justify-center relative">
+                    <canvas id="airforceCanvas" width="480" height="600"
+                        class="bg-gray-900 border-2 border-cyan-500 rounded-lg shadow-lg"
+                        style="max-width:100%; height:auto;"></canvas>
+                    <!-- Game Over Overlay -->
+                    <div id="airforceGameOverOverlay"
+                        class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center rounded-lg hidden"
+                        style="backdrop-filter: blur(3px);">
+                        <h3 class="text-red-500 text-4xl font-bold mb-2">MISSION FAILED</h3>
+                        <p class="text-white text-lg mb-1">Score: <span id="airforceFinalScore"
+                                class="text-cyan-400 font-bold">0</span></p>
+                        <p class="text-white text-sm mb-1">Level: <span id="airforceFinalLevel"
+                                class="text-yellow-400 font-bold">1</span></p>
+                        <p class="text-white text-sm mb-4">Enemies Destroyed: <span id="airforceFinalKills"
+                                class="text-red-400 font-bold">0</span></p>
+                        <button class="mem-btn mem-btn-restart bg-cyan-600 hover:bg-cyan-700 px-6 py-2"
+                            onclick="startAirforceGame()">🔄 Fly Again</button>
+                    </div>
+                    <!-- Start Screen -->
+                    <div id="airforceStartScreen"
+                        class="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center rounded-lg"
+                        style="backdrop-filter: blur(2px);">
+                        <p class="text-5xl mb-3">✈️</p>
+                        <h3 class="text-cyan-400 text-2xl font-bold mb-2">AIR FORCE SHOOTER</h3>
+                        <p class="text-gray-300 text-sm mb-4 text-center px-4">Arrow keys / WASD to move<br>SPACE to shoot<br>Destroy enemies, collect power-ups!</p>
+                        <button class="mem-btn mem-btn-restart bg-cyan-600 hover:bg-cyan-700 px-8 py-3 text-lg"
+                            onclick="startAirforceGame()">🚀 START MISSION</button>
+                    </div>
+                </div>
+                <!-- Right: Sidebar -->
+                <div class="game-sidebar">
+                    <div class="flex justify-between px-2 mb-2">
+                        <span class="text-white font-bold text-sm">Score: <span id="airforceScore"
+                                class="text-cyan-400">0</span></span>
+                        <span class="text-white font-bold text-sm">Best: <span id="airforceHighScore"
+                                class="text-yellow-400">0</span></span>
+                    </div>
+                    <div class="flex justify-between px-2 mb-2">
+                        <span class="text-white font-bold text-sm">❤️ <span id="airforceLives"
+                                class="text-red-400">3</span></span>
+                        <span class="text-white font-bold text-sm">Level: <span id="airforceLevel"
+                                class="text-orange-400">1</span></span>
+                    </div>
+                    <div class="px-2 mb-3">
+                        <span class="text-white font-bold text-sm">Rank: <span id="airforceRank"
+                                class="text-green-400">Cadet</span></span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3">
+                        <b>Move:</b> Arrow / WASD<br>
+                        <b>Shoot:</b> SPACE (auto-fire ON)<br>
+                        <b>Power-ups:</b><br>
+                        🛡️ Shield · ⚡ Rapid Fire · 💣 Bomb<br>
+                        🧲 Magnet · ❤️ Extra Life
+                    </p>
+                    <div class="leaderboard-section p-3 bg-gray-800 rounded-xl border border-gray-700 mb-3">
+                        <h4 class="text-center text-yellow-400 font-bold mb-2 text-sm">🏆 Top 3 Scores</h4>
+                        <ul id="airforceLeaderboardList" class="leaderboard-list">
+                            <li class="text-center text-gray-400 text-sm">Loading...</li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button class="mem-btn mem-btn-restart bg-cyan-600 hover:bg-cyan-700 w-full"
+                            onclick="startAirforceGame()">▶️ Play</button>
+                        <button class="mem-btn mem-btn-close bg-gray-600 hover:bg-gray-700 w-full"
+                            onclick="backToHub('airforceGameOverlay')">⬅ Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
+
 
 </html>
