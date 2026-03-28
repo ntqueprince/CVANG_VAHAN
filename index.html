@@ -50,6 +50,7 @@
             Links</button>
         <button class="animated-btn bg-gradient-to-r from-pink-500 to-rose-600" onclick="openPiano()">🎹 Play
             Piano</button>
+        <button class="animated-btn bg-gradient-to-r from-fuchsia-500 to-violet-700" onclick="openSongsHub()">🎵 Songs</button>
         <button class="secondary cov-btn" id="btnCompanyOwned">Company Owned Not Allowed</button>
     </div>
     <!-- Renamed Manual VI button -->
@@ -565,12 +566,14 @@
                 <!-- Keys will be injected here by JS -->
             </div>
 
-            <div style="margin-top:20px; display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div
+                style="margin-top:20px; display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
                 <span style="color:#9ca3af; font-size:14px;">🔊 Volume:</span>
                 <input type="range" id="pianoVolume" min="0" max="100" value="50"
                     style="width:120px; accent-color:#f3f4f6;">
                 <span style="color:#9ca3af; font-size:14px; margin-left:16px;">⚡ Speed:</span>
-                <select id="pianoSpeed" style="background:#374151; color:#f3f4f6; border:1px solid #4b5563; border-radius:6px; padding:4px 8px; font-size:13px; cursor:pointer;">
+                <select id="pianoSpeed"
+                    style="background:#374151; color:#f3f4f6; border:1px solid #4b5563; border-radius:6px; padding:4px 8px; font-size:13px; cursor:pointer;">
                     <option value="0.5">0.5x Slow</option>
                     <option value="0.75">0.75x</option>
                     <option value="1" selected>1x Normal</option>
@@ -584,7 +587,8 @@
             <div style="margin-top:16px; padding:0 4px;" id="demoSongsSection">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <span style="color:#d1d5db; font-size:13px; font-weight:600;">🎵 Famous Tunes</span>
-                    <span id="nowPlayingLabel" style="color:#a78bfa; font-size:11px; font-weight:600; display:none;"></span>
+                    <span id="nowPlayingLabel"
+                        style="color:#a78bfa; font-size:11px; font-weight:600; display:none;"></span>
                 </div>
                 <div id="demoSongsList" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center;"></div>
                 <!-- Selected Song Keys -->
@@ -592,11 +596,17 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span id="selectedSongTitle" style="color:#fbbf24; font-size:13px; font-weight:700;"></span>
                         <div style="display:flex; gap:6px;">
-                            <button id="songPlayBtn" onclick="playSelectedSong()" style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer; font-weight:700;">▶ Play</button>
-                            <button id="songStopBtn" onclick="stopDemoSong()" style="display:none; background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border:none; border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer; font-weight:700;">⏹ Stop</button>
+                            <button id="songPlayBtn" onclick="playSelectedSong()"
+                                style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer; font-weight:700;">▶
+                                Play</button>
+                            <button id="songStopBtn" onclick="stopDemoSong()"
+                                style="display:none; background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border:none; border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer; font-weight:700;">⏹
+                                Stop</button>
                         </div>
                     </div>
-                    <div id="songKeysGrid" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; padding:8px; background:rgba(15,23,42,0.4); border-radius:10px;"></div>
+                    <div id="songKeysGrid"
+                        style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; padding:8px; background:rgba(15,23,42,0.4); border-radius:10px;">
+                    </div>
                 </div>
             </div>
             <p style="color:#6b7280; font-size:11px; margin:14px 0 0 0; font-style:italic;">Created by Shivang</p>
@@ -661,8 +671,8 @@
             gap: 5px;
             padding: 6px 12px;
             border-radius: 20px;
-            background: rgba(55,65,81,0.6);
-            border: 1px solid rgba(75,85,99,0.5);
+            background: rgba(55, 65, 81, 0.6);
+            border: 1px solid rgba(75, 85, 99, 0.5);
             color: #e5e7eb;
             font-size: 12px;
             font-weight: 600;
@@ -670,20 +680,24 @@
             transition: all 0.2s;
             user-select: none;
         }
+
         .song-pill:hover {
-            background: rgba(99,102,241,0.3);
-            border-color: rgba(129,140,248,0.5);
+            background: rgba(99, 102, 241, 0.3);
+            border-color: rgba(129, 140, 248, 0.5);
         }
+
         .song-pill.active {
-            background: rgba(16,185,129,0.3);
-            border-color: rgba(52,211,153,0.6);
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(52, 211, 153, 0.6);
             color: #6ee7b7;
         }
+
         .song-pill.selected {
-            background: rgba(251,191,36,0.2);
-            border-color: rgba(251,191,36,0.5);
+            background: rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.5);
             color: #fbbf24;
         }
+
         .key-badge {
             display: inline-flex;
             align-items: center;
@@ -695,11 +709,18 @@
             font-size: 11px;
             cursor: pointer;
             color: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             transition: transform 0.12s;
         }
-        .key-badge:hover { transform: scale(1.15); }
-        .key-badge:active { transform: scale(0.9); }
+
+        .key-badge:hover {
+            transform: scale(1.15);
+        }
+
+        .key-badge:active {
+            transform: scale(0.9);
+        }
+
         .practice-key {
             display: inline-flex;
             align-items: center;
@@ -712,14 +733,16 @@
             cursor: pointer;
             color: #fff;
             border: none;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
             transition: transform 0.12s, box-shadow 0.15s;
             user-select: none;
         }
+
         .practice-key:hover {
             transform: scale(1.15);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
         }
+
         .practice-key:active {
             transform: scale(0.9);
         }
@@ -936,76 +959,96 @@
         var demoSongPlaying = false;
 
         var demoSongs = {
-            'Twinkle Twinkle': { emoji:'⭐', notes:[
-                ['m',400],['m',400],['t',400],['t',400],['v',400],['v',400],['t',800],
-                ['r',400],['r',400],['q',400],['q',400],['o',400],['o',400],['m',800],
-                ['t',400],['t',400],['r',400],['r',400],['q',400],['q',400],['o',800],
-                ['t',400],['t',400],['r',400],['r',400],['q',400],['q',400],['o',800],
-                ['m',400],['m',400],['t',400],['t',400],['v',400],['v',400],['t',800],
-                ['r',400],['r',400],['q',400],['q',400],['o',400],['o',400],['m',800]
-            ]},
-            'Happy Birthday': { emoji:'🎂', notes:[
-                ['t',300],['t',200],['v',500],['t',500],['y',500],['x',900],
-                ['t',300],['t',200],['v',500],['t',500],['z',500],['y',900],
-                ['t',300],['t',200],['t',500],['q',500],['y',500],['x',500],['v',800],
-                ['r',300],['r',200],['q',500],['y',500],['v',500],['t',900]
-            ]},
-            'Jingle Bells': { emoji:'🔔', notes:[
-                ['q',400],['q',400],['q',800],['q',400],['q',400],['q',800],
-                ['q',400],['t',400],['m',400],['o',400],['q',1000],
-                ['r',400],['r',400],['r',400],['r',400],['r',400],['q',400],['q',400],
-                ['q',200],['q',200],['o',400],['o',400],['q',400],['o',800],['t',800]
-            ]},
-            'Ode to Joy': { emoji:'🎼', notes:[
-                ['q',400],['q',400],['r',400],['t',400],['t',400],['r',400],['q',400],['o',400],
-                ['m',400],['m',400],['o',400],['q',400],['q',600],['o',200],['o',800],
-                ['q',400],['q',400],['r',400],['t',400],['t',400],['r',400],['q',400],['o',400],
-                ['m',400],['m',400],['o',400],['q',400],['o',600],['m',200],['m',800]
-            ]},
-            'Mary Had a Lamb': { emoji:'🐑', notes:[
-                ['q',400],['o',400],['m',400],['o',400],['q',400],['q',400],['q',800],
-                ['o',400],['o',400],['o',800],['q',400],['t',400],['t',800],
-                ['q',400],['o',400],['m',400],['o',400],['q',400],['q',400],['q',400],['q',400],
-                ['o',400],['o',400],['q',400],['o',400],['m',800]
-            ]},
-            'London Bridge': { emoji:'🌉', notes:[
-                ['t',400],['v',300],['t',400],['r',400],['q',400],['r',400],['t',600],
-                ['o',400],['q',400],['r',600],['q',400],['r',400],['t',600],
-                ['t',400],['v',300],['t',400],['r',400],['q',400],['r',400],['t',600],
-                ['o',400],['t',400],['q',400],['o',400],['m',800]
-            ]},
-            'Do Re Mi': { emoji:'🎵', notes:[
-                ['m',500],['o',400],['q',500],['m',300],['q',300],['m',300],['q',600],
-                ['o',500],['q',400],['r',200],['r',200],['q',300],['o',300],['r',600],
-                ['q',500],['r',400],['t',500],['q',300],['t',300],['q',300],['t',600],
-                ['r',500],['t',400],['v',200],['v',200],['t',300],['r',300],['v',600]
-            ]},
-            'Fur Elise': { emoji:'🎹', notes:[
-                ['q',300],['p',300],['q',300],['p',300],['q',300],['l',300],['o',300],['m',300],
-                ['j',600],['e',300],['h',300],['j',600],
-                ['l',300],['q',300],['l',600],['l',300],['p',300],['q',300],
-                ['q',300],['p',300],['q',300],['p',300],['q',300],['l',300],['o',300],['m',300],
-                ['j',600],['e',300],['h',300],['j',800]
-            ]},
-            'Sa Re Ga Ma': { emoji:'🌺', notes:[
-                ['m',500],['o',500],['q',500],['r',500],['t',500],['v',500],['x',500],['y',500],
-                ['y',500],['x',500],['v',500],['t',500],['r',500],['q',500],['o',500],['m',500],
-                ['m',300],['o',300],['q',300],['r',300],['t',400],['t',400],
-                ['r',300],['q',300],['o',300],['m',300],['m',800]
-            ]},
-            'Row Row Boat': { emoji:'⛵', notes:[
-                ['m',600],['m',600],['m',400],['o',200],['q',600],
-                ['q',400],['o',200],['q',400],['r',200],['t',800],
-                ['y',200],['y',200],['y',200],['t',200],['t',200],['t',200],['q',200],['q',200],['q',200],['m',200],['m',200],['m',200],
-                ['t',400],['r',200],['q',400],['o',200],['m',800]
-            ]}
+            'Twinkle Twinkle': {
+                emoji: '⭐', notes: [
+                    ['m', 400], ['m', 400], ['t', 400], ['t', 400], ['v', 400], ['v', 400], ['t', 800],
+                    ['r', 400], ['r', 400], ['q', 400], ['q', 400], ['o', 400], ['o', 400], ['m', 800],
+                    ['t', 400], ['t', 400], ['r', 400], ['r', 400], ['q', 400], ['q', 400], ['o', 800],
+                    ['t', 400], ['t', 400], ['r', 400], ['r', 400], ['q', 400], ['q', 400], ['o', 800],
+                    ['m', 400], ['m', 400], ['t', 400], ['t', 400], ['v', 400], ['v', 400], ['t', 800],
+                    ['r', 400], ['r', 400], ['q', 400], ['q', 400], ['o', 400], ['o', 400], ['m', 800]
+                ]
+            },
+            'Happy Birthday': {
+                emoji: '🎂', notes: [
+                    ['t', 300], ['t', 200], ['v', 500], ['t', 500], ['y', 500], ['x', 900],
+                    ['t', 300], ['t', 200], ['v', 500], ['t', 500], ['z', 500], ['y', 900],
+                    ['t', 300], ['t', 200], ['t', 500], ['q', 500], ['y', 500], ['x', 500], ['v', 800],
+                    ['r', 300], ['r', 200], ['q', 500], ['y', 500], ['v', 500], ['t', 900]
+                ]
+            },
+            'Jingle Bells': {
+                emoji: '🔔', notes: [
+                    ['q', 400], ['q', 400], ['q', 800], ['q', 400], ['q', 400], ['q', 800],
+                    ['q', 400], ['t', 400], ['m', 400], ['o', 400], ['q', 1000],
+                    ['r', 400], ['r', 400], ['r', 400], ['r', 400], ['r', 400], ['q', 400], ['q', 400],
+                    ['q', 200], ['q', 200], ['o', 400], ['o', 400], ['q', 400], ['o', 800], ['t', 800]
+                ]
+            },
+            'Ode to Joy': {
+                emoji: '🎼', notes: [
+                    ['q', 400], ['q', 400], ['r', 400], ['t', 400], ['t', 400], ['r', 400], ['q', 400], ['o', 400],
+                    ['m', 400], ['m', 400], ['o', 400], ['q', 400], ['q', 600], ['o', 200], ['o', 800],
+                    ['q', 400], ['q', 400], ['r', 400], ['t', 400], ['t', 400], ['r', 400], ['q', 400], ['o', 400],
+                    ['m', 400], ['m', 400], ['o', 400], ['q', 400], ['o', 600], ['m', 200], ['m', 800]
+                ]
+            },
+            'Mary Had a Lamb': {
+                emoji: '🐑', notes: [
+                    ['q', 400], ['o', 400], ['m', 400], ['o', 400], ['q', 400], ['q', 400], ['q', 800],
+                    ['o', 400], ['o', 400], ['o', 800], ['q', 400], ['t', 400], ['t', 800],
+                    ['q', 400], ['o', 400], ['m', 400], ['o', 400], ['q', 400], ['q', 400], ['q', 400], ['q', 400],
+                    ['o', 400], ['o', 400], ['q', 400], ['o', 400], ['m', 800]
+                ]
+            },
+            'London Bridge': {
+                emoji: '🌉', notes: [
+                    ['t', 400], ['v', 300], ['t', 400], ['r', 400], ['q', 400], ['r', 400], ['t', 600],
+                    ['o', 400], ['q', 400], ['r', 600], ['q', 400], ['r', 400], ['t', 600],
+                    ['t', 400], ['v', 300], ['t', 400], ['r', 400], ['q', 400], ['r', 400], ['t', 600],
+                    ['o', 400], ['t', 400], ['q', 400], ['o', 400], ['m', 800]
+                ]
+            },
+            'Do Re Mi': {
+                emoji: '🎵', notes: [
+                    ['m', 500], ['o', 400], ['q', 500], ['m', 300], ['q', 300], ['m', 300], ['q', 600],
+                    ['o', 500], ['q', 400], ['r', 200], ['r', 200], ['q', 300], ['o', 300], ['r', 600],
+                    ['q', 500], ['r', 400], ['t', 500], ['q', 300], ['t', 300], ['q', 300], ['t', 600],
+                    ['r', 500], ['t', 400], ['v', 200], ['v', 200], ['t', 300], ['r', 300], ['v', 600]
+                ]
+            },
+            'Fur Elise': {
+                emoji: '🎹', notes: [
+                    ['q', 300], ['p', 300], ['q', 300], ['p', 300], ['q', 300], ['l', 300], ['o', 300], ['m', 300],
+                    ['j', 600], ['e', 300], ['h', 300], ['j', 600],
+                    ['l', 300], ['q', 300], ['l', 600], ['l', 300], ['p', 300], ['q', 300],
+                    ['q', 300], ['p', 300], ['q', 300], ['p', 300], ['q', 300], ['l', 300], ['o', 300], ['m', 300],
+                    ['j', 600], ['e', 300], ['h', 300], ['j', 800]
+                ]
+            },
+            'Sa Re Ga Ma': {
+                emoji: '🌺', notes: [
+                    ['m', 500], ['o', 500], ['q', 500], ['r', 500], ['t', 500], ['v', 500], ['x', 500], ['y', 500],
+                    ['y', 500], ['x', 500], ['v', 500], ['t', 500], ['r', 500], ['q', 500], ['o', 500], ['m', 500],
+                    ['m', 300], ['o', 300], ['q', 300], ['r', 300], ['t', 400], ['t', 400],
+                    ['r', 300], ['q', 300], ['o', 300], ['m', 300], ['m', 800]
+                ]
+            },
+            'Row Row Boat': {
+                emoji: '⛵', notes: [
+                    ['m', 600], ['m', 600], ['m', 400], ['o', 200], ['q', 600],
+                    ['q', 400], ['o', 200], ['q', 400], ['r', 200], ['t', 800],
+                    ['y', 200], ['y', 200], ['y', 200], ['t', 200], ['t', 200], ['t', 200], ['q', 200], ['q', 200], ['q', 200], ['m', 200], ['m', 200], ['m', 200],
+                    ['t', 400], ['r', 200], ['q', 400], ['o', 200], ['m', 800]
+                ]
+            }
         };
 
         var keyColors = {
-            'a':'#ef4444','b':'#f97316','c':'#f59e0b','d':'#84cc16','e':'#22c55e','f':'#10b981','g':'#14b8a6',
-            'h':'#06b6d4','i':'#0ea5e9','j':'#3b82f6','k':'#6366f1','l':'#8b5cf6','m':'#a855f7','n':'#d946ef',
-            'o':'#ec4899','p':'#f43f5e','q':'#ef4444','r':'#f97316','s':'#f59e0b','t':'#84cc16','u':'#22c55e',
-            'v':'#10b981','w':'#14b8a6','x':'#06b6d4','y':'#0ea5e9','z':'#3b82f6'
+            'a': '#ef4444', 'b': '#f97316', 'c': '#f59e0b', 'd': '#84cc16', 'e': '#22c55e', 'f': '#10b981', 'g': '#14b8a6',
+            'h': '#06b6d4', 'i': '#0ea5e9', 'j': '#3b82f6', 'k': '#6366f1', 'l': '#8b5cf6', 'm': '#a855f7', 'n': '#d946ef',
+            'o': '#ec4899', 'p': '#f43f5e', 'q': '#ef4444', 'r': '#f97316', 's': '#f59e0b', 't': '#84cc16', 'u': '#22c55e',
+            'v': '#10b981', 'w': '#14b8a6', 'x': '#06b6d4', 'y': '#0ea5e9', 'z': '#3b82f6'
         };
 
         function renderDemoSongs() {
@@ -1022,7 +1065,7 @@
                 pill.innerHTML = song.emoji + ' ' + name;
                 list.appendChild(pill);
             }
-            list.addEventListener('click', function(e) {
+            list.addEventListener('click', function (e) {
                 var pill = e.target.closest('.song-pill');
                 if (pill) selectSong(pill.getAttribute('data-song'));
             });
@@ -1054,8 +1097,8 @@
                 btn.className = 'practice-key';
                 btn.textContent = k.toUpperCase();
                 btn.style.background = keyColors[k] || '#6366f1';
-                btn.onclick = (function(key) {
-                    return function() {
+                btn.onclick = (function (key) {
+                    return function () {
                         var el = document.querySelector('.piano-key[data-key="' + key + '"]');
                         if (el && keyMap[key]) playPianoNote(keyMap[key], el);
                     };
@@ -1064,7 +1107,7 @@
             }
         }
 
-        window.playSelectedSong = function() {
+        window.playSelectedSong = function () {
             if (selectedSong) playDemoSong(selectedSong);
         };
 
@@ -1106,7 +1149,7 @@
             if (el) el.classList.add('highlight-next');
         }
 
-        window.stopDemoSong = function() {
+        window.stopDemoSong = function () {
             demoSongPlaying = false;
             if (demoSongTimeout) { clearTimeout(demoSongTimeout); demoSongTimeout = null; }
             var pills = document.querySelectorAll('.song-pill');
@@ -1122,7 +1165,7 @@
             if (stopBtn) stopBtn.style.display = 'none';
         };
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             renderDemoSongs();
             // Auto-select first song
             var firstSong = Object.keys(demoSongs)[0];
@@ -1420,7 +1463,8 @@
                     <span class="text-3xl">🎨</span>
                     <span>Color Match</span>
                 </button>
-                <button class="game-select-btn bg-gradient-to-r from-slate-600 to-gray-900" onclick="launchGame('airforce')">
+                <button class="game-select-btn bg-gradient-to-r from-slate-600 to-gray-900"
+                    onclick="launchGame('airforce')">
                     <span class="text-3xl">✈️</span>
                     <span>Air Force</span>
                 </button>
@@ -1959,7 +2003,8 @@
                         style="backdrop-filter: blur(2px);">
                         <p class="text-5xl mb-3">✈️</p>
                         <h3 class="text-cyan-400 text-2xl font-bold mb-2">AIR FORCE SHOOTER</h3>
-                        <p class="text-gray-300 text-sm mb-4 text-center px-4">Arrow keys / WASD to move<br>SPACE to shoot<br>Destroy enemies, collect power-ups!</p>
+                        <p class="text-gray-300 text-sm mb-4 text-center px-4">Arrow keys / WASD to move<br>SPACE to
+                            shoot<br>Destroy enemies, collect power-ups!</p>
                         <button class="mem-btn mem-btn-restart bg-cyan-600 hover:bg-cyan-700 px-8 py-3 text-lg"
                             onclick="startAirforceGame()">🚀 START MISSION</button>
                     </div>
@@ -2004,6 +2049,59 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- #region 🔒 SONGS HUB OVERLAY -->
+    <div id="songsHubOverlay" class="songs-hub-overlay">
+        <div class="songs-hub-container">
+            <button class="songs-hub-minimize" onclick="minimizeSongsHub()">➖</button>
+            <button class="songs-hub-close" onclick="closeSongsHub()">✖</button>
+            <h2 class="songs-hub-title">🎵 Songs Hub</h2>
+            <p class="songs-hub-subtitle">Created by Shivang</p>
+
+            <!-- Channel Grid -->
+            <div class="songs-carousel-wrapper">
+                <div class="songs-carousel" id="songsCarousel">
+                    <!-- Channel cards will be injected by JS -->
+                </div>
+            </div>
+
+            <!-- Now Playing Bar -->
+            <div class="songs-now-playing" id="songsNowPlaying">
+                <div class="songs-now-playing-inner">
+                    <div class="songs-eq" id="songsEQ">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <span class="songs-now-text" id="songsNowText">Select a channel to play</span>
+                </div>
+                <div class="songs-volume-control">
+                    <button class="songs-volume-btn" id="songsVolumeIcon" type="button" onclick="toggleSongsMute()">🔊</button>
+                    <input class="songs-volume-slider" id="songsVolumeSlider" type="range" min="0" max="100" value="80" oninput="setSongsVolume(this.value)" />
+                </div>
+                <button class="songs-stop-btn" id="songsStopBtn" onclick="stopSongsChannel()" style="display:none;">⏹ Stop</button>
+            </div>
+
+            <!-- Navigation Arrows -->
+            <div class="songs-nav">
+                <button class="songs-nav-btn" onclick="rotateSongsCarousel(-1)">◀</button>
+                <button class="songs-nav-btn" onclick="rotateSongsCarousel(1)">▶</button>
+            </div>
+        </div>
+    </div>
+    <!-- Audio element for songs -->
+    <audio id="songsAudioPlayer" preload="none"></audio>
+    <!-- #endregion -->
+
+    <!-- Floating Mini Player for Songs Hub -->
+    <div id="songsMiniPlayer" class="songs-mini-player" style="display: none;">
+        <div class="mini-player-info" onclick="maximizeSongsHub()">
+            <span class="mini-player-icon">🎵</span>
+            <div class="mini-player-text-scroll">
+                <span class="mini-player-text" id="miniPlayerText">Playing...</span>
+            </div>
+            <span class="mini-player-expand">⛶</span>
+        </div>
+        <button class="mini-player-stop" onclick="stopSongsChannel()">✖</button>
     </div>
 
 </body>
