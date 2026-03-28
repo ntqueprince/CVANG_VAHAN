@@ -15101,14 +15101,14 @@ window.openQuickLinks = function () {
             bgmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
         if (bgmAudioCtx.state === 'suspended') bgmAudioCtx.resume();
-        
+
         let osc = bgmAudioCtx.createOscillator();
         let gain = bgmAudioCtx.createGain();
         osc.connect(gain);
         gain.connect(bgmAudioCtx.destination);
-        
+
         let now = bgmAudioCtx.currentTime;
-        
+
         if (type === 'shoot') {
             osc.type = 'square';
             osc.frequency.setValueAtTime(800, now);
@@ -15766,7 +15766,7 @@ window.openQuickLinks = function () {
     function startLevel(n) {
         currentLevel = Math.min(n, 10);
         if (n > 10) currentLevel = 10; // Stay at max level
-        waveEnemiesLeft = 10 + currentLevel * 5; 
+        waveEnemiesLeft = 10 + currentLevel * 5;
         if (currentLevel === 10) waveEnemiesLeft += 20; // Extra enemies on final level
         enemySpawnTimer = 0;
         waveTransition = 120; // 2 sec transition
@@ -15982,18 +15982,18 @@ window.openQuickLinks = function () {
         if (!gameRunning) return;
         let overlay = document.getElementById('airforceGameOverlay');
         if (!overlay || !overlay.classList.contains('active')) return;
-        
+
         let canvasEl = document.getElementById('airforceCanvas');
         if (!canvasEl) return;
         let rect = canvasEl.getBoundingClientRect();
         if (e.clientX >= rect.left && e.clientX <= rect.right &&
             e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            
+
             let scaleX = canvasEl.width / rect.width;
             let scaleY = canvasEl.height / rect.height;
             let mx = (e.clientX - rect.left) * scaleX;
             let my = (e.clientY - rect.top) * scaleY;
-            
+
             player.x = Math.max(20, Math.min(CW - 20, mx));
             player.y = Math.max(30, Math.min(CH - 30, my));
         }
@@ -16036,3 +16036,616 @@ window.openQuickLinks = function () {
         if (origBackToHub) origBackToHub(overlayId);
     };
 })();
+
+// #region 🔒 SONGS HUB - Premium Rotating Music Channels
+(function () {
+    // ──── Channel Data ────
+    const songsChannels = [
+        {
+            name: 'Bollywood Hits',
+            emoji: '🎬',
+            genre: 'Hindi Pop',
+            bg: 'linear-gradient(135deg, #f97316, #ea580c)',
+            streams: [
+                'https://stream-14.zeno.fm/r2gn1pgm4qruv',
+                'https://server4.ujala.nl/stream/2/listen.mp3',
+                'https://bollyvibes.radioca.st/stream'
+            ]
+        },
+        {
+            name: 'English Pop Hits',
+            emoji: '🌟',
+            genre: 'English Pop',
+            bg: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            streams: [
+                'https://kathy.torontocast.com:3060/stream'
+            ]
+        },
+        {
+            name: 'Lo-Fi Chill',
+            emoji: '🌙',
+            genre: 'Lo-Fi Beats',
+            bg: 'linear-gradient(135deg, #6366f1, #4338ca)',
+            streams: [
+                'https://stream.zeno.fm/f3wvbbqmdg8uv'
+            ]
+        },
+        {
+            name: 'Retro Classics',
+            emoji: '📻',
+            genre: 'Old Hindi Gold',
+            bg: 'linear-gradient(135deg, #d97706, #b45309)',
+            streams: [
+                'https://stream.zeno.fm/u0hrd3xkzhhvv',
+                'https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudio005/hlspbaudio005_Auto.m3u8',
+                'https://air.pc.cdn.bitgravity.com/air/live/pbaudio001/playlist.m3u8'
+            ]
+        },
+        {
+            name: 'Romantic Melodies',
+            emoji: '💕',
+            genre: 'Love Songs (Hindi)',
+            bg: 'linear-gradient(135deg, #ec4899, #be185d)',
+            streams: [
+                'https://drive.uber.radio/uber/bollywoodlove/icecast.audio',
+                'https://cp3.shoutcheap.com:18180/stream',
+                'https://stream.zeno.fm/cqak4ap7by8uv'
+            ]
+        },
+        {
+            name: 'Bolly Top 100',
+            emoji: 'ðŸ”¥',
+            genre: 'Latest Hindi Hits',
+            bg: 'linear-gradient(135deg, #ef4444, #db2777)',
+            streams: [
+                'https://stream.zeno.fm/1x7m4f2a5ehvv',
+                'https://stream.zeno.fm/cqak4ap7by8uv'
+            ]
+        },
+        {
+            name: 'Top 40 Global',
+            emoji: 'ðŸŒ',
+            genre: 'English Top 40',
+            bg: 'linear-gradient(135deg, #0ea5e9, #2563eb)',
+            streams: [
+                'http://strm112.1.fm/top40_mobile_mp3',
+                'https://kathy.torontocast.com:3060/stream'
+            ]
+        },
+        {
+            name: 'Golden Oldies',
+            emoji: 'ðŸ“€',
+            genre: 'English Classics',
+            bg: 'linear-gradient(135deg, #14b8a6, #0f766e)',
+            streams: [
+                'http://bigrradio.cdnstream1.com/5198_128',
+                'https://kathy.torontocast.com:3060/stream'
+            ]
+        }
+    ];
+
+    let currentAngle = 0;
+    let currentPlaying = -1;
+    let currentStreamIndex = 0;
+    let autoRotateTimer = null;
+    let songsAudioEventsBound = false;
+    const totalCards = songsChannels.length;
+    const songsHubTabId = `songs-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const songsHubStateKey = 'cvangSongsHubState';
+    const songsHubCommandKey = 'cvangSongsHubCommand';
+    let songsVolume = 0.8;
+    let previousSongsVolume = 0.8;
+
+    function getSongStreams(channel) {
+        if (!channel) return [];
+        if (Array.isArray(channel.streams) && channel.streams.length) return channel.streams;
+        return channel.stream ? [channel.stream] : [];
+    }
+
+    function updateSongsNowPlaying(message) {
+        const nowText = document.getElementById('songsNowText');
+        if (nowText) nowText.textContent = message;
+    }
+
+    function setMiniPlayer(trackText, forceShow = false) {
+        const miniPlayer = document.getElementById('songsMiniPlayer');
+        const miniText = document.getElementById('miniPlayerText');
+        if (miniText && trackText) miniText.textContent = trackText;
+        if (miniPlayer && forceShow) miniPlayer.style.display = 'flex';
+    }
+
+    function updateVolumeIcons(volumeValue) {
+        const volume = Number(volumeValue);
+        const icon = volume <= 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊';
+        const songsVolumeIcon = document.getElementById('songsVolumeIcon');
+        const miniPlayerVolumeIcon = document.getElementById('miniPlayerVolumeIcon');
+        if (songsVolumeIcon) songsVolumeIcon.textContent = icon;
+        if (miniPlayerVolumeIcon) miniPlayerVolumeIcon.textContent = icon;
+    }
+
+    function syncVolumeControls() {
+        const slider = document.getElementById('songsVolumeSlider');
+        if (slider) slider.value = String(Math.round(songsVolume * 100));
+        updateVolumeIcons(songsVolume);
+    }
+
+    function ensureMiniPlayerVolumeButton() {
+        const miniPlayer = document.getElementById('songsMiniPlayer');
+        if (!miniPlayer || document.getElementById('miniPlayerVolumeIcon')) return;
+
+        const stopButton = miniPlayer.querySelector('.mini-player-stop');
+        const volumeButton = document.createElement('button');
+        volumeButton.className = 'mini-player-volume';
+        volumeButton.id = 'miniPlayerVolumeIcon';
+        volumeButton.type = 'button';
+        volumeButton.textContent = '🔊';
+        volumeButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            window.toggleSongsMute();
+        });
+
+        if (stopButton) {
+            miniPlayer.insertBefore(volumeButton, stopButton);
+        } else {
+            miniPlayer.appendChild(volumeButton);
+        }
+    }
+
+    function applySongsVolume() {
+        const audio = document.getElementById('songsAudioPlayer');
+        if (audio) audio.volume = songsVolume;
+        syncVolumeControls();
+    }
+
+    function broadcastSongsHubState(payload) {
+        try {
+            localStorage.setItem(
+                songsHubStateKey,
+                JSON.stringify({
+                    ...payload,
+                    updatedAt: Date.now()
+                })
+            );
+        } catch (error) {
+            console.warn('Songs Hub state sync failed:', error);
+        }
+    }
+
+    function syncSongsHubState() {
+        const overlay = document.getElementById('songsHubOverlay');
+        const isMinimized = !!(overlay && !overlay.classList.contains('active') && currentPlaying !== -1);
+        const channel = currentPlaying !== -1 ? songsChannels[currentPlaying] : null;
+
+        broadcastSongsHubState({
+            ownerId: songsHubTabId,
+            playing: currentPlaying !== -1,
+            minimized: isMinimized,
+            channelIndex: currentPlaying,
+            text: channel ? `${channel.name} Playing...` : '',
+            label: channel ? `${channel.emoji} ${channel.name} - ${channel.genre}` : 'Select a channel to play'
+        });
+    }
+
+    function showSyncedMiniPlayer(text) {
+        const overlay = document.getElementById('songsHubOverlay');
+        if (overlay && overlay.classList.contains('active')) return;
+        setMiniPlayer(text || 'Song Playing...', true);
+    }
+
+    function hideMiniPlayerIfIdle() {
+        const miniPlayer = document.getElementById('songsMiniPlayer');
+        if (miniPlayer && currentPlaying === -1) miniPlayer.style.display = 'none';
+    }
+
+    function sendSongsHubCommand(type) {
+        try {
+            localStorage.setItem(
+                songsHubCommandKey,
+                JSON.stringify({
+                    type,
+                    sourceId: songsHubTabId,
+                    updatedAt: Date.now()
+                })
+            );
+        } catch (error) {
+            console.warn('Songs Hub command sync failed:', error);
+        }
+    }
+
+    function bindSongsAudioEvents() {
+        if (songsAudioEventsBound) return;
+
+        const audio = document.getElementById('songsAudioPlayer');
+        if (!audio) return;
+
+        audio.volume = songsVolume;
+        audio.addEventListener('error', tryNextSongsStream);
+        audio.addEventListener('stalled', tryNextSongsStream);
+        songsAudioEventsBound = true;
+    }
+
+    function tryNextSongsStream() {
+        if (currentPlaying === -1) return;
+
+        const audio = document.getElementById('songsAudioPlayer');
+        const channel = songsChannels[currentPlaying];
+        const streams = getSongStreams(channel);
+        if (!audio || !channel || streams.length === 0) return;
+
+        if (currentStreamIndex < streams.length - 1) {
+            currentStreamIndex += 1;
+            updateSongsNowPlaying(`${channel.emoji} ${channel.name} - trying backup stream...`);
+            setMiniPlayer(`${channel.name} - trying backup...`);
+            audio.src = streams[currentStreamIndex];
+            audio.load();
+            audio.play().catch(err => console.warn('Backup audio play failed:', err));
+            return;
+        }
+
+        updateSongsNowPlaying(`${channel.emoji} ${channel.name} is unavailable right now`);
+        setMiniPlayer(`${channel.name} unavailable`, true);
+        console.warn(`All streams failed for ${channel.name}`);
+    }
+
+    // ──── Build Carousel ────
+    function buildSongsCarousel() {
+        const carousel = document.getElementById('songsCarousel');
+        if (!carousel) return;
+        bindSongsAudioEvents();
+        carousel.innerHTML = '';
+
+        songsChannels.forEach((ch, i) => {
+            const card = document.createElement('div');
+            card.className = 'songs-channel-card';
+            card.style.background = ch.bg;
+            card.innerHTML = `
+                <span class="card-emoji">${ch.emoji}</span>
+                <span class="card-name">${ch.name}</span>
+                <span class="card-genre">${ch.genre}</span>
+            `;
+            card.addEventListener('click', () => playSongsChannel(i));
+            carousel.appendChild(card);
+        });
+
+        positionCards();
+    }
+
+    function positionCards() {
+        const carousel = document.getElementById('songsCarousel');
+        if (!carousel) return;
+        const cards = carousel.querySelectorAll('.songs-channel-card');
+
+        cards.forEach((card, i) => {
+            card.style.transform = 'none';
+            card.style.opacity = '1';
+            card.style.zIndex = String(10 + i);
+            card.style.pointerEvents = 'auto';
+        });
+    }
+
+    // ──── Rotate ────
+    window.rotateSongsCarousel = function () {
+        positionCards();
+    };
+
+    function autoRotate() {
+        positionCards();
+    }
+
+    window.setSongsVolume = function (value) {
+        const parsedVolume = Math.min(100, Math.max(0, Number(value))) / 100;
+        songsVolume = parsedVolume;
+        if (songsVolume > 0) previousSongsVolume = songsVolume;
+        applySongsVolume();
+    };
+
+    window.toggleSongsMute = function () {
+        if (songsVolume <= 0) {
+            songsVolume = previousSongsVolume > 0 ? previousSongsVolume : 0.8;
+        } else {
+            previousSongsVolume = songsVolume;
+            songsVolume = 0;
+        }
+        applySongsVolume();
+    };
+
+    function startAutoRotate() {
+        stopAutoRotate();
+        autoRotateTimer = setInterval(autoRotate, 4000);
+    }
+
+    function stopAutoRotate() {
+        if (autoRotateTimer) {
+            clearInterval(autoRotateTimer);
+            autoRotateTimer = null;
+        }
+    }
+
+    function restartAutoRotate() {
+        stopAutoRotate();
+        autoRotateTimer = setInterval(autoRotate, 4000);
+    }
+
+    // ──── Play Channel ────
+    function playSongsChannel(index) {
+        const audio = document.getElementById('songsAudioPlayer');
+        const eq = document.getElementById('songsEQ');
+        const nowText = document.getElementById('songsNowText');
+        const stopBtn = document.getElementById('songsStopBtn');
+        const carousel = document.getElementById('songsCarousel');
+
+        if (!audio || !eq || !nowText || !stopBtn || !carousel) return;
+
+        // Stop current
+        audio.pause();
+        audio.src = '';
+
+        // Remove all playing states
+        carousel.querySelectorAll('.songs-channel-card').forEach(c => c.classList.remove('playing'));
+
+        if (currentPlaying === index) {
+            // Toggle off
+            window.stopSongsChannel();
+            return;
+        }
+
+        // Play new
+        currentPlaying = index;
+        currentStreamIndex = 0;
+        const ch = songsChannels[index];
+        const streams = getSongStreams(ch);
+        if (!streams.length) {
+            updateSongsNowPlaying(`${ch.emoji} ${ch.name} has no stream configured`);
+            return;
+        }
+
+        audio.src = streams[currentStreamIndex];
+        audio.load();
+        audio.play().catch(err => console.warn('Audio play failed:', err));
+
+        // Update UI
+        const cards = carousel.querySelectorAll('.songs-channel-card');
+        if (cards[index]) cards[index].classList.add('playing');
+        eq.classList.add('active');
+        nowText.textContent = `${ch.emoji} ${ch.name} — ${ch.genre}`;
+        stopBtn.style.display = 'inline-block';
+
+        setMiniPlayer(`${ch.name} Playing...`);
+        syncSongsHubState();
+    }
+
+    // ──── Stop ────
+    window.stopSongsChannel = function (shouldBroadcast = true) {
+        const audio = document.getElementById('songsAudioPlayer');
+        const eq = document.getElementById('songsEQ');
+        const nowText = document.getElementById('songsNowText');
+        const stopBtn = document.getElementById('songsStopBtn');
+        const carousel = document.getElementById('songsCarousel');
+        const miniPlayer = document.getElementById('songsMiniPlayer');
+
+        if (audio) { audio.pause(); audio.src = ''; }
+        if (eq) eq.classList.remove('active');
+        if (nowText) nowText.textContent = 'Select a channel to play';
+        if (stopBtn) stopBtn.style.display = 'none';
+        if (carousel) carousel.querySelectorAll('.songs-channel-card').forEach(c => c.classList.remove('playing'));
+        if (miniPlayer) miniPlayer.style.display = 'none';
+        currentPlaying = -1;
+        currentStreamIndex = 0;
+
+        broadcastSongsHubState({
+            ownerId: songsHubTabId,
+            playing: false,
+            minimized: false,
+            channelIndex: -1,
+            text: '',
+            label: 'Select a channel to play'
+        });
+
+        if (shouldBroadcast) {
+            sendSongsHubCommand('stop');
+        }
+    };
+
+    // ──── Minimize & Maximize ────
+    window.minimizeSongsHub = function () {
+        if (currentPlaying === -1) {
+            alert("Play a song first before minimizing!");
+            return;
+        }
+        const overlay = document.getElementById('songsHubOverlay');
+        const miniPlayer = document.getElementById('songsMiniPlayer');
+        if (overlay) overlay.classList.remove('active');
+        if (miniPlayer) miniPlayer.style.display = 'flex';
+        syncSongsHubState();
+        stopAutoRotate();
+    };
+
+    window.maximizeSongsHub = function () {
+        const overlay = document.getElementById('songsHubOverlay');
+        const miniPlayer = document.getElementById('songsMiniPlayer');
+        if (overlay) overlay.classList.add('active');
+        if (miniPlayer) miniPlayer.style.display = 'none';
+        syncSongsHubState();
+        startAutoRotate();
+    };
+
+    // ──── Open / Close with Password ────
+    window.openSongsHub = function () {
+        var password = prompt('🔒 Enter Password to open Songs Hub:');
+        if (password !== 'cvang') {
+            if (password !== null) alert('❌ Wrong Password!');
+            return;
+        }
+
+        const overlay = document.getElementById('songsHubOverlay');
+        const miniPlayer = document.getElementById('songsMiniPlayer');
+        if (miniPlayer && miniPlayer.style.display === 'flex') {
+            window.maximizeSongsHub();
+            return;
+        }
+
+        if (!overlay) return;
+        overlay.classList.add('active');
+        buildSongsCarousel();
+        startAutoRotate();
+    };
+
+    window.closeSongsHub = function () {
+        const overlay = document.getElementById('songsHubOverlay');
+        if (overlay) overlay.classList.remove('active');
+        stopAutoRotate();
+        window.stopSongsChannel();
+    };
+
+    // Close on outside click
+    document.addEventListener('click', function (e) {
+        const overlay = document.getElementById('songsHubOverlay');
+        if (e.target === overlay) {
+            window.closeSongsHub();
+        }
+    });
+
+    // ──── Draggable Mini Player Logic ────
+    window.addEventListener('storage', function (event) {
+        if (event.key === songsHubStateKey && event.newValue) {
+            try {
+                const state = JSON.parse(event.newValue);
+                if (!state || state.ownerId === songsHubTabId) return;
+
+                updateSongsNowPlaying(state.label || 'Song Playing in another tab');
+                setMiniPlayer(state.text || 'Song Playing...');
+
+                if (state.playing && state.minimized) {
+                    showSyncedMiniPlayer(state.text || 'Song Playing...');
+                } else if (!state.playing) {
+                    hideMiniPlayerIfIdle();
+                }
+            } catch (error) {
+                console.warn('Songs Hub state parse failed:', error);
+            }
+        }
+
+        if (event.key === songsHubCommandKey && event.newValue) {
+            try {
+                const command = JSON.parse(event.newValue);
+                if (!command || command.sourceId === songsHubTabId) return;
+
+                if (command.type === 'stop' && currentPlaying !== -1) {
+                    window.stopSongsChannel(false);
+                }
+            } catch (error) {
+                console.warn('Songs Hub command parse failed:', error);
+            }
+        }
+    });
+
+    try {
+        const initialSongsState = localStorage.getItem(songsHubStateKey);
+        if (initialSongsState) {
+            const state = JSON.parse(initialSongsState);
+            if (state && state.playing && state.ownerId !== songsHubTabId) {
+                updateSongsNowPlaying(state.label || 'Song Playing in another tab');
+                showSyncedMiniPlayer(state.text || 'Song Playing...');
+            }
+        }
+    } catch (error) {
+        console.warn('Songs Hub initial sync failed:', error);
+    }
+
+    const miniPlayer = document.getElementById('songsMiniPlayer');
+    ensureMiniPlayerVolumeButton();
+    applySongsVolume();
+    if (miniPlayer) {
+        let isDragging = false;
+        let pX = 0, pY = 0, startX = 0, startY = 0;
+        let isClick = true;
+
+        miniPlayer.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        miniPlayer.addEventListener('touchstart', dragStart, { passive: true });
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+
+        // Prevent maximize if just dragging
+        const miniInfo = miniPlayer.querySelector('.mini-player-info');
+        if (miniInfo) {
+            miniInfo.addEventListener('click', function (e) {
+                if (!isClick) {
+                    e.stopPropagation();
+                    return;
+                }
+                // Only maximize if it was a click
+                window.maximizeSongsHub();
+            });
+            // remove inline onclick as we handle it here
+            miniInfo.removeAttribute('onclick');
+        }
+
+        function dragStart(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+
+            // Allow pointer-events
+            isDragging = true;
+            isClick = true; // resets to click until proven otherwise
+            miniPlayer.style.transition = 'none';
+
+            if (e.type === 'touchstart') {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            } else {
+                startX = e.clientX;
+                startY = e.clientY;
+            }
+
+            const rect = miniPlayer.getBoundingClientRect();
+            pX = startX - rect.left;
+            pY = startY - rect.top;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+
+            let clientX, clientY;
+            if (e.type === 'touchmove') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            // Distinguish drag from a simple click
+            if (Math.abs(clientX - startX) > 5 || Math.abs(clientY - startY) > 5) {
+                isClick = false;
+            }
+
+            if (!isClick) {
+                // Remove right/bottom anchoring to use precise left/top calculations
+                miniPlayer.style.bottom = 'auto';
+                miniPlayer.style.right = 'auto';
+
+                // Boundaries
+                let newX = clientX - pX;
+                let newY = clientY - pY;
+                let maxX = window.innerWidth - miniPlayer.offsetWidth;
+                let maxY = window.innerHeight - miniPlayer.offsetHeight;
+
+                newX = Math.max(0, Math.min(newX, maxX));
+                newY = Math.max(0, Math.min(newY, maxY));
+
+                miniPlayer.style.left = newX + 'px';
+                miniPlayer.style.top = newY + 'px';
+            }
+        }
+
+        function dragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            miniPlayer.style.transition = 'all 0.3s ease';
+            // isClick state resets on next dragStart
+        }
+    }
+})();
+// #endregion
