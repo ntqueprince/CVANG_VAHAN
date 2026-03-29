@@ -1820,8 +1820,43 @@ button:hover {
     border-radius: 16px;
     width: 95%;
     max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     animation: pop 0.3s ease;
+}
+
+/* Horizontal Scorecard Overrides */
+.scorecard-modal-content {
+    max-width: 800px; /* Make it wider for horizontal layout */
+}
+
+.scorecard-layout {
+    display: flex;
+    gap: 20px;
+}
+
+.scorecard-inputs {
+    flex: 1.2;
+    min-width: 0; /* Prevent flex overflow */
+}
+
+.scorecard-outputs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.scorecard-buttons {
+    margin-top: 15px;
+    flex-shrink: 0;
+}
+
+/* Make it vertical on small screens */
+@media (max-width: 650px) {
+    .scorecard-layout {
+        flex-direction: column;
+    }
 }
 
 @keyframes pop {
