@@ -1,3 +1,4 @@
+
 // #region 🔒 FIREBASE & IMAGE UPLOAD
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -1150,7 +1151,7 @@ const endorsementData = [
         "Charges / Deduction": "Deduction",
         "Inspection": "",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Declaration Required:\r\nI/We hereby declare that Policy No. _____________________ for Vehicle No. _____________________, covering the period from _____________________ to _____________________, was purchased by me/us on _____________________.\r\nDue to ________________________________________________, I/we request the cancellation of the above-mentioned Policy No. _____________________.\r\nI/we further confirm that no claims have been made under this policy or any other policy related to the said vehicle till date. I/we also confirm that an alternate policy, Policy No. _____________________, valid from _____________________, issued by _______________________________, has been provided and is currently active."
+        "Declaration format (if declaration required)": "Declaration Required:\r\nI/We hereby declare that Policy No. _____________________ for Vehicle No. _____________________, covering the period from _____________________ to _____________________, was purchased by me/us on _____________________.\r\nDue to ________________________________________________, I/we request the cancellation of the above-mentioned Policy No. _____________________.\r\nI/we further confirm that no claims have been made under this policy or any other policy related to the said vehicle till date. I/we also confirm that an alternate policy, Policy No. _____________________, valid from _____________________, issued by _______________________________, has been provided and is currently active."
     },
     {
         "InsurerRequirement": "New India AssurancePost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
@@ -6509,7 +6510,7 @@ const endorsementData = [
         "Insurer": "Reliance",
         "Requirement": "Hypothecation Remove",
         "Endorsement type": "Non Financial Endt",
-        "Documents or any other requirement": "Customer Request Letter\r\nEndorsed RC Copy / NOC from Financier",
+        "Documents or any other requirement": "Customer Request Letter\r\nEndorsed RC Copy / NOC from Financier",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
@@ -11230,7 +11231,7 @@ const endorsementData = [
         "Charges / Deduction": "Deduction",
         "Inspection": "No",
         "Any Exception": "Non brand New Car:\r\nComprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy).\r\nSAOD policy cancellation: Alteranate bundle policy required\r\nTP cancellation - Alternate comprehensive/TP should be from UIIC",
-        "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________.\r\n I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy.\r\n I declare that the alternate policy no. ____________________ is an active policy.\""
+        "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________.\r\n I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy.\r\n I declare that the alternate policy no. ____________________ is an active policy.\""
     },
     {
         "InsurerRequirement": "UnitedPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
@@ -12886,49 +12887,62 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial call to display new update indicator/snippet on page load
     showNewUpdateIndicatorAndSnippet();
 });
-// Fill CSAT & Quality dropdowns + AHT
+// Fill CSAT & Quality dropdowns + AHT + Absenteeism
 window.onload = function () {
     let csatSelect = document.getElementById("incentiveCSAT");
     let qualitySelect = document.getElementById("incentiveQuality");
     let minSelect = document.getElementById("incentiveAHTMin");
     let secSelect = document.getElementById("incentiveAHTSec");
+    let absentSelect = document.getElementById("incentiveAbsent");
 
     // Clear existing options to prevent duplication issues
-    csatSelect.innerHTML = '';
-    qualitySelect.innerHTML = '';
-    minSelect.innerHTML = '';
-    secSelect.innerHTML = '';
+    if (csatSelect) csatSelect.innerHTML = '';
+    if (qualitySelect) qualitySelect.innerHTML = '';
+    if (minSelect) minSelect.innerHTML = '';
+    if (secSelect) secSelect.innerHTML = '';
+    if (absentSelect) absentSelect.innerHTML = '';
 
     // CSAT 80–100
-    for (let i = 80; i <= 100; i++) {
-        csatSelect.innerHTML += `<option value="${i}">${i}%</option>`;
-        if (i < 100) {
-            csatSelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+    if (csatSelect) {
+        for (let i = 80; i <= 100; i++) {
+            csatSelect.innerHTML += `<option value="${i}">${i}%</option>`;
+            if (i < 100) csatSelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
         }
+        csatSelect.value = "90";
     }
-    csatSelect.value = "90";
 
     // Quality 40–100
-    for (let i = 40; i <= 100; i++) {
-        qualitySelect.innerHTML += `<option value="${i}">${i}%</option>`;
-        if (i < 100) {
-            qualitySelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
+    if (qualitySelect) {
+        for (let i = 40; i <= 100; i++) {
+            qualitySelect.innerHTML += `<option value="${i}">${i}%</option>`;
+            if (i < 100) qualitySelect.innerHTML += `<option value="${i}+">${i}+%</option>`;
         }
+        qualitySelect.value = "90";
     }
-    qualitySelect.value = "90";
 
     // AHT minutes (2–7 min)
-    for (let i = 2; i <= 7; i++) {
-        minSelect.innerHTML += `<option value="${i}">${i} Min</option>`;
+    if (minSelect) {
+        for (let i = 2; i <= 7; i++) {
+            minSelect.innerHTML += `<option value="${i}">${i} Min</option>`;
+        }
+        minSelect.value = "4";
     }
-    minSelect.value = "4";
 
-    // AHT seconds (step of 10 sec)
-    // AHT seconds (1 to 59 sec)
-    for (let i = 0; i < 60; i++) {
-        secSelect.innerHTML += `<option value="${i}">${i} Sec</option>`;
+    // AHT seconds (0 to 59 sec)
+    if (secSelect) {
+        for (let i = 0; i < 60; i++) {
+            secSelect.innerHTML += `<option value="${i}">${i} Sec</option>`;
+        }
+        secSelect.value = "30";
     }
-    secSelect.value = "30";
+
+    // Absenteeism (0 to 25 days)
+    if (absentSelect) {
+        for (let i = 0; i <= 25; i++) {
+            absentSelect.innerHTML += `<option value="${i}">${i} ${i <= 1 ? "Day" : "Days"}</option>`;
+        }
+        absentSelect.value = "0";
+    }
 };
 
 // Open Modal
@@ -12943,54 +12957,70 @@ window.closeIncentiveModal = function () {
 
 // --- Helper Functions ---
 
-// Step 1: CSAT flat amount
-function getCSATFlatAmount(csatValue) {
+// Step 1: Calling CSAT multiplier (Base Amount)
+function getCSATBaseAmount(csatValue) {
     let csat = parseFloat(csatValue);
-    let isPlus = csatValue.includes("+");
+    let isPlus = String(csatValue).includes("+");
+    
+    // Convert e.g., "93+" to a slightly higher number to use <= logic easily
+    let val = isPlus ? csat + 0.1 : csat;
 
-    if (csat <= 85 && !isPlus) return 0;
-    if (csat <= 87 && !isPlus) return 2000;
-    if (csat <= 90 && !isPlus) return 5000;
-    if (csat <= 92 && !isPlus) return 6000;
-    if (csat <= 95 && !isPlus) return 7000;
-    if (csat <= 97 && !isPlus) return 8000;
-
-    // Logic for '+' values and scores > 97
-    if (csat > 97 || (isPlus && csat >= 97)) return 10000;
-    if (isPlus && csat >= 95) return 8000;
-    if (isPlus && csat >= 92) return 7000;
-    if (isPlus && csat >= 90) return 6000;
-    if (isPlus && csat >= 87) return 5000;
-    if (isPlus && csat >= 85) return 2000;
-    if (isPlus && csat < 85) return 0;
-
-    return 0; // Default case
+    // As per requirement:
+    // exactly 93 -> 8000, 93+ -> 10000
+    // upper bounds are inclusive
+    if (val <= 85) return 0;
+    if (val <= 87) return 2000;
+    if (val <= 90) return 5000;
+    if (val <= 91) return 6000;
+    if (val <= 92) return 7000;
+    if (val <= 93) return 8000;
+    
+    return 10000; // > 93
 }
 
-// Step 2: Quality Bonus
-function getQualityBonus(qualityValue, csatFlatAmount) {
+// Step 2: AHT Multiplier
+function getAHTMultiplier(ahtSecs) {
+    // 03:50 = 230 secs
+    // 04:50 = 290 secs
+    // 06:00 = 360 secs
+    
+    // Agar time exact boundary ho tabhi agli range mein jayega:
+    if (ahtSecs < 230) return 1.0;     // e.g. 3m 49s = 100%
+    if (ahtSecs < 290) return 0.95;    // e.g. exactly 3m 50s = 95%
+    if (ahtSecs < 360) return 0.90;    // e.g. exactly 4m 50s = 90%
+    
+    return 0.0;                        // exactly 6m 00s = 0%
+}
+
+// Step 3: Quality Score Multiplier
+function getQualityMultiplier(qualityValue) {
     let quality = parseFloat(qualityValue);
-    let isPlus = qualityValue.includes("+");
-
-    if (quality < 80 && !isPlus) return null; // Cancel incentive
-    if (quality <= 85 && !isPlus) return csatFlatAmount * 0.05;
-    if (quality <= 90 && !isPlus) return csatFlatAmount * 0.10;
-
-    // Logic for '+' values and scores > 90
-    if (quality > 90 || (isPlus && quality >= 90)) return csatFlatAmount * 0.25;
-    if (isPlus && quality >= 85) return csatFlatAmount * 0.10;
-    if (isPlus && quality < 85 && quality >= 80) return csatFlatAmount * 0.05;
-    if (isPlus && quality < 80) return null;
-
-    return csatFlatAmount * 0.25; // Default for >90
+    let isPlus = String(qualityValue).includes("+");
+    
+    let val = isPlus ? quality + 0.1 : quality;
+    
+    // Upper bounds inclusive
+    if (val <= 75) return 0.0;
+    if (val <= 80) return 0.75;
+    if (val <= 85) return 0.90;
+    if (val <= 90) return 1.00;
+    
+    return 1.10; // > 90
 }
 
-// Step 3: AHT Bonus (No change here)
-function getAHTBonus(aht, csatFlatAmount) {
-    if (aht <= 230) return csatFlatAmount * 0.25; // ≤ 3:50
-    else if (aht <= 290) return csatFlatAmount * 0.10; // 3:51 – 4:50
-    else if (aht <= 360) return csatFlatAmount * 0.05; // 4:51 – 6:00
-    else return 0; // > 6:00
+// Step 4: Absenteeism Days Multiplier
+function getAbsenteeismMultiplier(days) {
+    if (days === 0) return 1.10;
+    if (days === 1) return 1.00;
+    if (days === 2) return 0.95;
+    if (days === 3) return 0.90;
+    if (days === 4) return 0.85;
+    if (days >= 5 && days <= 7) return 0.80;
+    if (days >= 8 && days <= 10) return 0.75;
+    if (days >= 11 && days <= 15) return 0.70;
+    if (days >= 16 && days <= 21) return 0.60;
+    if (days >= 22 && days <= 25) return 0.30;
+    return 0.0; // Failsafe for > 25 days
 }
 
 // --- Main Logic ---
@@ -12999,42 +13029,48 @@ window.calculateIncentive = function () {
     let qualityValue = document.getElementById("incentiveQuality").value;
     let min = parseInt(document.getElementById("incentiveAHTMin").value);
     let sec = parseInt(document.getElementById("incentiveAHTSec").value);
-    let escalation = document.getElementById("escalation").value;
-    let warning = parseInt(document.getElementById("warning").value);
+    let absentDays = parseInt(document.getElementById("incentiveAbsent").value);
 
-    let aht = min * 60 + sec; // total seconds
+    let ahtSecs = min * 60 + sec; // total seconds
 
-    // Get the original CSAT flat amount first
-    let csatFlatAmount = getCSATFlatAmount(csatValue);
+    // Calculate Step 1 Base Amount
+    let baseAmount = getCSATBaseAmount(csatValue);
+    
+    // Calculate Step 2 AHT Multiplier
+    let ahtMultiplier = getAHTMultiplier(ahtSecs);
 
-    // Then calculate the 70% CSAT bonus
-    let csatBonus = csatFlatAmount * 0.7;
+    // Calculate Step 3 Quality Multiplier
+    let qualityMultiplier = getQualityMultiplier(qualityValue);
 
-    // Calculate Quality & AHT bonuses based on the original flat amount
-    let qBonus = getQualityBonus(qualityValue, csatFlatAmount);
-    let ahtBonus = getAHTBonus(aht, csatFlatAmount);
+    // Calculate Step 4 Absenteeism Multiplier
+    let absentMultiplier = getAbsenteeismMultiplier(absentDays);
 
-    // Check for quality rule (if < 80, incentive is null)
-    if (qBonus === null) {
+    // If Quality is too low or AHT is too high, it might 0 out the incentive early
+    if (qualityMultiplier === 0) {
         document.getElementById("incentiveResult").innerHTML =
-            "<p style='color:red;'>❌ Incentive Cancelled (Quality < 80%)</p>";
+            "<p style='color:red;'>❌ Incentive Cancelled (Quality < 75%)</p>";
+        return;
+    }
+    
+    if (ahtMultiplier === 0) {
+        document.getElementById("incentiveResult").innerHTML =
+            "<p style='color:red;'>❌ Incentive Cancelled (AHT > 06:00)</p>";
         return;
     }
 
-    // Calculate total before final deductions
-    let totalIncentive = csatBonus + qBonus + ahtBonus;
-
-    // Step 4: Final Deductions
-    if (warning >= 1) {
-        totalIncentive = 0;
-    } else {
-        if (escalation == "1") totalIncentive *= 0.75;
-        else if (escalation == "2" || escalation == "2+") totalIncentive *= 0.5;
-    }
+    // Final Calculation formula: Base * AHT% * Quality% * Absentee%
+    let totalIncentive = baseAmount * ahtMultiplier * qualityMultiplier * absentMultiplier;
 
     document.getElementById(
         "incentiveResult"
-    ).innerHTML = `<p>💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>`;
+    ).innerHTML = `
+        <p>📊 Base Amount (CSAT): ₹${baseAmount}</p>
+        <p>⏳ AHT Multiplier: ${(ahtMultiplier * 100).toFixed(0)}%</p>
+        <p>🏆 Quality Multiplier: ${(qualityMultiplier * 100).toFixed(0)}%</p>
+        <p>📅 Absenteeism Multiplier: ${(absentMultiplier * 100).toFixed(0)}%</p>
+        <hr style="margin: 5px 0; border-top: 1px dotted #ccc;">
+        <p style="font-size: 1.1em; color: #10b981;">💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>
+    `;
 };
 // Highlight "NO" cells in ADP table
 document.addEventListener("DOMContentLoaded", () => {
