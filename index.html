@@ -52,6 +52,7 @@
             Piano</button>
         <button class="animated-btn bg-gradient-to-r from-fuchsia-500 to-violet-700" onclick="openSongsHub()">🎵
             Songs</button>
+        <button class="animated-btn bg-gradient-to-r from-teal-500 to-teal-700" onclick="openScorecardModal()">📊 IB-SCORECARD</button>
         <button class="secondary cov-btn" id="btnCompanyOwned">Company Owned Not Allowed</button>
     </div>
     <!-- Renamed Manual VI button -->
@@ -1253,6 +1254,92 @@
             <div class="button-container">
                 <button class="close-btn" onclick="closeIncentiveModal()">Close</button>
                 <button class="calculate-btn" onclick="calculateIncentive()">Calculate</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="incentive-modal" id="scorecardModal">
+        <div class="incentive-modal-content scorecard-modal-content">
+            <h2 class="title" style="background: linear-gradient(135deg, #0d9488, #0f766e); -webkit-background-clip: text; background-clip: text; color: transparent; text-align: center; margin-bottom: 20px;">📊 AGENT SCORECARD</h2>
+
+            <div class="scorecard-layout">
+                <!-- Left Side: Inputs -->
+                <div class="scorecard-inputs">
+                    <!-- Tenure -->
+                    <div class="input-section">
+                        <label for="scTenure">Tenure (Months):</label>
+                        <select id="scTenure" style="border: 2px solid #0d9488;">
+                            <option value="0-3">0-3 Months</option>
+                            <option value="3-6">3-6 Months</option>
+                            <option value="6+">6+ Months</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <!-- Calling CSAT -->
+                        <div class="input-section" style="flex: 1;">
+                            <label for="scCallCSAT">Calling CSAT %:</label>
+                            <select id="scCallCSAT"></select>
+                        </div>
+                        <!-- Ticket CSAT -->
+                        <div class="input-section" style="flex: 1;">
+                            <label for="scTicketCSAT">Ticket CSAT %:</label>
+                            <select id="scTicketCSAT"></select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <!-- Quality -->
+                        <div class="input-section" style="flex: 1;">
+                            <label for="scQuality">Quality %:</label>
+                            <select id="scQuality"></select>
+                        </div>
+                        <!-- Internal Audit -->
+                        <div class="input-section" style="flex: 1;">
+                            <label for="scAudit">Internal Audit %:</label>
+                            <select id="scAudit"></select>
+                        </div>
+                    </div>
+
+                    <!-- AHT -->
+                    <div class="input-section">
+                        <label for="scAHTMin">AHT (Min:Sec):</label>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <select id="scAHTMin" style="flex: 1;"></select> :
+                            <select id="scAHTSec" style="flex: 1;"></select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <!-- Late Login -->
+                        <div class="input-section" style="flex: 1;">
+                            <label for="scLateLogin">Late Login (Days):</label>
+                            <select id="scLateLogin"></select>
+                        </div>
+                        <!-- Login Hour -->
+                        <div class="input-section" style="flex: 1;">
+                            <label for="scLoginHrs">Login (Hrs:Min):</label>
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                <select id="scLoginHrs" style="flex: 1;"></select> :
+                                <select id="scLoginMins" style="flex: 1;"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Display and Buttons -->
+                <div class="scorecard-outputs">
+                    <!-- Result -->
+                    <div class="result-section" id="scorecardResult" style="background:#f0fdfa; border:1px solid #99f6e4; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                        <p><span class="colorful-text">Created by Shivang</span></p>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="button-container scorecard-buttons">
+                        <button class="close-btn" onclick="closeScorecardModal()" style="background:#ef4444;">Close</button>
+                        <button class="calculate-btn" onclick="calculateScorecard()" style="background:#0d9488;">Calculate</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
