@@ -16472,7 +16472,7 @@ window.openQuickLinks = function () {
     // ──── Open / Close with Password ────
     window.openSongsHub = function () {
         var password = prompt('🔒 Enter Password to open Songs Hub:');
-        if (password !== 'cvang') {
+        if (password !== 'shiv') {
             if (password !== null) alert('❌ Wrong Password!');
             return;
         }
