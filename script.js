@@ -12943,6 +12943,76 @@ window.onload = function () {
         }
         absentSelect.value = "0";
     }
+
+    // Scorecard Initialization
+    let scCallCSAT = document.getElementById("scCallCSAT");
+    let scTicketCSAT = document.getElementById("scTicketCSAT");
+    let scQuality = document.getElementById("scQuality");
+    let scAudit = document.getElementById("scAudit");
+    let scAHTMin = document.getElementById("scAHTMin");
+    let scAHTSec = document.getElementById("scAHTSec");
+    let scLateLogin = document.getElementById("scLateLogin");
+    let scLoginHrs = document.getElementById("scLoginHrs");
+    let scLoginMins = document.getElementById("scLoginMins");
+
+    if (scCallCSAT) {
+        for (let i = 0; i <= 100; i++) {
+            scCallCSAT.innerHTML += `<option value="${i}">${i}%</option>`;
+            if (i < 100) scCallCSAT.innerHTML += `<option value="${i}+">${i}+%</option>`;
+        }
+        scCallCSAT.value = "90";
+    }
+    if (scTicketCSAT) {
+        for (let i = 0; i <= 100; i++) {
+            scTicketCSAT.innerHTML += `<option value="${i}">${i}%</option>`;
+            if (i < 100) scTicketCSAT.innerHTML += `<option value="${i}+">${i}+%</option>`;
+        }
+        scTicketCSAT.value = "90";
+    }
+    if (scQuality) {
+        for (let i = 0; i <= 100; i++) {
+            scQuality.innerHTML += `<option value="${i}">${i}%</option>`;
+            if (i < 100) scQuality.innerHTML += `<option value="${i}+">${i}+%</option>`;
+        }
+        scQuality.value = "90";
+    }
+    if (scAudit) {
+        for (let i = 0; i <= 100; i++) {
+            scAudit.innerHTML += `<option value="${i}">${i}%</option>`;
+            if (i < 100) scAudit.innerHTML += `<option value="${i}+">${i}+%</option>`;
+        }
+        scAudit.value = "80";
+    }
+    if (scAHTMin) {
+        for (let i = 0; i <= 15; i++) {
+            scAHTMin.innerHTML += `<option value="${i}">${i} Min</option>`;
+        }
+        scAHTMin.value = "4";
+    }
+    if (scAHTSec) {
+        for (let i = 0; i < 60; i++) {
+            scAHTSec.innerHTML += `<option value="${i}">${i} Sec</option>`;
+        }
+        scAHTSec.value = "30";
+    }
+    if (scLateLogin) {
+        for (let i = 0; i <= 31; i++) {
+            scLateLogin.innerHTML += `<option value="${i}">${i} ${i <= 1 ? "Day" : "Days"}</option>`;
+        }
+        scLateLogin.value = "0";
+    }
+    if (scLoginHrs) {
+        for (let i = 0; i <= 24; i++) {
+            scLoginHrs.innerHTML += `<option value="${i}">${i} Hrs</option>`;
+        }
+        scLoginHrs.value = "9";
+    }
+    if (scLoginMins) {
+        for (let i = 0; i < 60; i++) {
+            scLoginMins.innerHTML += `<option value="${i}">${i} Min</option>`;
+        }
+        scLoginMins.value = "0";
+    }
 };
 
 // Open Modal
@@ -13070,6 +13140,152 @@ window.calculateIncentive = function () {
         <p>📅 Absenteeism Multiplier: ${(absentMultiplier * 100).toFixed(0)}%</p>
         <hr style="margin: 5px 0; border-top: 1px dotted #ccc;">
         <p style="font-size: 1.1em; color: #10b981;">💰 Final Incentive: <b>₹${totalIncentive.toFixed(0)}</b></p>
+    `;
+};
+
+// Open/Close Scorecard Modal
+window.openScorecardModal = function () {
+    const sm = document.getElementById("scorecardModal");
+    if(sm) sm.style.display = "flex";
+};
+window.closeScorecardModal = function () {
+    const sm = document.getElementById("scorecardModal");
+    if(sm) sm.style.display = "none";
+};
+
+// SCORECARD HELPERS (Boundary = lower slab)
+function getScCallCSAT(tenure, val) {
+    if (tenure === '0-3') {
+        if (val <= 80) return 0;
+        if (val <= 85) return 15;
+        if (val <= 90) return 20;
+        return 30; // > 90
+    } else { // 3-6 and 6+ use same for Calling CSAT
+        if (val <= 81) return 0;
+        if (val <= 86) return 15;
+        if (val <= 92) return 20;
+        return 30;
+    }
+}
+
+function getScTicketCSAT(tenure, val) {
+    if (tenure === '0-3') {
+        if (val <= 80) return 0;
+        if (val <= 85) return 2;
+        if (val <= 88) return 3;
+        return 5;
+    } else { // 3-6 and 6+
+        if (val <= 80) return 0;
+        if (val <= 85) return 2;
+        if (val <= 90) return 3;
+        return 5;
+    }
+}
+
+function getScAHT(tenure, secs) {
+    if (tenure === '0-3') {
+        if (secs < 285) return 20;  // < 04:45
+        if (secs <= 300) return 15; // <= 05:00
+        if (secs <= 315) return 10; // <= 05:15
+        return 0;
+    } else if (tenure === '3-6') {
+        if (secs < 270) return 20;  // < 04:30
+        if (secs <= 285) return 15; // <= 04:45
+        if (secs <= 300) return 10; // <= 05:00
+        return 0;
+    } else if (tenure === '6+') {
+        if (secs < 255) return 20;  // < 04:15
+        if (secs <= 270) return 15; // <= 04:30
+        if (secs <= 285) return 10; // <= 04:45
+        return 0;
+    }
+}
+
+function getScQuality(tenure, val) {
+    if (tenure === '0-3') {
+        if (val <= 80) return 0;
+        if (val <= 85) return 7;
+        if (val <= 87) return 10;
+        return 15;
+    } else if (tenure === '3-6') {
+        if (val <= 80) return 0;
+        if (val <= 85) return 7;
+        if (val <= 89) return 10;
+        return 15;
+    } else if (tenure === '6+') {
+        if (val <= 80) return 0;
+        if (val <= 85) return 7;
+        if (val <= 90) return 10;
+        return 15;
+    }
+}
+
+function getScAudit(val) {
+    if (val <= 70) return 0;
+    if (val <= 75) return 5;
+    if (val <= 80) return 7;
+    return 10;
+}
+
+function getScLateLogin(days) {
+    if (days <= 1) return 10;
+    if (days === 2) return 5;
+    return 0;
+}
+
+function getScLoginHrs(mins) {
+    if (mins < 420) return 0;   // < 07:00
+    if (mins <= 450) return 5;  // <= 07:30
+    if (mins <= 470) return 7;  // <= 07:50
+    return 10;                  // > 07:50
+}
+
+window.calculateScorecard = function() {
+    let tenure = document.getElementById("scTenure").value;
+    
+    // Helper to parse "92+" properly
+    const parseParam = (str) => {
+        let p = parseFloat(str);
+        if(String(str).includes("+")) return p + 0.1;
+        return p;
+    };
+
+    let callCsat = parseParam(document.getElementById("scCallCSAT").value);
+    let ticCsat = parseParam(document.getElementById("scTicketCSAT").value);
+    let qual = parseParam(document.getElementById("scQuality").value);
+    let audit = parseParam(document.getElementById("scAudit").value);
+    
+    let ahtMin = parseInt(document.getElementById("scAHTMin").value);
+    let ahtSec = parseInt(document.getElementById("scAHTSec").value);
+    let ahtSecsTotal = (ahtMin * 60) + ahtSec;
+
+    let lateLogin = parseInt(document.getElementById("scLateLogin").value);
+    
+    let logHrs = parseInt(document.getElementById("scLoginHrs").value);
+    let logMins = parseInt(document.getElementById("scLoginMins").value);
+    let loginMinTotal = (logHrs * 60) + logMins;
+
+    let ptCall = getScCallCSAT(tenure, callCsat);
+    let ptTic = getScTicketCSAT(tenure, ticCsat);
+    let ptAht = getScAHT(tenure, ahtSecsTotal);
+    let ptQual = getScQuality(tenure, qual);
+    let ptAud = getScAudit(audit);
+    let ptLate = getScLateLogin(lateLogin);
+    let ptLog = getScLoginHrs(loginMinTotal);
+
+    let totalScore = ptCall + ptTic + ptAht + ptQual + ptAud + ptLate + ptLog;
+
+    document.getElementById("scorecardResult").innerHTML = `
+        <p style="text-align:center; margin-bottom:10px;"><span class="colorful-text" style="font-size:0.9em;">Created by Shivang</span></p>
+        <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Calling CSAT:</span> <b>${ptCall} / 30</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Ticket CSAT:</span> <b>${ptTic} / 5</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>AHT IB+CTC:</span> <b>${ptAht} / 20</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Quality:</span> <b>${ptQual} / 15</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Internal Audit:</span> <b>${ptAud} / 10</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Late Login:</span> <b>${ptLate} / 10</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Login Hour:</span> <b>${ptLog} / 10</b></div>
+        
+        <p style="font-size: 1.3em; color: #0f766e; text-align:center; margin-top:15px;">🏆 Total Score: <b>${totalScore} / 100</b></p>
     `;
 };
 // Highlight "NO" cells in ADP table
