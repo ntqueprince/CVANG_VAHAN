@@ -50,7 +50,8 @@
             Links</button>
         <button class="animated-btn bg-gradient-to-r from-pink-500 to-rose-600" onclick="openPiano()">🎹 Play
             Piano</button>
-        <button class="animated-btn bg-gradient-to-r from-fuchsia-500 to-violet-700" onclick="openSongsHub()">🎵 Songs</button>
+        <button class="animated-btn bg-gradient-to-r from-fuchsia-500 to-violet-700" onclick="openSongsHub()">🎵
+            Songs</button>
         <button class="secondary cov-btn" id="btnCompanyOwned">Company Owned Not Allowed</button>
     </div>
     <!-- Renamed Manual VI button -->
@@ -1237,22 +1238,10 @@
                 <select id="incentiveAHTSec"></select>
             </div>
 
-            <!-- Deductions -->
+            <!-- Step 4: Absenteeism Days -->
             <div class="input-section">
-                <label for="escalation">Escalation:</label>
-                <select id="escalation">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2+</option>
-                </select>
-            </div>
-
-            <div class="input-section">
-                <label for="warning">Warning Letter:</label>
-                <select id="warning">
-                    <option value="0">0</option>
-                    <option value="1">1+</option>
-                </select>
+                <label for="incentiveAbsent">Absenteeism Days:</label>
+                <select id="incentiveAbsent"></select>
             </div>
 
             <!-- Result -->
@@ -2075,10 +2064,13 @@
                     <span class="songs-now-text" id="songsNowText">Select a channel to play</span>
                 </div>
                 <div class="songs-volume-control">
-                    <button class="songs-volume-btn" id="songsVolumeIcon" type="button" onclick="toggleSongsMute()">🔊</button>
-                    <input class="songs-volume-slider" id="songsVolumeSlider" type="range" min="0" max="100" value="80" oninput="setSongsVolume(this.value)" />
+                    <button class="songs-volume-btn" id="songsVolumeIcon" type="button"
+                        onclick="toggleSongsMute()">🔊</button>
+                    <input class="songs-volume-slider" id="songsVolumeSlider" type="range" min="0" max="100" value="80"
+                        oninput="setSongsVolume(this.value)" />
                 </div>
-                <button class="songs-stop-btn" id="songsStopBtn" onclick="stopSongsChannel()" style="display:none;">⏹ Stop</button>
+                <button class="songs-stop-btn" id="songsStopBtn" onclick="stopSongsChannel()" style="display:none;">⏹
+                    Stop</button>
             </div>
 
             <!-- Navigation Arrows -->
