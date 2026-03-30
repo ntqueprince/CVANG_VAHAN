@@ -177,6 +177,237 @@ button:hover {
     transform: translateY(-2px);
 }
 
+/* File Preview Container (before upload) */
+.file-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 10px auto;
+    max-width: 90%;
+}
+
+.file-preview-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e0e0e0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.file-preview-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.file-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-preview-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 22px;
+    height: 22px;
+    background: rgba(244, 67, 54, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    min-width: unset;
+    max-width: unset;
+    width: 22px;
+}
+
+.file-preview-remove:hover {
+    background: rgba(211, 47, 47, 1);
+    transform: scale(1.15);
+}
+
+.file-preview-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 9px;
+    padding: 2px 4px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Gallery Delete Button (after upload) */
+.delete-btn {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+    transition: all 0.3s ease;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+    transform: translateY(-2px);
+}
+
+.gallery-btn-group {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+/* Password Field Styles */
+.password-field-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 80%;
+    max-width: 300px;
+    margin: 4px auto;
+}
+
+.password-field-wrapper input {
+    width: 100%;
+    padding-right: 40px;
+    font-size: 14px;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    margin: 0;
+    min-width: unset;
+    max-width: unset;
+    width: auto;
+    box-shadow: none;
+    color: #78909c;
+    transition: color 0.2s;
+}
+
+.toggle-password-btn:hover {
+    color: #455a64;
+    background: none;
+    box-shadow: none;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Locked Image Styles */
+.image-locked {
+    position: relative;
+}
+
+.image-locked img {
+    filter: blur(15px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.image-locked .tag {
+    position: relative;
+    z-index: 3;
+    font-weight: 600;
+}
+
+.image-locked .gallery-btn-group {
+    position: relative;
+    z-index: 3;
+}
+
+.lock-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.lock-icon {
+    font-size: 36px;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.lock-text {
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.unlock-btn {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+    transition: all 0.3s ease;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+.unlock-btn:hover {
+    background: linear-gradient(135deg, #f57c00, #e65100);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.image-unlocked img {
+    transition: filter 0.5s ease;
+}
+
 /* Popup Styles for Tag Modal */
 .modal {
     display: none;
@@ -276,6 +507,18 @@ button:hover {
     color: white;
     font-weight: 400;
     transition: width 0.3s ease;
+}
+
+.modal-status {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #455a64;
+    font-weight: 500;
+    text-align: center;
+}
+
+#modalHeading {
+    transition: color 0.3s ease;
 }
 
 /* CSAT Calculator Modal Styles */
@@ -1828,7 +2071,8 @@ button:hover {
 
 /* Horizontal Scorecard Overrides */
 .scorecard-modal-content {
-    max-width: 800px; /* Make it wider for horizontal layout */
+    max-width: 800px;
+    /* Make it wider for horizontal layout */
 }
 
 .scorecard-layout {
@@ -1838,7 +2082,8 @@ button:hover {
 
 .scorecard-inputs {
     flex: 1.2;
-    min-width: 0; /* Prevent flex overflow */
+    min-width: 0;
+    /* Prevent flex overflow */
 }
 
 .scorecard-outputs {
