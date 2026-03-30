@@ -1,4 +1,5 @@
 
+
 // #region 🔒 FIREBASE & IMAGE UPLOAD
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -44,54 +45,159 @@ document.addEventListener("paste", function (event) {
 // Global variables
 let selectedFile = null;
 let selectedFiles = [];
+let pendingFiles = []; // Files queued for upload with preview
 let hasCalculated = false;
 
+// Toggle password visibility
+window.togglePasswordVisibility = function(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+    }
+};
+
 // Expose functions to window object
+
+// ✅ File Preview Logic - renders thumbnails with delete option
+function renderFilePreview() {
+    const container = document.getElementById('filePreviewContainer');
+    container.innerHTML = '';
+
+    if (pendingFiles.length === 0) {
+        return;
+    }
+
+    pendingFiles.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'file-preview-item';
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.alt = file.name;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'file-preview-remove';
+        removeBtn.textContent = '✕';
+        removeBtn.title = 'Remove this file';
+        removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            pendingFiles.splice(index, 1);
+            renderFilePreview();
+            // Agar sab files remove ho gayi to file input bhi reset karo
+            if (pendingFiles.length === 0) {
+                document.getElementById('fileUpload').value = '';
+            }
+        };
+
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'file-preview-name';
+        nameLabel.textContent = file.name;
+
+        item.appendChild(img);
+        item.appendChild(removeBtn);
+        item.appendChild(nameLabel);
+        container.appendChild(item);
+    });
+}
+
+// ✅ Listen for file input changes to show preview
+document.getElementById('fileUpload').addEventListener('change', function () {
+    pendingFiles = Array.from(this.files);
+    renderFilePreview();
+});
+
 // Multiple Image Upload Function
 window.uploadImage = function () {
     const uploadBtn = document.querySelector(".colorful-upload-btn");
-    uploadBtn.style.display = "none"; // Upload button ko hide kar do
 
-    const fileInput = document.getElementById("fileUpload");
     const tagInput = document.getElementById("tagInput");
-    const files = fileInput.files;   // Multiple files select kiye gaye
     const tag = tagInput.value.trim();
+    const password = document.getElementById("passwordInput").value.trim();
     const progressBar = document.getElementById("progress");
     const statusText = document.getElementById("status");
 
-    if (!files.length) {
+    // Use pendingFiles instead of fileInput.files
+    if (!pendingFiles.length) {
         showMessage("Please select at least one file!", "error");
         return;
     }
 
+    uploadBtn.style.display = "none"; // Upload button ko hide kar do
+
     if (!tag) {
-        // Agar tag blank hai to sabhi files save karo
-        selectedFiles = Array.from(files);
+        // Agar tag blank hai to modal open karo
+        selectedFiles = [...pendingFiles];
         document.getElementById("tagModal").style.display = "flex";
         return;
     }
 
-    // ✅ Loop through all selected files
-    Array.from(files).forEach((file) => {
-        uploadFile(file, tag, progressBar, statusText);
+    // Reset progress bar to 0%
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    statusText.textContent = 'Ready';
+
+    // ✅ Loop through all pending files
+    let completedCount = 0;
+    const totalFiles = pendingFiles.length;
+
+    pendingFiles.forEach((file) => {
+        uploadFile(file, tag, password, progressBar, statusText, null, () => {
+            completedCount++;
+            if (completedCount >= totalFiles) {
+                // Sab files complete hone par button wapas dikhao
+                uploadBtn.style.display = "inline-block";
+                showMessage(`${totalFiles} image(s) uploaded successfully!`, 'info');
+                document.getElementById('passwordInput').value = ''; // Clear password
+            }
+        });
     });
+
+    // Clear preview and reset
+    pendingFiles = [];
+    renderFilePreview();
+    document.getElementById('fileUpload').value = '';
 };
 
 
 window.closeModal = function () {
     document.getElementById('tagModal').style.display = 'none';
     document.getElementById('modalTagInput').value = '';
+    document.getElementById('modalTagInput').style.display = 'inline-block'; // Re-show input field
+    document.getElementById('modalPasswordInput').value = ''; // Clear modal password
+    const pwWrapper = document.querySelector('#tagModal .password-field-wrapper');
+    if (pwWrapper) pwWrapper.style.display = 'inline-flex'; // Re-show password field
     document.getElementById('modalProgressContainer').style.display = 'none';
     document.getElementById('modalProgress').style.width = '0%';
     document.getElementById('modalProgress').textContent = '0%';
+    // Reset modal heading back to default
+    const modalHeading = document.getElementById('modalHeading');
+    if (modalHeading) modalHeading.textContent = '⚠️ Tag is required!';
+    const modalStatus = document.getElementById('modalStatus');
+    if (modalStatus) modalStatus.textContent = 'Uploading...';
     document.querySelector('.modal-content .upload-btn').style.display = 'inline-block'; // Show buttons again
     document.querySelector('.modal-content .cancel-btn').style.display = 'inline-block'; // Show buttons again
+    // Re-show the main upload button that was hidden
+    const uploadBtn = document.querySelector(".colorful-upload-btn");
+    if (uploadBtn) uploadBtn.style.display = "inline-block";
+    // Reset main progress bar
+    document.getElementById('progress').style.width = '0%';
+    document.getElementById('progress').textContent = '0%';
+    document.getElementById('status').textContent = 'Ready';
     selectedFile = null; // Clear selected file
+    selectedFiles = []; // Clear selected files
+    pendingFiles = []; // Clear pending files
+    renderFilePreview(); // Clear file preview
+    document.getElementById('fileUpload').value = ''; // Reset file input
 };
 
 window.submitTag = function () {
     const modalTagInput = document.getElementById('modalTagInput');
     const tag = modalTagInput.value.trim();
+    const password = document.getElementById('modalPasswordInput').value.trim();
     const progressBar = document.getElementById('progress');
     const statusText = document.getElementById('status');
     const modalProgress = document.getElementById('modalProgress');
@@ -102,33 +208,69 @@ window.submitTag = function () {
         return;
     }
 
+    // Reset progress bars
+    modalProgress.style.width = '0%';
+    modalProgress.textContent = '0%';
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    statusText.textContent = 'Uploading...';
+
+    // Change modal heading to uploading state
+    const modalHeading = document.getElementById('modalHeading');
+    if (modalHeading) modalHeading.textContent = '📤 Uploading...';
+    const modalStatus = document.getElementById('modalStatus');
+    if (modalStatus) modalStatus.textContent = 'Starting upload...';
+
     modalProgressContainer.style.display = 'block';
-    document.querySelector('.modal-content .upload-btn').style.display = 'none'; // Hide buttons during upload
-    document.querySelector('.modal-content .cancel-btn').style.display = 'none'; // Hide buttons during upload
+    document.querySelector('.modal-content .upload-btn').style.display = 'none';
+    document.querySelector('.modal-content .cancel-btn').style.display = 'none';
+    // Input fields bhi hide karo uploading ke dauran
+    modalTagInput.style.display = 'none';
+    document.querySelector('#tagModal .password-field-wrapper').style.display = 'none';
 
     // ✅ Multiple files handle
-    if (selectedFiles.length > 0) {
-        selectedFiles.forEach((file, index) => {
-            uploadFile(file, tag, progressBar, statusText, modalProgress);
-            if (index === selectedFiles.length - 1) {
-                // Last file ke baad modal close
-                setTimeout(() => closeModal(), 1000);
+    const filesToUpload = selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
+    
+    if (filesToUpload.length === 0) {
+        showMessage("No files to upload!", "error");
+        return;
+    }
+
+    let completedCount = 0;
+    const totalFiles = filesToUpload.length;
+
+    filesToUpload.forEach((file) => {
+        uploadFile(file, tag, password, progressBar, statusText, modalProgress, () => {
+            completedCount++;
+            if (completedCount >= totalFiles) {
+                // Sab files upload ho gayi — ab modal band karo
+                setTimeout(() => {
+                    closeModal();
+                    showMessage(`${totalFiles} image(s) uploaded successfully!`, 'info');
+                }, 800);
             }
         });
-        selectedFiles = []; // reset
-    } else if (selectedFile) {
-        uploadFile(selectedFile, tag, progressBar, statusText, modalProgress);
-        setTimeout(() => closeModal(), 1000);
-        selectedFile = null; // reset
-    }
+    });
+
+    selectedFiles = [];
+    selectedFile = null;
 };
 
-function uploadFile(file, tag, progressBar, statusText) {
+function uploadFile(file, tag, password, progressBar, statusText, modalProgress, onComplete) {
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', uploadPreset);
     formData.append('tags', tag);
+
+    // Reset progress before starting
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    statusText.textContent = 'Uploading...';
+    if (modalProgress) {
+        modalProgress.style.width = '0%';
+        modalProgress.textContent = '0%';
+    }
 
     const xhr = new XMLHttpRequest();
 
@@ -138,7 +280,15 @@ function uploadFile(file, tag, progressBar, statusText) {
             const percentComplete = Math.round((event.loaded / event.total) * 100);
             progressBar.style.width = percentComplete + '%';
             progressBar.textContent = percentComplete + '%';
-            statusText.textContent = 'Uploading...';
+            statusText.textContent = `Uploading... ${percentComplete}%`;
+            // Modal progress bar bhi update karo agar open hai
+            if (modalProgress) {
+                modalProgress.style.width = percentComplete + '%';
+                modalProgress.textContent = percentComplete + '%';
+            }
+            // Modal status text update
+            const modalStatus = document.getElementById('modalStatus');
+            if (modalStatus) modalStatus.textContent = `Uploading... ${percentComplete}%`;
         }
     };
 
@@ -149,6 +299,7 @@ function uploadFile(file, tag, progressBar, statusText) {
             if (!data.secure_url) {
                 showMessage('Upload failed: No secure URL received', 'error');
                 statusText.textContent = 'Upload failed!';
+                if (onComplete) onComplete();
                 return;
             }
 
@@ -158,27 +309,37 @@ function uploadFile(file, tag, progressBar, statusText) {
                 name: file.name,
                 timestamp: Date.now()
             };
+            // Agar password set kiya hai to save karo
+            if (password) {
+                imgObj.password = password;
+            }
 
             // Save into Firebase
             push(imagesRef, imgObj)
                 .then(() => {
                     progressBar.style.width = '100%';
                     progressBar.textContent = '100%';
-                    statusText.textContent = 'Complete';
-                    showMessage(`${file.name} uploaded successfully!`, 'info');
+                    statusText.textContent = '✅ Complete';
+                    if (modalProgress) {
+                        modalProgress.style.width = '100%';
+                        modalProgress.textContent = '100%';
+                    }
                     document.getElementById('fileUpload').value = '';
                     document.getElementById('tagInput').value = '';
                     loadImages();
+                    if (onComplete) onComplete();
                 })
                 .catch((error) => {
                     console.error("Firebase Push Error:", error);
                     statusText.textContent = 'Upload failed: Firebase error';
                     showMessage('Upload failed: Firebase error', 'error');
+                    if (onComplete) onComplete();
                 });
         } else {
             console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
             statusText.textContent = 'Upload failed!';
             showMessage('Upload failed!', 'error');
+            if (onComplete) onComplete();
         }
     };
 
@@ -186,6 +347,7 @@ function uploadFile(file, tag, progressBar, statusText) {
         console.error("Upload error occurred:", xhr.status);
         statusText.textContent = 'Upload error!';
         showMessage('Upload failed due to network error!', 'error');
+        if (onComplete) onComplete();
     };
 
     xhr.open('POST', url, true);
@@ -261,7 +423,7 @@ function loadImages() {
                 .map(([key, img]) => ({ key, ...img }))
                 .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); // Sort by timestamp descending
 
-            sortedImages.forEach(({ key, url, tag, timestamp, name }) => {
+            sortedImages.forEach(({ key, url, tag, timestamp, name, password: imgPassword }) => {
                 // Check if the image is older than 5 minutes (300,000 milliseconds)
                 // If it is, delete it from the database (cleanup logic)
                 if (now - (timestamp || 0) > 300000) {
@@ -269,32 +431,125 @@ function loadImages() {
                         .then(() => console.log(`Image ${key} deleted (older than 5 min)`))
                         .catch((error) => console.error("Auto-delete error:", error));
                 } else {
+                    const isLocked = !!imgPassword;
                     const container = document.createElement('div');
-                    container.className = 'image-container';
+                    container.className = 'image-container' + (isLocked ? ' image-locked' : '');
 
                     const imgElement = document.createElement('img');
                     imgElement.src = url;
                     imgElement.alt = tag || 'Uploaded image';
                     imgElement.loading = 'lazy';
-                    imgElement.onerror = () => { // Fallback for broken images
+                    imgElement.onerror = () => {
                         imgElement.src = `https://placehold.co/150x150/cccccc/333333?text=Image+Error`;
                         console.warn(`Failed to load image: ${url}`);
                     };
 
+                    // Lock overlay for password protected images
+                    if (isLocked) {
+                        const lockOverlay = document.createElement('div');
+                        lockOverlay.className = 'lock-overlay';
+                        lockOverlay.innerHTML = '<span class="lock-icon">🔒</span><span class="lock-text">Tap to unlock</span>';
+                        container.appendChild(lockOverlay);
+                    }
+
                     const tagElement = document.createElement('p');
                     tagElement.className = 'tag';
-                    tagElement.textContent = `Tag: ${tag || 'No tag'}`;
+                    tagElement.textContent = `Tag: ${tag || 'No tag'}` + (isLocked ? ' 🔒' : '');
 
-                    // Changed to Download Button with new downloadImageDirectly function
-                    const downloadBtn = document.createElement('button'); // Changed back to button for click event
+                    // ✅ Shared unlock function — kahi se bhi call karo
+                    const unlockImage = () => {
+                        if (!container.classList.contains('image-locked')) return; // Already unlocked
+                        const enteredPw = prompt('🔑 Enter password to unlock this image:');
+                        if (enteredPw === null) return; // Cancelled
+                        if (enteredPw === imgPassword) {
+                            container.classList.remove('image-locked');
+                            container.classList.add('image-unlocked');
+                            container.style.cursor = 'default';
+                            const overlay = container.querySelector('.lock-overlay');
+                            if (overlay) overlay.remove();
+                            tagElement.textContent = `Tag: ${tag || 'No tag'} ✅`;
+                            const unlockBtnEl = container.querySelector('.unlock-btn');
+                            if (unlockBtnEl) unlockBtnEl.style.display = 'none';
+                            showMessage('🔓 Image unlocked!', 'info');
+                        } else {
+                            showMessage('❌ Wrong password!', 'error');
+                        }
+                    };
+
+                    // ✅ Poore container par click se unlock (locked images ke liye)
+                    if (isLocked) {
+                        container.style.cursor = 'pointer';
+                        container.onclick = (e) => {
+                            // Agar button par click kiya hai to ignore karo (button apna kaam karega)
+                            if (e.target.closest('.download-btn') || e.target.closest('.delete-btn') || e.target.closest('.unlock-btn')) {
+                                return;
+                            }
+                            unlockImage();
+                        };
+                    }
+
+                    // Download Button
+                    const downloadBtn = document.createElement('button');
                     downloadBtn.className = 'download-btn';
-                    downloadBtn.textContent = 'Download';
-                    // Call the new download function
-                    downloadBtn.onclick = () => window.downloadImageDirectly(url, name || `image_${key}.jpg`);
+                    downloadBtn.textContent = '⬇ Download';
+                    downloadBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (isLocked && container.classList.contains('image-locked')) {
+                            unlockImage();
+                            return;
+                        }
+                        window.downloadImageDirectly(url, name || `image_${key}.jpg`);
+                    };
+
+                    // Delete Button
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '🗑 Delete';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        // Agar password protected hai to pehle password maango
+                        if (isLocked && imgPassword) {
+                            const pw = prompt('🔑 Enter password to delete this image:');
+                            if (pw === null) return;
+                            if (pw !== imgPassword) {
+                                showMessage('❌ Wrong password! Cannot delete.', 'error');
+                                return;
+                            }
+                        }
+                        if (confirm('Are you sure you want to delete this image?')) {
+                            remove(dbRef(db, `images/${key}`))
+                                .then(() => {
+                                    showMessage('Image deleted successfully!', 'info');
+                                })
+                                .catch((error) => {
+                                    console.error("Delete error:", error);
+                                    showMessage('Failed to delete image.', 'error');
+                                });
+                        }
+                    };
+
+                    // Button group
+                    const btnGroup = document.createElement('div');
+                    btnGroup.className = 'gallery-btn-group';
+
+                    // Unlock button (only for locked images)
+                    if (isLocked) {
+                        const unlockBtn = document.createElement('button');
+                        unlockBtn.className = 'unlock-btn';
+                        unlockBtn.textContent = '🔓 Unlock';
+                        unlockBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            unlockImage();
+                        };
+                        btnGroup.appendChild(unlockBtn);
+                    }
+
+                    btnGroup.appendChild(downloadBtn);
+                    btnGroup.appendChild(deleteBtn);
 
                     container.appendChild(imgElement);
                     container.appendChild(tagElement);
-                    container.appendChild(downloadBtn); // Append the download button
+                    container.appendChild(btnGroup);
                     gallery.appendChild(container);
                 }
             });
@@ -13031,7 +13286,7 @@ window.closeIncentiveModal = function () {
 function getCSATBaseAmount(csatValue) {
     let csat = parseFloat(csatValue);
     let isPlus = String(csatValue).includes("+");
-    
+
     // Convert e.g., "93+" to a slightly higher number to use <= logic easily
     let val = isPlus ? csat + 0.1 : csat;
 
@@ -13044,7 +13299,7 @@ function getCSATBaseAmount(csatValue) {
     if (val <= 91) return 6000;
     if (val <= 92) return 7000;
     if (val <= 93) return 8000;
-    
+
     return 10000; // > 93
 }
 
@@ -13053,12 +13308,12 @@ function getAHTMultiplier(ahtSecs) {
     // 03:50 = 230 secs
     // 04:50 = 290 secs
     // 06:00 = 360 secs
-    
+
     // Agar time exact boundary ho tabhi agli range mein jayega:
     if (ahtSecs < 230) return 1.0;     // e.g. 3m 49s = 100%
     if (ahtSecs < 290) return 0.95;    // e.g. exactly 3m 50s = 95%
     if (ahtSecs < 360) return 0.90;    // e.g. exactly 4m 50s = 90%
-    
+
     return 0.0;                        // exactly 6m 00s = 0%
 }
 
@@ -13066,15 +13321,15 @@ function getAHTMultiplier(ahtSecs) {
 function getQualityMultiplier(qualityValue) {
     let quality = parseFloat(qualityValue);
     let isPlus = String(qualityValue).includes("+");
-    
+
     let val = isPlus ? quality + 0.1 : quality;
-    
+
     // Upper bounds inclusive
     if (val <= 75) return 0.0;
     if (val <= 80) return 0.75;
     if (val <= 85) return 0.90;
     if (val <= 90) return 1.00;
-    
+
     return 1.10; // > 90
 }
 
@@ -13105,7 +13360,7 @@ window.calculateIncentive = function () {
 
     // Calculate Step 1 Base Amount
     let baseAmount = getCSATBaseAmount(csatValue);
-    
+
     // Calculate Step 2 AHT Multiplier
     let ahtMultiplier = getAHTMultiplier(ahtSecs);
 
@@ -13121,7 +13376,7 @@ window.calculateIncentive = function () {
             "<p style='color:red;'>❌ Incentive Cancelled (Quality < 75%)</p>";
         return;
     }
-    
+
     if (ahtMultiplier === 0) {
         document.getElementById("incentiveResult").innerHTML =
             "<p style='color:red;'>❌ Incentive Cancelled (AHT > 06:00)</p>";
@@ -13146,11 +13401,11 @@ window.calculateIncentive = function () {
 // Open/Close Scorecard Modal
 window.openScorecardModal = function () {
     const sm = document.getElementById("scorecardModal");
-    if(sm) sm.style.display = "flex";
+    if (sm) sm.style.display = "flex";
 };
 window.closeScorecardModal = function () {
     const sm = document.getElementById("scorecardModal");
-    if(sm) sm.style.display = "none";
+    if (sm) sm.style.display = "none";
 };
 
 // SCORECARD HELPERS (Boundary = lower slab)
@@ -13240,13 +13495,13 @@ function getScLoginHrs(mins) {
     return 10;                  // > 07:50
 }
 
-window.calculateScorecard = function() {
+window.calculateScorecard = function () {
     let tenure = document.getElementById("scTenure").value;
-    
+
     // Helper to parse "92+" properly
     const parseParam = (str) => {
         let p = parseFloat(str);
-        if(String(str).includes("+")) return p + 0.1;
+        if (String(str).includes("+")) return p + 0.1;
         return p;
     };
 
@@ -13254,13 +13509,13 @@ window.calculateScorecard = function() {
     let ticCsat = parseParam(document.getElementById("scTicketCSAT").value);
     let qual = parseParam(document.getElementById("scQuality").value);
     let audit = parseParam(document.getElementById("scAudit").value);
-    
+
     let ahtMin = parseInt(document.getElementById("scAHTMin").value);
     let ahtSec = parseInt(document.getElementById("scAHTSec").value);
     let ahtSecsTotal = (ahtMin * 60) + ahtSec;
 
     let lateLogin = parseInt(document.getElementById("scLateLogin").value);
-    
+
     let logHrs = parseInt(document.getElementById("scLoginHrs").value);
     let logMins = parseInt(document.getElementById("scLoginMins").value);
     let loginMinTotal = (logHrs * 60) + logMins;
