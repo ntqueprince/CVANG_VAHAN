@@ -52,7 +52,8 @@
             Piano</button>
         <button class="animated-btn bg-gradient-to-r from-fuchsia-500 to-violet-700" onclick="openSongsHub()">🎵
             Songs</button>
-        <button class="animated-btn bg-gradient-to-r from-teal-500 to-teal-700" onclick="openScorecardModal()">📊 IB-SCORECARD</button>
+        <button class="animated-btn bg-gradient-to-r from-teal-500 to-teal-700" onclick="openScorecardModal()">📊
+            IB-SCORECARD</button>
         <button class="secondary cov-btn" id="btnCompanyOwned">Company Owned Not Allowed</button>
     </div>
     <!-- Renamed Manual VI button -->
@@ -75,7 +76,12 @@
         <h2>Upload Images</h2>
         <label for="fileUpload">Choose image files to upload:</label>
         <input accept="image/*" id="fileUpload" type="file" multiple />
+        <div id="filePreviewContainer" class="file-preview-container"></div>
         <input id="tagInput" placeholder="Enter tag (e.g., SHIVANG)" type="text" />
+        <div class="password-field-wrapper">
+            <input id="passwordInput" placeholder="🔒 Set password (optional)" type="password" />
+            <button class="toggle-password-btn" onclick="togglePasswordVisibility('passwordInput', this)" type="button">👁</button>
+        </div>
         <button class="colorful-upload-btn" onclick="uploadImage()">Upload</button>
         <div class="progress-container">
             <div class="progress-bar">
@@ -88,14 +94,19 @@
     <div id="gallery"></div>
     <div class="modal" id="tagModal">
         <div class="modal-content">
-            <h4>Error: Tag is required!</h4>
+            <h4 id="modalHeading">⚠️ Tag is required!</h4>
             <input id="modalTagInput" placeholder="Enter tag (e.g., SHIVANG)" type="text" />
+            <div class="password-field-wrapper">
+                <input id="modalPasswordInput" placeholder="🔒 Set password (optional)" type="password" />
+                <button class="toggle-password-btn" onclick="togglePasswordVisibility('modalPasswordInput', this)" type="button">👁</button>
+            </div>
             <button class="upload-btn" onclick="submitTag()">Upload</button>
-            cancel-btn" onclick="closeModal()">Cancel</button>
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
             <div class="modal-progress-container" id="modalProgressContainer">
                 <div class="modal-progress-bar">
                     <div class="modal-progress" id="modalProgress">0%</div>
                 </div>
+                <div class="modal-status" id="modalStatus">Uploading...</div>
             </div>
         </div>
     </div>
@@ -1257,10 +1268,12 @@
             </div>
         </div>
     </div>
-    
+
     <div class="incentive-modal" id="scorecardModal">
         <div class="incentive-modal-content scorecard-modal-content">
-            <h2 class="title" style="background: linear-gradient(135deg, #0d9488, #0f766e); -webkit-background-clip: text; background-clip: text; color: transparent; text-align: center; margin-bottom: 20px;">📊 AGENT SCORECARD</h2>
+            <h2 class="title"
+                style="background: linear-gradient(135deg, #0d9488, #0f766e); -webkit-background-clip: text; background-clip: text; color: transparent; text-align: center; margin-bottom: 20px;">
+                📊 AGENT SCORECARD</h2>
 
             <div class="scorecard-layout">
                 <!-- Left Side: Inputs -->
@@ -1330,14 +1343,17 @@
                 <!-- Right Side: Display and Buttons -->
                 <div class="scorecard-outputs">
                     <!-- Result -->
-                    <div class="result-section" id="scorecardResult" style="background:#f0fdfa; border:1px solid #99f6e4; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="result-section" id="scorecardResult"
+                        style="background:#f0fdfa; border:1px solid #99f6e4; height: 100%; display: flex; flex-direction: column; justify-content: center;">
                         <p><span class="colorful-text">Created by Shivang</span></p>
                     </div>
 
                     <!-- Buttons -->
                     <div class="button-container scorecard-buttons">
-                        <button class="close-btn" onclick="closeScorecardModal()" style="background:#ef4444;">Close</button>
-                        <button class="calculate-btn" onclick="calculateScorecard()" style="background:#0d9488;">Calculate</button>
+                        <button class="close-btn" onclick="closeScorecardModal()"
+                            style="background:#ef4444;">Close</button>
+                        <button class="calculate-btn" onclick="calculateScorecard()"
+                            style="background:#0d9488;">Calculate</button>
                     </div>
                 </div>
             </div>
