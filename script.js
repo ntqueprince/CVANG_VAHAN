@@ -13403,6 +13403,110 @@ window.calculateIncentive = function () {
     `;
 };
 
+// --- Incentive Slab Toggle ---
+window.toggleIncentiveSlab = function () {
+    const container = document.getElementById("incentiveSlabContainer");
+    if (!container) return;
+
+    if (container.style.display === "none" || !container.style.display) {
+        container.style.display = "block";
+        container.innerHTML = getSlabHTML();
+    } else {
+        container.style.display = "none";
+    }
+};
+
+function getSlabHTML() {
+    const tableStyle = `width:100%; border-collapse:collapse; margin-bottom:15px; font-size:13px;`;
+    const thStyle = `padding:6px 8px; text-align:left; border:1px solid #d1d5db; font-weight:600;`;
+    const tdStyle = `padding:5px 8px; border:1px solid #d1d5db; color:#1f2937;`;
+    const bestTd = `padding:5px 8px; border:1px solid #d1d5db; color:#047857; font-weight:700; background:#ecfdf5;`;
+    const worstTd = `padding:5px 8px; border:1px solid #d1d5db; color:#dc2626; font-weight:700; background:#fef2f2;`;
+    const altRow = `background:#f9fafb;`;
+
+    return `
+        <div style="margin-top:10px;">
+            <!-- CSAT Slab -->
+            <h4 style="color:#1f2937; margin:10px 0 5px; font-size:14px; font-weight:700;">📊 CSAT Base Amount</h4>
+            <table style="${tableStyle}">
+                <thead>
+                    <tr>
+                        <th style="${thStyle} background:#374151; color:white;">CSAT %</th>
+                        <th style="${thStyle} background:#374151; color:white;">Base Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="${worstTd}">≤ 85%</td><td style="${worstTd}">₹0</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">85+ – 87%</td><td style="${tdStyle}">₹2,000</td></tr>
+                    <tr><td style="${tdStyle}">87+ – 90%</td><td style="${tdStyle}">₹5,000</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">90+ – 91%</td><td style="${tdStyle}">₹6,000</td></tr>
+                    <tr><td style="${tdStyle}">91+ – 92%</td><td style="${tdStyle}">₹7,000</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">92+ – 93%</td><td style="${tdStyle}">₹8,000</td></tr>
+                    <tr><td style="${bestTd}">93+ %</td><td style="${bestTd}">₹10,000</td></tr>
+                </tbody>
+            </table>
+
+            <!-- AHT Slab -->
+            <h4 style="color:#1f2937; margin:10px 0 5px; font-size:14px; font-weight:700;">⏳ AHT Multiplier</h4>
+            <table style="${tableStyle}">
+                <thead>
+                    <tr>
+                        <th style="${thStyle} background:#374151; color:white;">AHT</th>
+                        <th style="${thStyle} background:#374151; color:white;">Multiplier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="${bestTd}">< 3:50</td><td style="${bestTd}">100%</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">3:50 – 4:49</td><td style="${tdStyle}">95%</td></tr>
+                    <tr><td style="${tdStyle}">4:50 – 5:59</td><td style="${tdStyle}">90%</td></tr>
+                    <tr><td style="${worstTd}">≥ 6:00</td><td style="${worstTd}">0% (Cancel)</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Quality Slab -->
+            <h4 style="color:#1f2937; margin:10px 0 5px; font-size:14px; font-weight:700;">🏆 Quality Multiplier</h4>
+            <table style="${tableStyle}">
+                <thead>
+                    <tr>
+                        <th style="${thStyle} background:#374151; color:white;">Quality %</th>
+                        <th style="${thStyle} background:#374151; color:white;">Multiplier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="${worstTd}">≤ 75%</td><td style="${worstTd}">0% (Cancel)</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">75+ – 80%</td><td style="${tdStyle}">75%</td></tr>
+                    <tr><td style="${tdStyle}">80+ – 85%</td><td style="${tdStyle}">90%</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">85+ – 90%</td><td style="${tdStyle}">100%</td></tr>
+                    <tr><td style="${bestTd}">90+ %</td><td style="${bestTd}">110%</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Absenteeism Slab -->
+            <h4 style="color:#1f2937; margin:10px 0 5px; font-size:14px; font-weight:700;">📅 Absenteeism Multiplier</h4>
+            <table style="${tableStyle}">
+                <thead>
+                    <tr>
+                        <th style="${thStyle} background:#374151; color:white;">Absent Days</th>
+                        <th style="${thStyle} background:#374151; color:white;">Multiplier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="${bestTd}">0 Day</td><td style="${bestTd}">110%</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">1 Day</td><td style="${tdStyle}">100%</td></tr>
+                    <tr><td style="${tdStyle}">2 Days</td><td style="${tdStyle}">95%</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">3 Days</td><td style="${tdStyle}">90%</td></tr>
+                    <tr><td style="${tdStyle}">4 Days</td><td style="${tdStyle}">85%</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">5–7 Days</td><td style="${tdStyle}">80%</td></tr>
+                    <tr><td style="${tdStyle}">8–10 Days</td><td style="${tdStyle}">75%</td></tr>
+                    <tr style="${altRow}"><td style="${tdStyle}">11–15 Days</td><td style="${tdStyle}">70%</td></tr>
+                    <tr><td style="${tdStyle}">16–21 Days</td><td style="${tdStyle}">60%</td></tr>
+                    <tr><td style="${worstTd}">22–25 Days</td><td style="${worstTd}">30%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
 // Open/Close Scorecard Modal
 window.openScorecardModal = function () {
     const sm = document.getElementById("scorecardModal");
@@ -13496,8 +13600,8 @@ function getScLateLogin(days) {
 function getScLoginHrs(mins) {
     if (mins < 420) return 0;   // < 07:00
     if (mins <= 450) return 5;  // <= 07:30
-    if (mins <= 470) return 7;  // <= 07:50
-    return 10;                  // > 07:50
+    if (mins < 470) return 7;   // < 07:50
+    return 10;                  // >= 07:50
 }
 
 window.calculateScorecard = function () {
