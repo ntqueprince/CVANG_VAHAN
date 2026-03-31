@@ -49,7 +49,7 @@ let pendingFiles = []; // Files queued for upload with preview
 let hasCalculated = false;
 
 // Toggle password visibility
-window.togglePasswordVisibility = function(inputId, btn) {
+window.togglePasswordVisibility = function (inputId, btn) {
     const input = document.getElementById(inputId);
     if (input.type === 'password') {
         input.type = 'text';
@@ -230,7 +230,7 @@ window.submitTag = function () {
 
     // ✅ Multiple files handle
     const filesToUpload = selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
-    
+
     if (filesToUpload.length === 0) {
         showMessage("No files to upload!", "error");
         return;
@@ -13383,8 +13383,13 @@ window.calculateIncentive = function () {
         return;
     }
 
-    // Final Calculation formula: Base * AHT% * Quality% * Absentee%
-    let totalIncentive = baseAmount * ahtMultiplier * qualityMultiplier * absentMultiplier;
+    // Final Calculation: Each multiplier applies independently on base amount (additive, not compound)
+    let totalIncentive = baseAmount * ahtMultiplier
+        + baseAmount * (qualityMultiplier - 1)
+        + baseAmount * (absentMultiplier - 1);
+
+    // Ensure incentive doesn't go below 0
+    if (totalIncentive < 0) totalIncentive = 0;
 
     document.getElementById(
         "incentiveResult"
