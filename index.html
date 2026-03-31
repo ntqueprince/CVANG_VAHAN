@@ -80,7 +80,8 @@
         <input id="tagInput" placeholder="Enter tag (e.g., SHIVANG)" type="text" />
         <div class="password-field-wrapper">
             <input id="passwordInput" placeholder="🔒 Set password (optional)" type="password" />
-            <button class="toggle-password-btn" onclick="togglePasswordVisibility('passwordInput', this)" type="button">👁</button>
+            <button class="toggle-password-btn" onclick="togglePasswordVisibility('passwordInput', this)"
+                type="button">👁</button>
         </div>
         <button class="colorful-upload-btn" onclick="uploadImage()">Upload</button>
         <div class="progress-container">
@@ -98,7 +99,8 @@
             <input id="modalTagInput" placeholder="Enter tag (e.g., SHIVANG)" type="text" />
             <div class="password-field-wrapper">
                 <input id="modalPasswordInput" placeholder="🔒 Set password (optional)" type="password" />
-                <button class="toggle-password-btn" onclick="togglePasswordVisibility('modalPasswordInput', this)" type="button">👁</button>
+                <button class="toggle-password-btn" onclick="togglePasswordVisibility('modalPasswordInput', this)"
+                    type="button">👁</button>
             </div>
             <button class="upload-btn" onclick="submitTag()">Upload</button>
             <button class="cancel-btn" onclick="closeModal()">Cancel</button>
@@ -1261,13 +1263,18 @@
                 <p id="incentiveResult"><span class="colorful-text">Created by Shivang</span></p>
             </div>
 
+            <!-- Slab Tables Container (hidden by default) -->
+            <div id="incentiveSlabContainer" style="display: none;"></div>
+
             <!-- Buttons -->
             <div class="button-container">
                 <button class="close-btn" onclick="closeIncentiveModal()">Close</button>
+                <button class="calculate-btn" onclick="toggleIncentiveSlab()" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">📋 View Slab</button>
                 <button class="calculate-btn" onclick="calculateIncentive()">Calculate</button>
             </div>
         </div>
     </div>
+
 
     <div class="incentive-modal" id="scorecardModal">
         <div class="incentive-modal-content scorecard-modal-content">
