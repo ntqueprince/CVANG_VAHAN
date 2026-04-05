@@ -3543,6 +3543,889 @@ button:hover {
     }
 }
 
+#carromGameOverlay {
+    overflow: hidden;
+    padding: 16px;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+}
+
+.carrom-shell {
+    color: #fff7ed;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 32px);
+    overflow: hidden;
+}
+
+.carrom-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.carrom-header-badge {
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(249, 115, 22, 0.15));
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    color: #fde68a;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.carrom-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.58fr) 328px;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.carrom-board-panel,
+.carrom-side-card {
+    background:
+        linear-gradient(180deg, rgba(38, 22, 16, 0.95), rgba(17, 24, 39, 0.88)),
+        radial-gradient(circle at top, rgba(251, 191, 36, 0.1), transparent 38%);
+    border: 1px solid rgba(251, 191, 36, 0.12);
+    border-radius: 28px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.carrom-board-panel {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.carrom-topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.carrom-chip {
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(63, 42, 29, 0.72);
+    border: 1px solid rgba(253, 186, 116, 0.18);
+    color: #ffedd5;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.carrom-intro-panel {
+    min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    border-radius: 26px;
+    padding: 26px 30px 32px;
+    background:
+        radial-gradient(circle at top, rgba(251, 191, 36, 0.1), transparent 30%),
+        linear-gradient(180deg, rgba(24, 14, 10, 0.96), rgba(15, 23, 42, 0.76));
+}
+
+.carrom-tab-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 26px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 4px 0 8px;
+    background: linear-gradient(180deg, rgba(24, 14, 10, 0.98), rgba(24, 14, 10, 0.84) 74%, rgba(24, 14, 10, 0));
+}
+
+.carrom-tab-btn {
+    flex: 1;
+    min-width: 220px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(253, 186, 116, 0.14);
+    background: rgba(30, 20, 16, 0.84);
+    color: #fed7aa;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.carrom-tab-btn.active {
+    color: #1c1917;
+    background: linear-gradient(135deg, #fbbf24, #fb923c);
+    box-shadow: 0 18px 36px rgba(249, 115, 22, 0.16);
+}
+
+.carrom-form-panel.hidden,
+.carrom-board-stage.hidden {
+    display: none;
+}
+
+.carrom-label,
+.carrom-format-label,
+.carrom-inline-label {
+    display: block;
+    color: #fdba74;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.carrom-label {
+    margin-bottom: 8px;
+}
+
+.carrom-text-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(251, 191, 36, 0.16);
+    background: rgba(28, 19, 15, 0.86);
+    color: #fff7ed;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carrom-text-input:focus {
+    border-color: rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08);
+}
+
+.carrom-room-code-input {
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+}
+
+.carrom-format-block {
+    margin-top: 18px;
+}
+
+.carrom-format-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.carrom-format-btn {
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(253, 186, 116, 0.16);
+    background: rgba(45, 26, 18, 0.9);
+    color: #ffedd5;
+    font-weight: 700;
+    transition: all 0.18s ease;
+}
+
+.carrom-format-btn.active {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.94), rgba(249, 115, 22, 0.92));
+    color: #1c1917;
+    box-shadow: 0 16px 28px rgba(249, 115, 22, 0.18);
+}
+
+.carrom-helper-text {
+    margin: 14px 0 18px;
+    color: #fed7aa;
+    line-height: 1.65;
+    font-size: 0.94rem;
+}
+
+.carrom-feature-grid {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.carrom-feature-card {
+    padding: 16px;
+    border-radius: 20px;
+    background: rgba(28, 19, 15, 0.72);
+    border: 1px solid rgba(251, 191, 36, 0.12);
+}
+
+.carrom-feature-title {
+    color: #fff7ed;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.carrom-feature-copy {
+    color: #fdba74;
+    font-size: 0.86rem;
+    line-height: 1.55;
+}
+
+.carrom-board-stage {
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    justify-content: center;
+}
+
+.carrom-status-banner {
+    margin-bottom: 16px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.18), rgba(249, 115, 22, 0.12));
+    border: 1px solid rgba(251, 191, 36, 0.16);
+    color: #fef3c7;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
+.carrom-board-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.carrom-turn-pill {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
+    border-radius: 18px;
+    background: rgba(28, 19, 15, 0.78);
+    border: 1px solid rgba(251, 191, 36, 0.14);
+    color: #ffedd5;
+    font-weight: 700;
+    text-align: center;
+}
+
+.carrom-canvas-shell {
+    flex: 1;
+    min-height: 0;
+    padding: 10px;
+    border-radius: 30px;
+    background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 34%),
+        linear-gradient(180deg, rgba(30, 20, 16, 0.92), rgba(15, 23, 42, 0.72));
+    border: 1px solid rgba(251, 191, 36, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    position: relative;
+}
+
+#carromBoardCanvas {
+    width: min(100%, 860px, calc(100vh - 220px));
+    aspect-ratio: 1 / 1;
+    max-height: min(860px, calc(100vh - 220px));
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 24px;
+    box-shadow: 0 28px 80px rgba(15, 23, 42, 0.46);
+    background: #321f17;
+    touch-action: none;
+}
+
+.carrom-board-chat-overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 2;
+    width: min(320px, calc(100% - 32px));
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.carrom-board-chat-toast {
+    padding: 12px 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(253, 186, 116, 0.16);
+    background: rgba(18, 24, 39, 0.76);
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(10px);
+}
+
+.carrom-board-chat-toast.own {
+    margin-left: auto;
+    background: linear-gradient(135deg, rgba(22, 101, 52, 0.88), rgba(21, 128, 61, 0.84));
+    border-color: rgba(187, 247, 208, 0.24);
+}
+
+.carrom-board-chat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.carrom-board-chat-name {
+    color: #fde68a;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.carrom-board-chat-toast.own .carrom-board-chat-name {
+    color: #ecfccb;
+}
+
+.carrom-board-chat-time {
+    color: rgba(255, 247, 237, 0.7);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.carrom-board-chat-text {
+    color: #fff7ed;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.carrom-control-dock {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 24px;
+    background: rgba(28, 19, 15, 0.76);
+    border: 1px solid rgba(251, 191, 36, 0.12);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 16px;
+    align-items: center;
+}
+
+.carrom-drag-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.carrom-inline-label {
+    margin-bottom: 0;
+}
+
+.carrom-drag-copy {
+    margin: 0;
+    color: #fed7aa;
+    line-height: 1.6;
+    font-size: 0.92rem;
+}
+
+.carrom-power-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.carrom-power-bar {
+    height: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(71, 45, 27, 0.8);
+    border: 1px solid rgba(251, 191, 36, 0.12);
+}
+
+.carrom-power-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #fde68a, #f59e0b, #f97316);
+    transition: width 0.12s ease;
+}
+
+.carrom-aim-hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: #fdba74;
+    line-height: 1.6;
+    font-size: 0.92rem;
+}
+
+.carrom-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 6px;
+}
+
+.carrom-side-card {
+    padding: 16px;
+}
+
+.carrom-back-btn {
+    background: linear-gradient(135deg, #7f1d1d, #dc2626) !important;
+    border: 1px solid rgba(254, 202, 202, 0.22) !important;
+    color: #fff7ed !important;
+    box-shadow: 0 20px 34px rgba(185, 28, 28, 0.2);
+}
+
+.carrom-back-btn:hover {
+    filter: brightness(1.05);
+}
+
+.carrom-approval-card {
+    border-color: rgba(251, 191, 36, 0.22);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 38px rgba(249, 115, 22, 0.16);
+}
+
+.carrom-topline-sidebar {
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.carrom-topline-sidebar .carrom-chip {
+    flex: 1 1 140px;
+    text-align: center;
+}
+
+.carrom-board-toolbar-sidebar {
+    margin-bottom: 0;
+    flex-direction: column;
+}
+
+.carrom-control-dock-sidebar {
+    margin-top: 12px;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.carrom-control-dock-sidebar .carrom-power-rail {
+    gap: 8px;
+}
+
+.carrom-control-dock-sidebar .carrom-aim-hint {
+    grid-column: auto;
+}
+
+.carrom-chat-card {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    backdrop-filter: blur(12px);
+}
+
+.carrom-approval-text {
+    color: #fed7aa;
+    line-height: 1.6;
+    font-size: 0.92rem;
+}
+
+.carrom-approval-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.carrom-side-eyebrow {
+    color: #fdba74;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.carrom-room-code-box {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(28, 19, 15, 0.72);
+    border: 1px solid rgba(251, 191, 36, 0.12);
+}
+
+.carrom-room-code-label {
+    color: #fdba74;
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+}
+
+.carrom-room-code-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    color: #fde68a;
+    margin-bottom: 12px;
+}
+
+.carrom-player-stack {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.carrom-player-card {
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(251, 191, 36, 0.1);
+    background: linear-gradient(180deg, rgba(28, 19, 15, 0.85), rgba(15, 23, 42, 0.74));
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.carrom-player-card.active-seat {
+    border-color: rgba(251, 191, 36, 0.32);
+    box-shadow: 0 14px 28px rgba(249, 115, 22, 0.12);
+}
+
+.carrom-player-card.hidden-seat {
+    opacity: 0.38;
+}
+
+.carrom-player-role {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fdba74;
+    margin-bottom: 6px;
+}
+
+.carrom-player-name,
+.carrom-match-headline {
+    font-weight: 800;
+    font-size: 1.12rem;
+    color: #fff7ed;
+}
+
+.carrom-player-meta,
+.carrom-role-hint {
+    color: #fed7aa;
+    line-height: 1.55;
+    font-size: 0.9rem;
+}
+
+.carrom-scoreboard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.carrom-score-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(28, 19, 15, 0.7);
+    border: 1px solid rgba(251, 191, 36, 0.1);
+}
+
+.carrom-score-card.active {
+    border-color: rgba(251, 191, 36, 0.26);
+    box-shadow: 0 12px 26px rgba(249, 115, 22, 0.12);
+}
+
+.carrom-score-copy {
+    min-width: 0;
+}
+
+.carrom-score-name {
+    color: #fff7ed;
+    font-weight: 700;
+}
+
+.carrom-score-note {
+    color: #fdba74;
+    font-size: 0.82rem;
+    margin-top: 2px;
+}
+
+.carrom-score-value {
+    min-width: 52px;
+    text-align: right;
+    color: #fde68a;
+    font-size: 1.24rem;
+    font-weight: 800;
+}
+
+.carrom-shot-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.carrom-shot-list li {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(28, 19, 15, 0.72);
+    border: 1px solid rgba(251, 191, 36, 0.1);
+    color: #ffedd5;
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.carrom-chat-list {
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    border-radius: 22px;
+    background:
+        linear-gradient(180deg, rgba(12, 17, 30, 0.52), rgba(28, 19, 15, 0.32)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.03), transparent 45%);
+    border: 1px solid rgba(251, 191, 36, 0.08);
+}
+
+.carrom-chat-row {
+    display: flex;
+}
+
+.carrom-chat-row.own {
+    justify-content: flex-end;
+}
+
+.carrom-chat-row.other {
+    justify-content: flex-start;
+}
+
+.carrom-chat-bubble {
+    max-width: min(84%, 260px);
+    padding: 10px 12px 9px;
+    border-radius: 18px 18px 18px 8px;
+    background: rgba(28, 19, 15, 0.86);
+    border: 1px solid rgba(251, 191, 36, 0.1);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16);
+}
+
+.carrom-chat-row.own .carrom-chat-bubble {
+    border-radius: 18px 18px 8px 18px;
+    background: linear-gradient(135deg, rgba(22, 101, 52, 0.94), rgba(21, 128, 61, 0.88));
+    border-color: rgba(187, 247, 208, 0.24);
+}
+
+.carrom-chat-empty {
+    color: #fdba74;
+    font-size: 0.88rem;
+    text-align: center;
+    padding: 18px 14px;
+}
+
+.carrom-chat-meta {
+    color: #fcd34d;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.carrom-chat-row.own .carrom-chat-meta {
+    color: #ecfccb;
+}
+
+.carrom-chat-bubble-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.carrom-chat-time {
+    color: rgba(255, 247, 237, 0.68);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.carrom-chat-text {
+    color: #ffedd5;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    word-break: break-word;
+}
+
+.carrom-chat-compose {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.62);
+    border: 1px solid rgba(251, 191, 36, 0.1);
+    align-items: center;
+}
+
+.carrom-chat-input {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: rgba(28, 19, 15, 0.28);
+    color: #fff7ed;
+    outline: none;
+}
+
+.carrom-chat-input:focus {
+    border-color: rgba(251, 191, 36, 0.35);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.08);
+}
+
+#carromChatSendBtn {
+    min-width: 0;
+    padding: 11px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #f0fdf4;
+    box-shadow: 0 14px 24px rgba(22, 163, 74, 0.2);
+}
+
+#carromChatSendBtn:disabled {
+    background: rgba(71, 85, 105, 0.48);
+    color: rgba(255, 255, 255, 0.45);
+    box-shadow: none;
+}
+
+.carrom-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.carrom-primary-btn,
+.carrom-secondary-btn {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-weight: 700;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.carrom-primary-btn {
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    color: #1c1917;
+    box-shadow: 0 18px 32px rgba(249, 115, 22, 0.18);
+}
+
+.carrom-secondary-btn {
+    background: rgba(28, 19, 15, 0.86);
+    border: 1px solid rgba(251, 191, 36, 0.14);
+    color: #fff7ed;
+}
+
+.carrom-primary-btn:hover,
+.carrom-secondary-btn:hover,
+.carrom-tab-btn:hover,
+.carrom-format-btn:hover {
+    transform: translateY(-1px);
+}
+
+.carrom-primary-btn:disabled,
+.carrom-secondary-btn:disabled,
+.carrom-format-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 1180px) {
+    #carromGameOverlay {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .carrom-shell,
+    .carrom-layout,
+    .carrom-board-panel,
+    .carrom-sidebar {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .carrom-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .carrom-board-stage {
+        min-height: auto;
+    }
+
+    .carrom-tab-btn {
+        min-width: 0;
+    }
+
+    .carrom-chat-card {
+        position: static;
+    }
+
+    #carromBoardCanvas {
+        width: min(100%, 760px);
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .carrom-header {
+        flex-direction: column;
+    }
+
+    .carrom-feature-grid,
+    .carrom-format-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .carrom-intro-panel,
+    .carrom-board-stage {
+        min-height: auto;
+    }
+
+    .carrom-tab-row,
+    .carrom-board-toolbar,
+    .carrom-chat-compose {
+        flex-direction: column;
+    }
+
+    .carrom-control-dock {
+        grid-template-columns: 1fr;
+    }
+
+    .carrom-chat-compose {
+        display: flex;
+    }
+
+    .carrom-approval-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Whack-a-Mole */
 .whack-grid {
     max-width: 400px;
