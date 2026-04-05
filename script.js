@@ -3,7 +3,8 @@
 // #region 🔒 FIREBASE & IMAGE UPLOAD
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getDatabase, ref as dbRef, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import { getDatabase, ref as dbRef, push, onValue, remove, serverTimestamp, set, get, update } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import { Chess } from "https://cdn.jsdelivr.net/npm/chess.js@1.0.0/+esm";
 
 // Your web app's Firebase configuration (using config from structure.html)
 const firebaseConfig = {
@@ -13906,362 +13907,6 @@ if (chatInput) {
 }
 
 // ========================================
-// 🎮 Memory Card Game Logic
-// ========================================
-
-const memoryGameOverlay = document.getElementById('memoryGameOverlay');
-const gameBoard = document.getElementById('gameBoard');
-const moveCountEl = document.getElementById('moveCount');
-const pairCountEl = document.getElementById('pairCount');
-const gameTimerEl = document.getElementById('gameTimer');
-const winMessage = document.getElementById('winMessage');
-const winStats = document.getElementById('winStats');
-
-// Game State
-let cards = [];
-let flippedCards = [];
-let matchedPairs = 0;
-let moves = 0;
-let timer = 0;
-let timerInterval = null;
-let isPlaying = false;
-let boardLocked = false;
-
-// Pair emojis for the game (8 pairs = 16 cards)
-const cardEmojis = ['🚀', '🌟', '💻', '🎮', '🔥', '💎', '🌈', '🍕'];
-
-// Initialize/Reset Game
-function initMemoryGame() {
-    // Reset state
-    clearInterval(timerInterval);
-    timerInterval = null;
-    timer = 0;
-    moves = 0;
-    matchedPairs = 0;
-    flippedCards = [];
-    isPlaying = false;
-    boardLocked = false;
-
-    // Update UI
-    moveCountEl.textContent = moves;
-    pairCountEl.textContent = `${matchedPairs}/8`;
-    gameTimerEl.textContent = '0:00';
-    winMessage.classList.remove('show');
-    gameBoard.innerHTML = '';
-
-    // Create deck (2 of each emoji)
-    let deck = [...cardEmojis, ...cardEmojis];
-
-    // Shuffle deck (Fisher-Yates)
-    for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-
-    // Create UI cards
-    deck.forEach((emoji, index) => {
-        const card = document.createElement('div');
-        card.classList.add('memory-card');
-        card.dataset.emoji = emoji;
-        card.dataset.index = index;
-
-        card.innerHTML = `
-            <div class="memory-card-inner">
-                <div class="memory-card-front"></div>
-                <div class="memory-card-back">${emoji}</div>
-            </div>
-        `;
-
-        card.addEventListener('click', () => flipCard(card));
-        gameBoard.appendChild(card);
-    });
-}
-
-// Flip Card Logic
-function flipCard(card) {
-    if (boardLocked || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-
-    // Start timer on first move
-    if (!isPlaying) {
-        isPlaying = true;
-        timerInterval = setInterval(() => {
-            timer++;
-            const mins = Math.floor(timer / 60);
-            const secs = timer % 60;
-            gameTimerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-        }, 1000);
-    }
-
-    // Flip the card
-    card.classList.add('flipped');
-    flippedCards.push(card);
-
-    // If two cards are flipped, check for match
-    if (flippedCards.length === 2) {
-        moves++;
-        moveCountEl.textContent = moves;
-        checkMatch();
-    }
-}
-
-// Check Match Logic
-function checkMatch() {
-    boardLocked = true;
-    const [card1, card2] = flippedCards;
-    const isMatch = card1.dataset.emoji === card2.dataset.emoji;
-
-    if (isMatch) {
-        // They match!
-        setTimeout(() => {
-            card1.classList.add('matched');
-            card2.classList.add('matched');
-            matchedPairs++;
-            pairCountEl.textContent = `${matchedPairs}/8`;
-            resetBoard();
-
-            // Check win condition
-            if (matchedPairs === 8) {
-                gameWon();
-            }
-        }, 500); // Wait for flip animation
-    } else {
-        // Not a match
-        setTimeout(() => {
-            card1.classList.add('wrong');
-            card2.classList.add('wrong');
-
-            setTimeout(() => {
-                card1.classList.remove('wrong', 'flipped');
-                card2.classList.remove('wrong', 'flipped');
-                resetBoard();
-            }, 500); // Wait before un-flipping
-        }, 600); // Give player a moment to see cards
-    }
-}
-
-function resetBoard() {
-    flippedCards = [];
-    boardLocked = false;
-}
-
-// Win Logic (Memory Game)
-function gameWon() {
-    clearInterval(timerInterval);
-    setTimeout(() => {
-        const mins = Math.floor(timer / 60);
-        const secs = timer % 60;
-        const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
-        winStats.innerHTML = `You completed the game in <strong>${moves} moves</strong><br>Time taken: <strong>${timeStr}</strong>`;
-        winMessage.classList.add('show');
-
-        // Check for Leaderboard
-        checkAndSaveScore('memory', moves, false); // Lower moves is better
-    }, 500); // Small delay after last match
-}
-
-// Modal Controls - Expose to global window object
-window.openMemoryGame = function () {
-    memoryGameOverlay.classList.add('active');
-    initMemoryGame(); // Start fresh every time it opens
-    loadLeaderboard('memory', 'moves (lower is better)');
-};
-
-window.closeMemoryGame = function () {
-    memoryGameOverlay.classList.remove('active');
-    clearInterval(timerInterval); // Stop timer if it's running
-};
-
-window.restartMemoryGame = function () {
-    initMemoryGame();
-};
-
-// Close modal on outside click or ESC key
-memoryGameOverlay.addEventListener('click', (e) => {
-    if (e.target === memoryGameOverlay) {
-        window.closeMemoryGame();
-    }
-});
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && memoryGameOverlay.classList.contains('active')) {
-        window.closeMemoryGame();
-    }
-});
-
-// ========================================
-// 🏆 Game Hub & Firebase Leaderboard System
-// ========================================
-
-const gameHubOverlay = document.getElementById('gameHubOverlay');
-
-window.openGameHub = function () {
-    gameHubOverlay.classList.add('active');
-};
-
-window.closeGameHub = function () {
-    gameHubOverlay.classList.remove('active');
-};
-
-window.backToHub = function (overlayId) {
-    document.getElementById(overlayId).classList.remove('active');
-    // Stop any running intervals depending on the game
-    if (overlayId === 'snakeGameOverlay') clearInterval(snakeInterval);
-    if (overlayId === 'reactionGameOverlay') { clearTimeout(reactionTimeout); isReactionWaiting = false; }
-    if (overlayId === 'whackGameOverlay') { clearInterval(moleInterval); clearInterval(whackTimerInterval); }
-    if (overlayId === 'memoryGameOverlay') clearInterval(timerInterval);
-    if (overlayId === 'bounceGameOverlay') clearInterval(bounceInterval);
-    if (overlayId === 'starsGameOverlay') clearInterval(starsInterval);
-    if (overlayId === 'aimGameOverlay') { clearInterval(aimTimerInterval); aimGameActive = false; }
-    if (overlayId === 'flappyGameOverlay') { if (flappyAnimFrame) cancelAnimationFrame(flappyAnimFrame); flappyGameActive = false; }
-    if (overlayId === 'colormatchGameOverlay') { clearInterval(colorMatchTimerInterval); colorMatchActive = false; }
-
-    // Bring back hub
-    openGameHub();
-};
-
-window.launchGame = function (gameType) {
-    closeGameHub();
-    if (gameType === 'memory') {
-        window.openMemoryGame();
-    } else if (gameType === 'snake') {
-        document.getElementById('snakeGameOverlay').classList.add('active');
-        loadLeaderboard('snake', 'points');
-        window.startSnakeGame();
-    } else if (gameType === 'reaction') {
-        document.getElementById('reactionGameOverlay').classList.add('active');
-        document.getElementById('reactionResult').textContent = '';
-        const ra = document.getElementById('reactionArea');
-        ra.style.backgroundColor = '#ef4444'; // reset to red
-        ra.textContent = "Click to Start";
-        loadLeaderboard('reaction', 'ms');
-    } else if (gameType === 'whack') {
-        document.getElementById('whackGameOverlay').classList.add('active');
-        loadLeaderboard('whack', 'moles');
-        window.startWhackGame();
-    } else if (gameType === 'bounce') {
-        document.getElementById('bounceGameOverlay').classList.add('active');
-        loadLeaderboard('bounce', 'pts');
-        window.startBounceGame();
-    } else if (gameType === 'stars') {
-        document.getElementById('starsGameOverlay').classList.add('active');
-        loadLeaderboard('stars', 'pts');
-        window.startStarsGame();
-    } else if (gameType === 'aim') {
-        document.getElementById('aimGameOverlay').classList.add('active');
-        loadLeaderboard('aim', 'pts');
-        window.startAimGame();
-    } else if (gameType === 'flappy') {
-        document.getElementById('flappyGameOverlay').classList.add('active');
-        loadLeaderboard('flappy', 'pts');
-        window.startFlappyGame();
-    } else if (gameType === 'colormatch') {
-        document.getElementById('colormatchGameOverlay').classList.add('active');
-        loadLeaderboard('colormatch', 'pts');
-        window.startColorMatchGame();
-    } else if (gameType === 'airforce') {
-        document.getElementById('airforceGameOverlay').classList.add('active');
-        loadLeaderboard('airforce', 'pts');
-    }
-};
-
-// --- Firebase Leaderboard Logic ---
-// We'll store leaderboards under 'leaderboards' node in Firebase
-const leaderboardsRef = dbRef(db, 'leaderboards');
-
-function loadLeaderboard(gameId, unit) {
-    const listElementId = `${gameId}LeaderboardList`;
-    const listEl = document.getElementById(listElementId);
-    if (!listEl) return;
-
-    listEl.innerHTML = '<li class="text-center text-gray-400 text-sm">Loading scores...</li>';
-
-    const gameBoardRef = dbRef(db, `leaderboards/${gameId}`);
-    onValue(gameBoardRef, (snapshot) => {
-        const data = snapshot.val();
-        listEl.innerHTML = '';
-
-        if (!data) {
-            listEl.innerHTML = '<li class="text-center text-gray-400 text-sm">No high scores yet! Be the first!</li>';
-            return;
-        }
-
-        // Convert to array and sort
-        const scoresArray = Object.values(data);
-
-        if (gameId === 'memory' || gameId === 'reaction') {
-            // Lower is better (Moves or MS)
-            scoresArray.sort((a, b) => a.score - b.score);
-        } else {
-            // Higher is better (Snake points, Moles hit)
-            scoresArray.sort((a, b) => b.score - a.score);
-        }
-
-        // Take top 3
-        const top3 = scoresArray.slice(0, 3);
-
-        top3.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = `rank-${index + 1}`;
-            li.innerHTML = `<span>#${index + 1} ${item.name}</span> <span>${item.score} ${unit}</span>`;
-            listEl.appendChild(li);
-        });
-
-    }, { onlyOnce: true });
-}
-
-function checkAndSaveScore(gameId, newScore, isHigherBetter = true) {
-    const gameBoardRef = dbRef(db, `leaderboards/${gameId}`);
-
-    // Temporary listener to get current top scores
-    onValue(gameBoardRef, (snapshot) => {
-        const data = snapshot.val();
-        let shouldSave = false;
-
-        if (!data) {
-            shouldSave = true; // No scores yet
-        } else {
-            const scoresArray = Object.values(data);
-            if (scoresArray.length < 3) {
-                shouldSave = true; // Less than 3 scores
-            } else {
-                // Sort current scores
-                if (isHigherBetter) {
-                    scoresArray.sort((a, b) => b.score - a.score);
-                    // Beat the 3rd place?
-                    if (newScore > scoresArray[2].score) shouldSave = true;
-                } else {
-                    scoresArray.sort((a, b) => a.score - b.score);
-                    // Beat the 3rd place (lower is better)?
-                    if (newScore < scoresArray[2].score) shouldSave = true;
-                }
-            }
-        }
-
-        if (shouldSave) {
-            // Save directly without name prompt
-            push(gameBoardRef, {
-                name: 'Player',
-                score: newScore,
-                date: Date.now()
-            });
-            // Refresh leaderboard display immediately
-            let unit = '';
-            if (gameId === 'memory') unit = 'moves';
-            if (gameId === 'snake') unit = 'points';
-            if (gameId === 'reaction') unit = 'ms';
-            if (gameId === 'whack') unit = 'moles';
-            if (gameId === 'bounce') unit = 'pts';
-            if (gameId === 'stars') unit = 'pts';
-            if (gameId === 'aim') unit = 'pts';
-            if (gameId === 'flappy') unit = 'pts';
-            if (gameId === 'colormatch') unit = 'pts';
-            loadLeaderboard(gameId, unit);
-        }
-    }, { onlyOnce: true });
-}
-
-
-// ========================================
 // 🐍 Snake Game Logic
 // ========================================
 let snakeCanvas, snakeCtx;
@@ -14476,134 +14121,125 @@ document.addEventListener("keyup", function (event) {
 
 
 // ========================================
-// ⚡ Reaction Time Game Logic
-// ========================================
-let reactionTimeout;
-let reactionStartTime;
-let isReactionWaiting = false;
-let isReactionReady = false;
-
-window.handleReactionClick = function () {
-    const area = document.getElementById('reactionArea');
-    const resText = document.getElementById('reactionResult');
-
-    if (!isReactionWaiting && !isReactionReady) {
-        // Start phase
-        area.style.backgroundColor = '#ef4444'; // Red
-        area.textContent = "Wait for Green...";
-        resText.textContent = "";
-        isReactionWaiting = true;
-
-        const randomTime = Math.floor(Math.random() * 3000) + 1500; // 1.5s to 4.5s
-
-        reactionTimeout = setTimeout(() => {
-            isReactionWaiting = false;
-            isReactionReady = true;
-            area.style.backgroundColor = '#22c55e'; // Green
-            area.textContent = "CLICK NOW!";
-            reactionStartTime = Date.now();
-        }, randomTime);
-
-    } else if (isReactionWaiting) {
-        // Clicked too early
-        clearTimeout(reactionTimeout);
-        isReactionWaiting = false;
-        area.style.backgroundColor = '#ef4444'; // Red
-        area.textContent = "Too early! Click to try again.";
-        resText.textContent = "Failed - Jumped the gun!";
-
-    } else if (isReactionReady) {
-        // Clicked on green
-        const endTime = Date.now();
-        const reactionTime = endTime - reactionStartTime;
-        isReactionReady = false;
-
-        area.style.backgroundColor = '#3b82f6'; // Blue
-        area.textContent = "Click to go again";
-        resText.innerHTML = `Reaction Time: <strong>${reactionTime} ms</strong>`;
-
-        checkAndSaveScore('reaction', reactionTime, false); // Lower ms is better
-    }
-}
-
-
-// ========================================
-// 🔨 Whack-a-Mole Game Logic
-// ========================================
-let moles;
-let whackScore = 0;
-let lastMoleIdx = -1;
-let moleInterval;
-let whackTimer = 30; // 30 seconds
-let whackTimerInterval;
-let isWhackPlaying = false;
-
-window.startWhackGame = function () {
-    if (isWhackPlaying) return;
-
-    moles = document.querySelectorAll('.mole');
-    whackScore = 0;
-    whackTimer = 30;
-    isWhackPlaying = true;
-
-    document.getElementById('whackScore').textContent = whackScore;
-    document.getElementById('whackTime').textContent = `${whackTimer}s`;
-
-    moleInterval = setInterval(randomMole, 800);
-    whackTimerInterval = setInterval(() => {
-        whackTimer--;
-        document.getElementById('whackTime').textContent = `${whackTimer}s`;
-        if (whackTimer <= 0) {
-            endWhackGame();
-        }
-    }, 1000);
-}
-
-function randomMole() {
-    // Hide all moles first manually in case animation lag
-    moles.forEach(m => m.classList.remove('up'));
-
-    let randomIdx;
-    do {
-        randomIdx = Math.floor(Math.random() * moles.length);
-    } while (randomIdx === lastMoleIdx);
-
-    lastMoleIdx = randomIdx;
-    moles[randomIdx].classList.add('up');
-
-    // Auto hide after some time
-    setTimeout(() => {
-        moles[randomIdx].classList.remove('up');
-    }, 700);
-}
-
-window.whackMole = function (idx) {
-    if (!isWhackPlaying) return;
-    const mole = document.getElementById(`mole-${idx}`);
-
-    if (mole.classList.contains('up')) {
-        whackScore++;
-        document.getElementById('whackScore').textContent = whackScore;
-        mole.classList.remove('up');
-        // add quick visual feedback on the hole container
-        mole.parentElement.style.backgroundColor = '#ec4899'; // pink brief flash
-        setTimeout(() => mole.parentElement.style.backgroundColor = '#451a03', 150);
-    }
-}
-
-function endWhackGame() {
-    clearInterval(moleInterval);
-    clearInterval(whackTimerInterval);
-    isWhackPlaying = false;
-    moles.forEach(m => m.classList.remove('up'));
-
-    alert(`Time's UP! You whacked ${whackScore} moles!`);
-    checkAndSaveScore('whack', whackScore, true); // Higher is better
-}
-
-// ========================================
 // 🎾 Bounce Ball Game Logic
 // ========================================
+// ========================================
+// Game Hub & Firebase Leaderboard System
+// ========================================
+const gameHubOverlay = document.getElementById('gameHubOverlay');
+const leaderboardUnits = {
+    snake: 'points',
+    bounce: 'pts',
+    airforce: 'pts'
+};
+const AIRFORCE_PLAYER_NAME_KEY = 'airforcePlayerName';
+const CHESS_PLAYER_NAME_KEY = 'chessPlayerName';
+
+function getStoredAirforcePlayerName() {
+    return (localStorage.getItem(AIRFORCE_PLAYER_NAME_KEY) || '').trim();
+}
+
+function setStoredAirforcePlayerName(name) {
+    localStorage.setItem(AIRFORCE_PLAYER_NAME_KEY, name.trim());
+}
+
+window.openGameHub = function () {
+    gameHubOverlay.classList.add('active');
+};
+
+window.closeGameHub = function () {
+    gameHubOverlay.classList.remove('active');
+};
+
+window.backToHub = function (overlayId) {
+    document.getElementById(overlayId).classList.remove('active');
+    if (overlayId === 'snakeGameOverlay') clearInterval(snakeInterval);
+    if (overlayId === 'bounceGameOverlay') clearInterval(bounceInterval);
+    openGameHub();
+};
+
+window.launchGame = function (gameType) {
+    closeGameHub();
+    if (gameType === 'snake') {
+        document.getElementById('snakeGameOverlay').classList.add('active');
+        loadLeaderboard('snake', leaderboardUnits.snake);
+        window.startSnakeGame();
+    } else if (gameType === 'bounce') {
+        document.getElementById('bounceGameOverlay').classList.add('active');
+        loadLeaderboard('bounce', leaderboardUnits.bounce);
+        window.startBounceGame();
+    } else if (gameType === 'airforce') {
+        document.getElementById('airforceGameOverlay').classList.add('active');
+        const airforceNameInput = document.getElementById('airforcePlayerNameInput');
+        const airforceStartScreen = document.getElementById('airforceStartScreen');
+        const airforceGameOverOverlay = document.getElementById('airforceGameOverOverlay');
+        const airforceNameHint = document.getElementById('airforcePlayerNameHint');
+        const storedName = getStoredAirforcePlayerName();
+        if (airforceNameInput) airforceNameInput.value = storedName;
+        if (airforceNameHint) airforceNameHint.classList.add('hidden');
+        if (airforceGameOverOverlay) airforceGameOverOverlay.classList.add('hidden');
+        if (airforceStartScreen) airforceStartScreen.classList.remove('hidden');
+        loadLeaderboard('airforce', leaderboardUnits.airforce);
+    } else if (gameType === 'chess') {
+        document.getElementById('chessGameOverlay').classList.add('active');
+        if (typeof window.prepareChessOverlay === 'function') {
+            window.prepareChessOverlay();
+        }
+    }
+};
+
+function loadLeaderboard(gameId, unit) {
+    const listEl = document.getElementById(`${gameId}LeaderboardList`);
+    if (!listEl) return;
+
+    const gameBoardRef = dbRef(db, `leaderboards/${gameId}`);
+    onValue(gameBoardRef, (snapshot) => {
+        const data = snapshot.val();
+        listEl.innerHTML = '';
+
+        if (!data) {
+            listEl.innerHTML = '<li class="text-center text-gray-400 text-sm">No high scores yet! Be the first!</li>';
+            return;
+        }
+
+        Object.values(data)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 3)
+            .forEach((item, index) => {
+                const playerDisplayName = (item && item.name ? String(item.name) : 'Unknown Pilot').trim() || 'Unknown Pilot';
+                const li = document.createElement('li');
+                li.className = `rank-${index + 1}`;
+                li.innerHTML = `<span>#${index + 1} ${playerDisplayName}</span> <span>${item.score} ${unit}</span>`;
+                listEl.appendChild(li);
+            });
+    }, { onlyOnce: true });
+}
+
+window.saveLeaderboardScore = function (gameId, name, score) {
+    const gameBoardRef = dbRef(db, `leaderboards/${gameId}`);
+    push(gameBoardRef, {
+        name: name || 'Player',
+        score,
+        date: Date.now()
+    });
+    loadLeaderboard(gameId, leaderboardUnits[gameId] || '');
+};
+
+function checkAndSaveScore(gameId, newScore) {
+    let playerName = 'Player';
+    if (gameId === 'airforce') {
+        playerName = getStoredAirforcePlayerName() || 'Player';
+    } else {
+        try {
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (user && user.name) playerName = user.name;
+        } catch (error) {
+            console.warn('Unable to read logged in user for leaderboard save.', error);
+        }
+    }
+    window.saveLeaderboardScore(gameId, playerName, newScore);
+}
+
 let bounceCanvas, bounceCtx;
 let bounceInterval;
 let gameOverBounce = false;
@@ -14847,815 +14483,6 @@ document.addEventListener("keyup", function (e) {
 
 
 // ========================================
-// ✨ Falling Stars Game Logic
-// ========================================
-let starsCanvas, starsCtx;
-let starsInterval;
-let gameOverStars = false;
-let isStarsPaused = false;
-let starsScore = 0;
-let starsLives = 3;
-
-let items = []; // falling objects
-let starsFrame = 0;
-let starsDifficulty = 1;
-
-const basket = {
-    width: 70,
-    height: 22,
-    x: 215,
-    y: 460,
-    color: '#f472b6' // pink-400
-};
-
-let basketTargetX = 215; // For smooth following
-
-window.startStarsGame = function () {
-    starsCanvas = document.getElementById('starsCanvas');
-    starsCtx = starsCanvas.getContext('2d');
-
-    starsScore = 0;
-    starsLives = 3;
-    items = [];
-    starsFrame = 0;
-    starsDifficulty = 1;
-    gameOverStars = false;
-    isStarsPaused = false;
-    basketTargetX = (starsCanvas.width - basket.width) / 2;
-    basket.x = basketTargetX;
-
-    updateStarsUI();
-    document.getElementById('starsPauseOverlay').classList.add('hidden');
-    document.getElementById('starsGameOverOverlay').classList.add('hidden');
-
-    if (starsInterval) clearInterval(starsInterval);
-    starsInterval = setInterval(drawStarsGame, 20); // 50fps
-}
-
-window.toggleStarsPause = function () {
-    if (gameOverStars || !starsInterval) return;
-
-    isStarsPaused = !isStarsPaused;
-    const overlay = document.getElementById('starsPauseOverlay');
-
-    if (isStarsPaused) {
-        clearInterval(starsInterval);
-        overlay.classList.remove('hidden');
-    } else {
-        starsInterval = setInterval(drawStarsGame, 20);
-        overlay.classList.add('hidden');
-    }
-}
-
-function updateStarsUI() {
-    document.getElementById('starsScore').textContent = starsScore;
-    let heartStr = '';
-    for (let i = 0; i < starsLives; i++) heartStr += '💖';
-    document.getElementById('starsLives').textContent = `Lives: ${heartStr}`;
-}
-
-function spawnItem() {
-    const isBomb = Math.random() < 0.2 + (starsDifficulty * 0.05); // More bombs as diff increases
-    const isGolden = !isBomb && Math.random() < 0.1; // Rare golden star
-
-    let type = 'star';
-    let color = '#fef08a'; // yellow-200
-    let points = 1;
-    let radius = 8;
-
-    if (isBomb) {
-        type = 'bomb';
-        color = '#ef4444'; // red-500
-        points = -1;
-        radius = 10;
-    } else if (isGolden) {
-        type = 'golden';
-        color = '#a855f7'; // purple-500
-        points = 5;
-        radius = 12;
-    }
-
-    items.push({
-        x: Math.random() * (starsCanvas.width - radius * 2) + radius,
-        y: -20,
-        radius: radius,
-        speed: (Math.random() * 2 + 2) + starsDifficulty,
-        type: type,
-        color: color,
-        points: points
-    });
-}
-
-function drawStarsGame() {
-    if (gameOverStars || isStarsPaused) return;
-
-    starsFrame++;
-
-    // Increase difficulty every 500 frames (~10s) up to a max limit
-    if (starsFrame % 500 === 0 && starsDifficulty < 5) {
-        starsDifficulty += 0.5;
-        // shrink basket slightly
-        if (basket.width > 30) basket.width -= 5;
-    }
-
-    // Spawn items based on difficulty rate
-    let spawnRate = Math.max(20, 50 - (starsDifficulty * 5));
-    if (starsFrame % spawnRate === 0) {
-        spawnItem();
-    }
-
-    starsCtx.fillStyle = '#111827';
-    starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
-
-    // Smooth basket movement (Lerp)
-    basket.x += (basketTargetX - basket.x) * 0.2;
-
-    // Draw Basket
-    starsCtx.fillStyle = basket.color;
-    starsCtx.beginPath();
-    starsCtx.moveTo(basket.x, basket.y);
-    starsCtx.lineTo(basket.x + basket.width, basket.y);
-    starsCtx.lineTo(basket.x + basket.width - 5, basket.y + basket.height);
-    starsCtx.lineTo(basket.x + 5, basket.y + basket.height);
-    starsCtx.closePath();
-    starsCtx.fill();
-
-    // Move & Draw Items
-    for (let i = items.length - 1; i >= 0; i--) {
-        let it = items[i];
-        it.y += it.speed;
-
-        // Draw item
-        starsCtx.beginPath();
-        if (it.type === 'star' || it.type === 'golden') {
-            // Draw a basic star shape using arc for simplicity but distinct color
-            starsCtx.fillStyle = it.color;
-            starsCtx.arc(it.x, it.y, it.radius, 0, Math.PI * 2);
-            starsCtx.fill();
-        } else {
-            // Draw Bomb
-            starsCtx.fillStyle = it.color;
-            starsCtx.arc(it.x, it.y, it.radius, 0, Math.PI * 2);
-            starsCtx.fill();
-            // Bomb fuse
-            starsCtx.strokeStyle = '#d1d5db';
-            starsCtx.beginPath();
-            starsCtx.moveTo(it.x, it.y - it.radius);
-            starsCtx.lineTo(it.x + 5, it.y - it.radius - 5);
-            starsCtx.stroke();
-        }
-
-        // Collision detection with basket
-        if (it.y + it.radius >= basket.y && it.y - it.radius <= basket.y + basket.height) {
-            if (it.x + it.radius >= basket.x && it.x - it.radius <= basket.x + basket.width) {
-                // Caught!
-                if (it.type === 'bomb') {
-                    starsLives--;
-                    // Flash screen red
-                    starsCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
-                    starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
-                } else {
-                    starsScore += it.points;
-                }
-
-                updateStarsUI();
-                items.splice(i, 1);
-
-                if (starsLives <= 0) {
-                    gameOverStarsPhase();
-                    return;
-                }
-                continue;
-            }
-        }
-
-        // Missed item (hit floor)
-        if (it.y > starsCanvas.height + it.radius) {
-            if (it.type === 'star' || it.type === 'golden') {
-                // Penalize for missing good items by losing half a life, or just ignore. 
-                // Let's just deduct a point so it's not too punishing, but prevent going negative.
-                if (starsScore > 0) {
-                    starsScore--;
-                    updateStarsUI();
-                }
-            }
-            items.splice(i, 1);
-        }
-    }
-}
-
-function gameOverStarsPhase() {
-    gameOverStars = true;
-    clearInterval(starsInterval);
-
-    document.getElementById('starsFinalScore').textContent = starsScore;
-    document.getElementById('starsGameOverOverlay').classList.remove('hidden');
-
-    checkAndSaveScore('stars', starsScore, true);
-}
-
-// Controls
-document.addEventListener("mousemove", function (e) {
-    const overlay = document.getElementById('starsGameOverlay');
-    if (!overlay || !overlay.classList.contains('active') || isStarsPaused || gameOverStars) return;
-
-    if (starsCanvas) {
-        const rect = starsCanvas.getBoundingClientRect();
-        const relativeX = e.clientX - rect.left;
-
-        if (relativeX > 0 && relativeX < starsCanvas.width) {
-            basketTargetX = relativeX - basket.width / 2;
-            if (basketTargetX < 0) basketTargetX = 0;
-            if (basketTargetX + basket.width > starsCanvas.width) basketTargetX = starsCanvas.width - basket.width;
-        }
-    }
-});
-
-document.addEventListener("keydown", function (e) {
-    const overlay = document.getElementById('starsGameOverlay');
-    if (!overlay || !overlay.classList.contains('active')) return;
-
-    if (e.code === 'Space') {
-        e.preventDefault();
-        window.toggleStarsPause();
-    }
-});
-// #endregion
-
-// #region 🔒 AIM TRAINER GAME
-// ========================================
-// 🎯 Aim Trainer Game Logic
-// ========================================
-let aimCanvas, aimCtx;
-let aimTimerInterval;
-let aimGameActive = false;
-let aimScore = 0;
-let aimTimeLeft = 30;
-let aimHits = 0;
-let aimMisses = 0;
-let aimTarget = null;
-let aimAnimations = []; // for hit effects
-const AIM_TARGET_LIFETIME = 1500; // target disappears after 1.5 seconds!
-const AIM_MISS_PENALTY = 3; // lose 3 pts for miss
-
-function spawnAimTarget() {
-    // Targets get smaller as score increases (progressive difficulty)
-    const difficultyBonus = Math.min(aimScore * 0.15, 12);
-    const minRadius = Math.max(6, 10 - difficultyBonus * 0.3);
-    const maxRadius = Math.max(18, 30 - difficultyBonus);
-    const radius = minRadius + Math.random() * (maxRadius - minRadius);
-    const x = radius + Math.random() * (aimCanvas.width - radius * 2);
-    const y = radius + Math.random() * (aimCanvas.height - radius * 2);
-
-    // Color based on size — smaller = more red/valuable
-    const sizeRatio = (radius - minRadius) / (maxRadius - minRadius + 0.01);
-    const r = Math.floor(255 - sizeRatio * 100);
-    const g = Math.floor(80 + sizeRatio * 120);
-    const b = Math.floor(50 + sizeRatio * 50);
-
-    aimTarget = { x, y, radius, color: `rgb(${r},${g},${b})`, spawnTime: Date.now() };
-}
-
-function getAimPoints(radius) {
-    // Smaller targets = more points (8 to 30)
-    return Math.max(8, Math.round(35 - radius * 0.9));
-}
-
-function drawAimGame() {
-    if (!aimCtx) return;
-    aimCtx.fillStyle = '#111827';
-    aimCtx.fillRect(0, 0, aimCanvas.width, aimCanvas.height);
-
-    // Draw grid lines for aim feel
-    aimCtx.strokeStyle = 'rgba(255,255,255,0.03)';
-    aimCtx.lineWidth = 1;
-    for (let i = 0; i < aimCanvas.width; i += 50) {
-        aimCtx.beginPath();
-        aimCtx.moveTo(i, 0);
-        aimCtx.lineTo(i, aimCanvas.height);
-        aimCtx.stroke();
-        aimCtx.beginPath();
-        aimCtx.moveTo(0, i);
-        aimCtx.lineTo(aimCanvas.width, i);
-        aimCtx.stroke();
-    }
-
-    // Draw target
-    if (aimTarget) {
-        // Check if target expired (auto-disappear)
-        const timeAlive = Date.now() - aimTarget.spawnTime;
-        if (timeAlive > AIM_TARGET_LIFETIME) {
-            // Target expired = counts as miss!
-            aimMisses++;
-            aimAnimations.push({ x: aimTarget.x, y: aimTarget.y, radius: aimTarget.radius, time: Date.now(), hit: false, points: 0 });
-            const accuracy = aimHits + aimMisses > 0 ? Math.round((aimHits / (aimHits + aimMisses)) * 100) : 0;
-            document.getElementById('aimAccuracy').textContent = accuracy + '%';
-            spawnAimTarget();
-        }
-
-        // Timer ring (shrinks as time runs out)
-        const lifeRatio = Math.max(0, 1 - timeAlive / AIM_TARGET_LIFETIME);
-        aimCtx.beginPath();
-        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius + 6, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * lifeRatio);
-        aimCtx.strokeStyle = lifeRatio > 0.4 ? `rgba(74,222,128,${lifeRatio})` : `rgba(239,68,68,${1 - lifeRatio})`;
-        aimCtx.lineWidth = 3;
-        aimCtx.stroke();
-        // Outer glow
-        aimCtx.beginPath();
-        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius + 4, 0, Math.PI * 2);
-        aimCtx.fillStyle = 'rgba(255, 100, 50, 0.15)';
-        aimCtx.fill();
-
-        // Main circle
-        aimCtx.beginPath();
-        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius, 0, Math.PI * 2);
-        aimCtx.fillStyle = aimTarget.color;
-        aimCtx.fill();
-
-        // Inner ring
-        aimCtx.beginPath();
-        aimCtx.arc(aimTarget.x, aimTarget.y, aimTarget.radius * 0.5, 0, Math.PI * 2);
-        aimCtx.strokeStyle = 'rgba(255,255,255,0.5)';
-        aimCtx.lineWidth = 2;
-        aimCtx.stroke();
-
-        // Bullseye dot
-        aimCtx.beginPath();
-        aimCtx.arc(aimTarget.x, aimTarget.y, 3, 0, Math.PI * 2);
-        aimCtx.fillStyle = '#fff';
-        aimCtx.fill();
-
-        // Points label
-        const pts = getAimPoints(aimTarget.radius);
-        aimCtx.fillStyle = '#fff';
-        aimCtx.font = 'bold 11px sans-serif';
-        aimCtx.textAlign = 'center';
-        aimCtx.fillText(`+${pts}`, aimTarget.x, aimTarget.y - aimTarget.radius - 8);
-    }
-
-    // Draw hit animations
-    aimAnimations = aimAnimations.filter(a => {
-        const elapsed = Date.now() - a.time;
-        if (elapsed > 400) return false;
-        const alpha = 1 - elapsed / 400;
-        const expand = a.radius + elapsed * 0.15;
-
-        aimCtx.beginPath();
-        aimCtx.arc(a.x, a.y, expand, 0, Math.PI * 2);
-        aimCtx.strokeStyle = a.hit ? `rgba(74,222,128,${alpha})` : `rgba(239,68,68,${alpha})`;
-        aimCtx.lineWidth = 3;
-        aimCtx.stroke();
-
-        if (a.hit) {
-            aimCtx.fillStyle = `rgba(74,222,128,${alpha})`;
-            aimCtx.font = `bold ${14 + elapsed * 0.03}px sans-serif`;
-            aimCtx.textAlign = 'center';
-            aimCtx.fillText(`+${a.points}`, a.x, a.y - expand - 5);
-        }
-        return true;
-    });
-
-    if (aimGameActive) {
-        requestAnimationFrame(drawAimGame);
-    }
-}
-
-window.startAimGame = function () {
-    aimCanvas = document.getElementById('aimCanvas');
-    aimCtx = aimCanvas.getContext('2d');
-
-    aimScore = 0;
-    aimTimeLeft = 30;
-    aimHits = 0;
-    aimMisses = 0;
-    aimGameActive = true;
-    aimAnimations = [];
-
-    document.getElementById('aimScore').textContent = aimScore;
-    document.getElementById('aimTimer').textContent = aimTimeLeft;
-    document.getElementById('aimAccuracy').textContent = '0%';
-    document.getElementById('aimGameOverOverlay').classList.add('hidden');
-
-    spawnAimTarget();
-
-    if (aimTimerInterval) clearInterval(aimTimerInterval);
-    aimTimerInterval = setInterval(() => {
-        aimTimeLeft--;
-        document.getElementById('aimTimer').textContent = aimTimeLeft;
-
-        if (aimTimeLeft <= 0) {
-            clearInterval(aimTimerInterval);
-            aimGameActive = false;
-
-            const accuracy = aimHits + aimMisses > 0 ? Math.round((aimHits / (aimHits + aimMisses)) * 100) : 0;
-            document.getElementById('aimFinalScore').textContent = aimScore;
-            document.getElementById('aimFinalAccuracy').textContent = accuracy + '%';
-            document.getElementById('aimGameOverOverlay').classList.remove('hidden');
-
-            checkAndSaveScore('aim', aimScore, true);
-        }
-    }, 1000);
-
-    drawAimGame();
-}
-
-// Handle clicks on canvas
-document.addEventListener('DOMContentLoaded', function () {
-    const setupAimCanvas = () => {
-        const canvas = document.getElementById('aimCanvas');
-        if (!canvas) return;
-
-        canvas.addEventListener('click', function (e) {
-            if (!aimGameActive || !aimTarget) return;
-
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const clickX = (e.clientX - rect.left) * scaleX;
-            const clickY = (e.clientY - rect.top) * scaleY;
-
-            const dist = Math.sqrt((clickX - aimTarget.x) ** 2 + (clickY - aimTarget.y) ** 2);
-
-            if (dist <= aimTarget.radius) {
-                // HIT!
-                const points = getAimPoints(aimTarget.radius);
-                aimScore += points;
-                aimHits++;
-                aimAnimations.push({ x: aimTarget.x, y: aimTarget.y, radius: aimTarget.radius, time: Date.now(), hit: true, points });
-
-                document.getElementById('aimScore').textContent = aimScore;
-                spawnAimTarget();
-            } else {
-                // MISS — penalty!
-                aimMisses++;
-                aimScore = Math.max(0, aimScore - AIM_MISS_PENALTY);
-                document.getElementById('aimScore').textContent = aimScore;
-                aimAnimations.push({ x: clickX, y: clickY, radius: 10, time: Date.now(), hit: false, points: 0 });
-            }
-
-            // Update accuracy
-            const accuracy = aimHits + aimMisses > 0 ? Math.round((aimHits / (aimHits + aimMisses)) * 100) : 0;
-            document.getElementById('aimAccuracy').textContent = accuracy + '%';
-        });
-    };
-    setupAimCanvas();
-});
-// #endregion
-
-// #region 🔒 FLAPPY BIRD GAME
-// ========================================
-// 🐦 Flappy Bird Game Logic
-// ========================================
-let flappyCanvas, flappyCtx;
-let flappyInterval;
-let flappyGameActive = false;
-let flappyGameOver = false;
-let flappyStarted = false;
-let flappyScore = 0;
-let flappyLastTime = 0;
-let flappyAnimFrame = null;
-
-// Level System
-let flappyLevel = 'medium';
-const flappyLevels = {
-    easy: { gravity: 0.25, flapForce: -5.5, pipeSpeed: 1.8, pipeGap: 175, pipeInterval: 110, color: '#4ade80', label: 'Easy — Slow & Wide' },
-    medium: { gravity: 0.35, flapForce: -6.5, pipeSpeed: 2.5, pipeGap: 145, pipeInterval: 90, color: '#facc15', label: 'Medium — Normal' },
-    hard: { gravity: 0.50, flapForce: -8.0, pipeSpeed: 4.0, pipeGap: 110, pipeInterval: 65, color: '#f87171', label: 'Hard — Fast & Tight 🔥' }
-};
-
-const bird = { x: 80, y: 250, width: 30, height: 24, velocity: 0, gravity: 0.35, flapForce: -6.5 };
-let pipes = [];
-const PIPE_WIDTH = 50;
-let currentPipeGap = 145;
-let currentPipeSpeed = 2.5;
-let currentPipeInterval = 90;
-let pipeTimer = 0;
-
-function resetBird() {
-    bird.y = 250;
-    bird.velocity = 0;
-    pipes = [];
-    pipeTimer = 0;
-}
-
-window.setFlappyLevel = function (level) {
-    flappyLevel = level;
-    const info = flappyLevels[level];
-
-    // Update UI highlights
-    ['flappyEasyBtn', 'flappyMediumBtn', 'flappyHardBtn'].forEach(id => {
-        document.getElementById(id).classList.remove('ring-2', 'ring-green-400', 'ring-yellow-400', 'ring-red-400');
-        document.getElementById(id).classList.add('ring-0');
-    });
-
-    const btnId = level === 'easy' ? 'flappyEasyBtn' : level === 'medium' ? 'flappyMediumBtn' : 'flappyHardBtn';
-    const ringColor = level === 'easy' ? 'ring-green-400' : level === 'medium' ? 'ring-yellow-400' : 'ring-red-400';
-    document.getElementById(btnId).classList.remove('ring-0');
-    document.getElementById(btnId).classList.add('ring-2', ringColor);
-
-    const infoElem = document.getElementById('flappyLevelInfo');
-    infoElem.textContent = info.label;
-    infoElem.style.color = info.color;
-
-    // Auto-restart
-    window.startFlappyGame();
-}
-
-window.flappyFlap = function () {
-    if (flappyGameOver) return;
-    if (!flappyStarted) {
-        flappyStarted = true;
-        document.getElementById('flappyStartOverlay').classList.add('hidden');
-    }
-    bird.velocity = bird.flapForce;
-}
-
-window.startFlappyGame = function () {
-    flappyCanvas = document.getElementById('flappyCanvas');
-    flappyCtx = flappyCanvas.getContext('2d');
-
-    const levelConfig = flappyLevels[flappyLevel];
-
-    // Apply level settings
-    bird.gravity = levelConfig.gravity;
-    bird.flapForce = levelConfig.flapForce;
-    currentPipeSpeed = levelConfig.pipeSpeed;
-    currentPipeGap = levelConfig.pipeGap;
-    currentPipeInterval = levelConfig.pipeInterval;
-
-    flappyScore = 0;
-    flappyGameOver = false;
-    flappyGameActive = true;
-    flappyStarted = false;
-    flappyLastTime = 0;
-    resetBird();
-
-    document.getElementById('flappyScore').textContent = 0;
-    document.getElementById('flappyGameOverOverlay').classList.add('hidden');
-    document.getElementById('flappyStartOverlay').classList.remove('hidden');
-
-    if (flappyAnimFrame) cancelAnimationFrame(flappyAnimFrame);
-    flappyAnimFrame = requestAnimationFrame(flappyGameLoop);
-}
-
-function flappyGameLoop(timestamp) {
-    if (!flappyGameActive) return;
-    if (!flappyLastTime) flappyLastTime = timestamp;
-    const delta = Math.min((timestamp - flappyLastTime) / 16.67, 2); // normalize to ~60fps, cap at 2x
-    flappyLastTime = timestamp;
-
-    drawFlappyGame(delta);
-
-    if (flappyGameActive && !flappyGameOver) {
-        flappyAnimFrame = requestAnimationFrame(flappyGameLoop);
-    }
-}
-
-function drawFlappyGame(delta) {
-    if (!flappyCtx) return;
-    const d = delta || 1;
-    const W = flappyCanvas.width;
-    const H = flappyCanvas.height;
-
-    // Sky gradient background
-    const grad = flappyCtx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#0c4a6e');
-    grad.addColorStop(1, '#164e63');
-    flappyCtx.fillStyle = grad;
-    flappyCtx.fillRect(0, 0, W, H);
-
-    // Ground
-    flappyCtx.fillStyle = '#854d0e';
-    flappyCtx.fillRect(0, H - 30, W, 30);
-    flappyCtx.fillStyle = '#65a30d';
-    flappyCtx.fillRect(0, H - 30, W, 6);
-
-    if (flappyStarted && !flappyGameOver) {
-        // Gravity with delta-time
-        bird.velocity += bird.gravity * d;
-        bird.y += bird.velocity * d;
-
-        // Pipes
-        pipeTimer++;
-        if (pipeTimer > currentPipeInterval) {
-            pipeTimer = 0;
-            const topHeight = 60 + Math.random() * (H - currentPipeGap - 120);
-            pipes.push({ x: W, topHeight, passed: false });
-        }
-
-        for (let i = pipes.length - 1; i >= 0; i--) {
-            pipes[i].x -= currentPipeSpeed * d;
-
-            // Score when passed
-            if (!pipes[i].passed && pipes[i].x + PIPE_WIDTH < bird.x) {
-                pipes[i].passed = true;
-                flappyScore++;
-                document.getElementById('flappyScore').textContent = flappyScore;
-            }
-
-            // Remove off-screen pipes
-            if (pipes[i].x + PIPE_WIDTH < 0) {
-                pipes.splice(i, 1);
-            }
-        }
-
-        // Collision detection
-        const birdTop = bird.y;
-        const birdBot = bird.y + bird.height;
-        const birdRight = bird.x + bird.width;
-
-        // Floor/ceiling
-        if (birdBot >= H - 30 || birdTop <= 0) {
-            endFlappyGame();
-        }
-
-        // Pipe collision
-        for (const pipe of pipes) {
-            if (birdRight > pipe.x && bird.x < pipe.x + PIPE_WIDTH) {
-                if (birdTop < pipe.topHeight || birdBot > pipe.topHeight + currentPipeGap) {
-                    endFlappyGame();
-                }
-            }
-        }
-    }
-
-    // Draw pipes
-    for (const pipe of pipes) {
-        // Top pipe
-        flappyCtx.fillStyle = '#16a34a';
-        flappyCtx.fillRect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
-        flappyCtx.fillStyle = '#15803d';
-        flappyCtx.fillRect(pipe.x - 4, pipe.topHeight - 20, PIPE_WIDTH + 8, 20);
-
-        // Bottom pipe
-        const bottomY = pipe.topHeight + currentPipeGap;
-        flappyCtx.fillStyle = '#16a34a';
-        flappyCtx.fillRect(pipe.x, bottomY, PIPE_WIDTH, H - bottomY - 30);
-        flappyCtx.fillStyle = '#15803d';
-        flappyCtx.fillRect(pipe.x - 4, bottomY, PIPE_WIDTH + 8, 20);
-    }
-
-    // Draw bird
-    flappyCtx.fillStyle = '#facc15';
-    flappyCtx.beginPath();
-    const angle = Math.min(Math.max(bird.velocity * 3, -30), 60) * Math.PI / 180;
-    flappyCtx.save();
-    flappyCtx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
-    flappyCtx.rotate(angle);
-    flappyCtx.ellipse(0, 0, bird.width / 2, bird.height / 2, 0, 0, Math.PI * 2);
-    flappyCtx.fill();
-
-    // Eye
-    flappyCtx.fillStyle = '#fff';
-    flappyCtx.beginPath();
-    flappyCtx.arc(8, -4, 5, 0, Math.PI * 2);
-    flappyCtx.fill();
-    flappyCtx.fillStyle = '#000';
-    flappyCtx.beginPath();
-    flappyCtx.arc(9, -4, 2.5, 0, Math.PI * 2);
-    flappyCtx.fill();
-
-    // Beak
-    flappyCtx.fillStyle = '#f97316';
-    flappyCtx.beginPath();
-    flappyCtx.moveTo(bird.width / 2, 0);
-    flappyCtx.lineTo(bird.width / 2 + 10, 3);
-    flappyCtx.lineTo(bird.width / 2, 6);
-    flappyCtx.closePath();
-    flappyCtx.fill();
-    flappyCtx.restore();
-
-    // Score display on canvas
-    flappyCtx.fillStyle = '#fff';
-    flappyCtx.font = 'bold 36px sans-serif';
-    flappyCtx.textAlign = 'center';
-    flappyCtx.fillText(flappyScore, W / 2, 50);
-}
-
-function endFlappyGame() {
-    flappyGameOver = true;
-    if (flappyAnimFrame) cancelAnimationFrame(flappyAnimFrame);
-    flappyGameActive = false;
-
-    document.getElementById('flappyFinalScore').textContent = flappyScore;
-    document.getElementById('flappyGameOverOverlay').classList.remove('hidden');
-
-    checkAndSaveScore('flappy', flappyScore, true);
-}
-
-// Keyboard support for Flappy
-document.addEventListener('keydown', function (e) {
-    const overlay = document.getElementById('flappyGameOverlay');
-    if (!overlay || !overlay.classList.contains('active')) return;
-    if (e.code === 'Space') {
-        e.preventDefault();
-        window.flappyFlap();
-    }
-});
-// #endregion
-
-// #region 🔒 COLOR MATCH GAME
-// ========================================
-// 🎨 Color Match Game Logic
-// ========================================
-let colorMatchTimerInterval;
-let colorMatchActive = false;
-let colorMatchScore = 0;
-let colorMatchTimeLeft = 30;
-let colorMatchHits = 0;
-let colorMatchMisses = 0;
-let colorMatchStreak = 0;
-let currentColorAnswer = '';
-
-const CM_COLORS = [
-    { name: 'red', hex: '#ef4444' },
-    { name: 'blue', hex: '#3b82f6' },
-    { name: 'green', hex: '#22c55e' },
-    { name: 'yellow', hex: '#eab308' }
-];
-
-function generateColorMatchRound() {
-    // Pick a random WORD (text content)
-    const wordColor = CM_COLORS[Math.floor(Math.random() * CM_COLORS.length)];
-    // Pick a DIFFERENT display color
-    let displayColor;
-    do {
-        displayColor = CM_COLORS[Math.floor(Math.random() * CM_COLORS.length)];
-    } while (displayColor.name === wordColor.name);
-
-    currentColorAnswer = displayColor.name; // correct answer is the DISPLAY color
-
-    const wordElem = document.getElementById('colorWord');
-    wordElem.textContent = wordColor.name.toUpperCase();
-    wordElem.style.color = displayColor.hex;
-    wordElem.style.textShadow = `0 0 30px ${displayColor.hex}40`;
-}
-
-window.pickColor = function (colorName) {
-    if (!colorMatchActive) return;
-
-    if (colorName === currentColorAnswer) {
-        // CORRECT!
-        colorMatchHits++;
-        colorMatchStreak++;
-        const streakBonus = colorMatchStreak >= 3 ? 2 : 1;
-        colorMatchScore += 10 * streakBonus;
-
-        // Flash green on word
-        const wordElem = document.getElementById('colorWord');
-        wordElem.style.textShadow = '0 0 40px #22c55e';
-        setTimeout(() => { wordElem.style.textShadow = `0 0 30px ${currentColorAnswer}40`; }, 150);
-    } else {
-        // WRONG!
-        colorMatchMisses++;
-        colorMatchStreak = 0;
-        colorMatchScore = Math.max(0, colorMatchScore - 5);
-
-        // Flash red
-        const wordElem = document.getElementById('colorWord');
-        wordElem.style.textShadow = '0 0 40px #ef4444';
-        setTimeout(() => { wordElem.style.textShadow = `0 0 30px ${currentColorAnswer}40`; }, 150);
-    }
-
-    document.getElementById('colorMatchScore').textContent = colorMatchScore;
-    document.getElementById('colorMatchStreak').textContent = colorMatchStreak;
-    generateColorMatchRound();
-}
-
-window.startColorMatchGame = function () {
-    colorMatchScore = 0;
-    colorMatchTimeLeft = 30;
-    colorMatchHits = 0;
-    colorMatchMisses = 0;
-    colorMatchStreak = 0;
-    colorMatchActive = true;
-
-    document.getElementById('colorMatchScore').textContent = 0;
-    document.getElementById('colorMatchTimer').textContent = 30;
-    document.getElementById('colorMatchStreak').textContent = 0;
-    document.getElementById('colorMatchGameOver').classList.add('hidden');
-
-    generateColorMatchRound();
-
-    if (colorMatchTimerInterval) clearInterval(colorMatchTimerInterval);
-    colorMatchTimerInterval = setInterval(() => {
-        colorMatchTimeLeft--;
-        document.getElementById('colorMatchTimer').textContent = colorMatchTimeLeft;
-
-        if (colorMatchTimeLeft <= 0) {
-            clearInterval(colorMatchTimerInterval);
-            colorMatchActive = false;
-
-            const accuracy = colorMatchHits + colorMatchMisses > 0 ? Math.round((colorMatchHits / (colorMatchHits + colorMatchMisses)) * 100) : 0;
-            document.getElementById('colorMatchFinalScore').textContent = colorMatchScore;
-            document.getElementById('colorMatchFinalAccuracy').textContent = accuracy + '%';
-            document.getElementById('colorMatchGameOver').classList.remove('hidden');
-
-            checkAndSaveScore('colormatch', colorMatchScore, true);
-        }
-    }, 1000);
-}
-// #endregion
 
 // ========================================
 // 🚀 Quick Links - Open All Regular Links
@@ -15702,7 +14529,7 @@ window.openQuickLinks = function () {
 (function () {
     'use strict';
 
-    const CW = 480, CH = 600;
+    let CW = 480, CH = 600;
     let canvas, ctx, animFrame;
     let gameRunning = false;
     let score, lives, currentLevel, kills, highScore;
@@ -15765,6 +14592,8 @@ window.openQuickLinks = function () {
     let magnetEnd = 0;
     let enemySpawnTimer = 0;
     let waveEnemiesLeft = 0;
+    let waveEnemiesTotal = 0;
+    let waveResolved = 0;
     let waveTransition = 0;
     let frameCount = 0;
 
@@ -15779,6 +14608,22 @@ window.openQuickLinks = function () {
         { score: 12000, name: 'Air Marshal' },
         { score: 20000, name: 'Supreme Commander' }
     ];
+    const AIRFORCE_THEMES = [
+        { name: 'Dawn Breaker', mission: 'Pierce the low-cloud patrol line.', skyTop: '#061626', skyBottom: '#144a74', accent: '#38bdf8', secondary: '#8b5cf6', star: '#dbeafe', haze: 'rgba(56,189,248,0.18)' },
+        { name: 'Solar Drift', mission: 'Slide through a blazing sunrise canyon.', skyTop: '#2a1304', skyBottom: '#8a3412', accent: '#fb923c', secondary: '#facc15', star: '#fde68a', haze: 'rgba(251,146,60,0.16)' },
+        { name: 'Ion Stream', mission: 'Cut across an electric storm front.', skyTop: '#07172f', skyBottom: '#1d4ed8', accent: '#60a5fa', secondary: '#22d3ee', star: '#dbeafe', haze: 'rgba(34,211,238,0.16)' },
+        { name: 'Crimson Run', mission: 'Break a hostile red alert blockade.', skyTop: '#22070c', skyBottom: '#7f1d1d', accent: '#fb7185', secondary: '#f97316', star: '#ffe4e6', haze: 'rgba(251,113,133,0.16)' },
+        { name: 'Nebula Crown', mission: 'Hold formation inside a violet nebula.', skyTop: '#180530', skyBottom: '#5b21b6', accent: '#a78bfa', secondary: '#f472b6', star: '#ede9fe', haze: 'rgba(167,139,250,0.18)' },
+        { name: 'Tempest Core', mission: 'Thread a volatile thunder corridor.', skyTop: '#06131f', skyBottom: '#0f766e', accent: '#2dd4bf', secondary: '#38bdf8', star: '#ccfbf1', haze: 'rgba(45,212,191,0.16)' },
+        { name: 'Night Raid', mission: 'Engage stealth craft in blackout airspace.', skyTop: '#020617', skyBottom: '#172554', accent: '#818cf8', secondary: '#38bdf8', star: '#cbd5e1', haze: 'rgba(129,140,248,0.15)' },
+        { name: 'Aurora Spear', mission: 'Drive through polar curtains and split the fleet.', skyTop: '#042f2e', skyBottom: '#0f766e', accent: '#5eead4', secondary: '#93c5fd', star: '#d1fae5', haze: 'rgba(94,234,212,0.18)' },
+        { name: 'Voidfall', mission: 'Survive the dark-sky gauntlet.', skyTop: '#020617', skyBottom: '#111827', accent: '#f472b6', secondary: '#a78bfa', star: '#e5e7eb', haze: 'rgba(244,114,182,0.14)' },
+        { name: 'Crown Siege', mission: 'Destroy the command armada and own the sky.', skyTop: '#140c1f', skyBottom: '#3b0764', accent: '#facc15', secondary: '#38bdf8', star: '#fef3c7', haze: 'rgba(250,204,21,0.18)' }
+    ];
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
 
     function getRank(s) {
         let r = RANKS[0].name;
@@ -15786,6 +14631,43 @@ window.openQuickLinks = function () {
             if (s >= RANKS[i].score) r = RANKS[i].name;
         }
         return r;
+    }
+
+    function getAirforceTheme(level) {
+        return AIRFORCE_THEMES[Math.max(0, Math.min(AIRFORCE_THEMES.length - 1, level - 1))];
+    }
+
+    function updateAirforceThemeUI() {
+        const theme = getAirforceTheme(currentLevel);
+        const canvasEl = document.getElementById('airforceCanvas');
+        const themeNameEl = document.getElementById('airforceThemeName');
+        const sectorLabelEl = document.getElementById('airforceSectorLabel');
+        const missionTextEl = document.getElementById('airforceMissionText');
+        const progressLabelEl = document.getElementById('airforceProgressLabel');
+        const progressBarEl = document.getElementById('airforceProgressBar');
+        const boostsEl = document.getElementById('airforceBoosts');
+
+        if (canvasEl) {
+            canvasEl.style.borderColor = theme.accent;
+            canvasEl.style.boxShadow = `0 24px 70px ${theme.haze}`;
+        }
+        if (themeNameEl) themeNameEl.textContent = theme.name;
+        if (sectorLabelEl) sectorLabelEl.textContent = `Sector ${currentLevel} / 10`;
+        if (missionTextEl) missionTextEl.textContent = theme.mission;
+        if (progressLabelEl) progressLabelEl.textContent = `${waveResolved} / ${waveEnemiesTotal}`;
+        if (progressBarEl) {
+            const progress = waveEnemiesTotal ? Math.min(100, (waveResolved / waveEnemiesTotal) * 100) : 0;
+            progressBarEl.style.width = `${progress}%`;
+            progressBarEl.style.background = `linear-gradient(90deg, ${theme.accent}, ${theme.secondary})`;
+        }
+        if (boostsEl) {
+            const states = [];
+            const now = Date.now();
+            if (shieldEnd > now) states.push(`Shield ${Math.ceil((shieldEnd - now) / 1000)}s`);
+            if (rapidFireEnd > now) states.push(`Rapid ${Math.ceil((rapidFireEnd - now) / 1000)}s`);
+            if (magnetEnd > now) states.push(`Magnet ${Math.ceil((magnetEnd - now) / 1000)}s`);
+            boostsEl.textContent = states.length ? states.join(' | ') : 'Weapons nominal';
+        }
     }
 
     // Colors
@@ -15805,13 +14687,16 @@ window.openQuickLinks = function () {
 
     // Init stars for scrolling background
     function initStars() {
+        const theme = getAirforceTheme(currentLevel);
         stars = [];
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 90; i++) {
             stars.push({
                 x: Math.random() * CW,
                 y: Math.random() * CH,
                 s: Math.random() * 2 + 0.5,
-                speed: Math.random() * 2 + 0.5
+                speed: Math.random() * 1.45 + 0.5,
+                alpha: Math.random() * 0.5 + 0.25,
+                tint: theme.star
             });
         }
     }
@@ -15819,6 +14704,7 @@ window.openQuickLinks = function () {
     function updateStars() {
         for (let i = 0; i < stars.length; i++) {
             stars[i].y += stars[i].speed;
+            stars[i].x += Math.sin((frameCount + i * 7) * 0.01) * 0.06;
             if (stars[i].y > CH) {
                 stars[i].y = 0;
                 stars[i].x = Math.random() * CW;
@@ -15827,11 +14713,28 @@ window.openQuickLinks = function () {
     }
 
     function drawStars() {
+        const theme = getAirforceTheme(currentLevel);
+        const gradient = ctx.createLinearGradient(0, 0, 0, CH);
+        gradient.addColorStop(0, theme.skyTop);
+        gradient.addColorStop(1, theme.skyBottom);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, CW, CH);
+
+        ctx.fillStyle = theme.haze;
+        ctx.beginPath();
+        ctx.arc(CW * 0.25, 110, 90 + Math.sin(frameCount * 0.02) * 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(CW * 0.78, 180, 130 + Math.cos(frameCount * 0.015) * 10, 0, Math.PI * 2);
+        ctx.fill();
+
         for (let i = 0; i < stars.length; i++) {
             let s = stars[i];
-            ctx.fillStyle = `rgba(255,255,255,${0.3 + s.s * 0.2})`;
+            ctx.fillStyle = s.tint || theme.star;
+            ctx.globalAlpha = s.alpha || (0.3 + s.s * 0.2);
             ctx.fillRect(s.x, s.y, s.s, s.s);
         }
+        ctx.globalAlpha = 1;
     }
 
     // Player
@@ -15841,7 +14744,7 @@ window.openQuickLinks = function () {
             y: CH - 70,
             w: 36,
             h: 40,
-            speed: 5,
+            speed: 3.55,
             invincible: 0
         };
     }
@@ -15924,19 +14827,30 @@ window.openQuickLinks = function () {
     // Bullets
     function shoot() {
         let rapid = rapidFireEnd > Date.now();
-        let bSpeed = -10;
+        let bSpeed = -6.6;
         bullets.push({ x: player.x, y: player.y - 22, w: 3, h: 10, speed: bSpeed, type: 'player' });
         if (rapid) {
             bullets.push({ x: player.x - 10, y: player.y - 15, w: 3, h: 8, speed: bSpeed, type: 'player' });
             bullets.push({ x: player.x + 10, y: player.y - 15, w: 3, h: 8, speed: bSpeed, type: 'player' });
         }
+        if (bullets.length > 220) bullets.splice(0, bullets.length - 220);
         playAirforceSound('shoot');
     }
 
     function updateBullets() {
         for (let i = bullets.length - 1; i >= 0; i--) {
             let b = bullets[i];
-            b.y += b.speed;
+            if (b.type === 'enemy') {
+                if (b.trail) {
+                    b.trail.unshift({ x: b.x, y: b.y });
+                    if (b.trail.length > 6) b.trail.pop();
+                }
+                b.pulse = (b.pulse || 0) + 0.22;
+                b.x += b.vx || 0;
+                b.y += b.vy !== undefined ? b.vy : b.speed;
+            } else {
+                b.y += b.speed;
+            }
             if (b.y < -10 || b.y > CH + 10 || b.x < -10 || b.x > CW + 10) {
                 bullets.splice(i, 1);
             }
@@ -15953,24 +14867,49 @@ window.openQuickLinks = function () {
                 ctx.fillRect(b.x - b.w / 2, b.y, b.w, b.h);
                 ctx.shadowBlur = 0;
             } else {
-                ctx.fillStyle = COLORS.enemyBullet;
+                const radius = b.radius || 5;
+                const dangerColor = b.color || '#fb7185';
+                const outerColor = b.outerColor || '#f97316';
+                if (b.trail && b.trail.length > 1) {
+                    for (let t = 0; t < b.trail.length; t++) {
+                        const node = b.trail[t];
+                        const alpha = (1 - t / b.trail.length) * 0.35;
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, Math.max(1.2, radius - t * 0.7), 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(251, 113, 133, ${alpha})`;
+                        ctx.fill();
+                    }
+                }
+                ctx.shadowColor = outerColor;
+                ctx.shadowBlur = 14;
+                ctx.fillStyle = outerColor;
                 ctx.beginPath();
-                ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+                ctx.arc(b.x, b.y, radius + 1.8 + Math.sin(b.pulse || 0) * 0.8, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = dangerColor;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, Math.max(2, radius - 1.8), 0, Math.PI * 2);
+                ctx.stroke();
             }
         }
     }
 
     // Enemies
-    const LEVEL_SPEED_MULT = [0, 0.4, 0.7, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4]; // Level 1-10 speed multipliers
-    const LEVEL_SPAWN_MULT = [0, 1.6, 1.3, 1.0, 0.85, 0.7, 0.6, 0.5, 0.45, 0.4, 0.35]; // Level 1-10 spawn rate multipliers
+    const LEVEL_SPEED_MULT = [0, 0.36, 0.43, 0.5, 0.57, 0.63, 0.69, 0.75, 0.81, 0.87, 0.93]; // roughly 50% overall pace
+    const LEVEL_SPAWN_MULT = [0, 2.84, 2.48, 2.16, 1.88, 1.64, 1.44, 1.28, 1.12, 1.0, 0.88]; // slower wave pacing
 
     function spawnEnemy() {
         let types = ['fighter', 'bomber'];
-        if (currentLevel >= 2) types.push('kamikaze');
-        if (currentLevel >= 3) types.push('stealth');
-        if (currentLevel >= 4) types.push('stealth', 'kamikaze');
-        if (currentLevel >= 5 && Math.random() < (0.05 + currentLevel * 0.02)) types.push('boss');
+        if (currentLevel >= 3) types.push('kamikaze');
+        if (currentLevel >= 4) types.push('stealth');
+        if (currentLevel >= 6) types.push('stealth', 'kamikaze');
+        if (currentLevel >= 8 && Math.random() < (0.035 + currentLevel * 0.016)) types.push('boss');
 
         let type = types[Math.floor(Math.random() * types.length)];
         let mult = LEVEL_SPEED_MULT[currentLevel];
@@ -15983,7 +14922,9 @@ window.openQuickLinks = function () {
             shootTimer: 0,
             w: 28,
             h: 28,
-            angle: 0
+            angle: 0,
+            drift: 0.65 + Math.random() * 1.15,
+            phase: Math.random() * Math.PI * 2
         };
 
         if (type === 'bomber') { e.hp = 3; e.speed = 1 * mult; e.w = 34; e.h = 34; }
@@ -16004,44 +14945,67 @@ window.openQuickLinks = function () {
                 let dx = player.x - e.x;
                 let dy = player.y - e.y;
                 let dist = Math.sqrt(dx * dx + dy * dy) || 1;
-                e.x += (dx / dist) * e.speed;
+                e.x += (dx / dist) * Math.min(e.speed, 3.6);
                 e.y += (dy / dist) * e.speed;
                 e.angle = Math.atan2(dy, dx) + Math.PI / 2;
             } else if (e.type === 'stealth') {
                 // Zigzag
                 e.y += e.speed;
-                e.x += Math.sin(frameCount * 0.05 + i) * 2;
+                e.x += Math.sin(frameCount * 0.05 + e.phase) * (1.6 + e.drift);
             } else {
                 e.y += e.speed;
-                e.x += Math.sin(frameCount * 0.02 + i * 2) * 1;
+                e.x += Math.sin(frameCount * 0.02 + e.phase) * e.drift;
             }
+
+            const edgePadding = e.w / 2 + 8;
+            e.x = clamp(e.x, edgePadding, CW - edgePadding);
 
             // Enemy shooting (not kamikaze)
             if (e.type !== 'kamikaze' && e.y > 50 && e.y < CH - 100) {
                 e.shootTimer++;
-                let fireRate = e.type === 'boss' ? 30 : (e.type === 'bomber' ? 80 : 120);
+                let fireRate = e.type === 'boss' ? 56 : (e.type === 'bomber' ? 140 : 192);
                 if (e.shootTimer >= fireRate) {
                     e.shootTimer = 0;
                     let dx2 = player.x - e.x;
                     let dy2 = player.y - e.y;
                     let d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2) || 1;
+                    const enemyShotSpeed = (e.type === 'boss' ? 2.75 : (e.type === 'bomber' ? 2.225 : 1.9)) + currentLevel * 0.045;
+                    const bulletRadius = e.type === 'boss' ? 6 : (e.type === 'bomber' ? 5 : 4);
                     bullets.push({
-                        x: e.x, y: e.y + e.h / 2, w: 4, h: 4,
-                        speed: 4,
-                        vx: (dx2 / d2) * 4,
-                        vy: (dy2 / d2) * 4,
+                        x: e.x,
+                        y: e.y + e.h / 2,
+                        w: bulletRadius * 2,
+                        h: bulletRadius * 2,
+                        speed: enemyShotSpeed,
+                        vx: (dx2 / d2) * enemyShotSpeed,
+                        vy: (dy2 / d2) * enemyShotSpeed,
+                        radius: bulletRadius,
+                        pulse: Math.random() * Math.PI * 2,
+                        trail: [],
+                        color: e.type === 'boss' ? '#f43f5e' : '#fb7185',
+                        outerColor: e.type === 'boss' ? '#f97316' : '#fb923c',
                         type: 'enemy'
                     });
                     if (e.type === 'boss') {
                         // Boss shoots triple
-                        bullets.push({ x: e.x - 15, y: e.y + e.h / 2, w: 4, h: 4, speed: 4, vx: 0, vy: 4, type: 'enemy' });
-                        bullets.push({ x: e.x + 15, y: e.y + e.h / 2, w: 4, h: 4, speed: 4, vx: 0, vy: 4, type: 'enemy' });
+                        bullets.push({
+                            x: e.x - 15, y: e.y + e.h / 2, w: 12, h: 12, speed: 4.7, vx: -0.8, vy: 4.6,
+                            radius: 5.2, pulse: Math.random() * Math.PI * 2, trail: [],
+                            color: '#fb7185', outerColor: '#facc15', type: 'enemy'
+                        });
+                        bullets.push({
+                            x: e.x + 15, y: e.y + e.h / 2, w: 12, h: 12, speed: 4.7, vx: 0.8, vy: 4.6,
+                            radius: 5.2, pulse: Math.random() * Math.PI * 2, trail: [],
+                            color: '#fb7185', outerColor: '#facc15', type: 'enemy'
+                        });
                     }
+                    if (bullets.length > 220) bullets.splice(0, bullets.length - 220);
                 }
             }
 
             // Remove if off screen
-            if (e.y > CH + 50 || e.x < -60 || e.x > CW + 60) {
+            if (e.y > CH + 50) {
+                waveResolved = Math.min(waveEnemiesTotal, waveResolved + 1);
                 enemies.splice(i, 1);
             }
         }
@@ -16120,7 +15084,7 @@ window.openQuickLinks = function () {
             ctx.stroke();
             // HP bar
             let hpW = 40;
-            let maxHp = 10 + wave * 2;
+            let maxHp = 10 + currentLevel * 4;
             ctx.fillStyle = '#374151';
             ctx.fillRect(ex - hpW / 2, ey - 35, hpW, 4);
             ctx.fillStyle = '#22c55e';
@@ -16299,7 +15263,7 @@ window.openQuickLinks = function () {
                         let pts = e.type === 'boss' ? 100 : (e.type === 'bomber' ? 30 : (e.type === 'stealth' ? 25 : 10));
                         score += pts;
                         kills++;
-                        waveEnemiesLeft--;
+                        waveResolved = Math.min(waveEnemiesTotal, waveResolved + 1);
                         spawnExplosion(e.x, e.y, e.type === 'boss' ? 30 : 12, COLORS.explosion);
                         playAirforceSound('explosion');
                         // Drop powerup chance
@@ -16320,15 +15284,10 @@ window.openQuickLinks = function () {
             for (let bi = bullets.length - 1; bi >= 0; bi--) {
                 let b = bullets[bi];
                 if (b.type !== 'enemy') continue;
-                // Update enemy bullet position with vx/vy
-                if (b.vx !== undefined) {
-                    b.x += b.vx;
-                    b.y += b.vy;
-                    b.speed = 0; // already moved by vx/vy
-                }
                 let dx = b.x - player.x;
                 let dy = b.y - player.y;
-                if (Math.abs(dx) < 14 && Math.abs(dy) < 18) {
+                const hitRadius = (b.radius || 4) + 8;
+                if ((dx * dx) + (dy * dy) < hitRadius * hitRadius) {
                     bullets.splice(bi, 1);
                     if (shieldEnd > Date.now()) {
                         shieldEnd = 0; // shield absorbs hit
@@ -16382,10 +15341,15 @@ window.openQuickLinks = function () {
     function startLevel(n) {
         currentLevel = Math.min(n, 10);
         if (n > 10) currentLevel = 10; // Stay at max level
-        waveEnemiesLeft = 10 + currentLevel * 5;
-        if (currentLevel === 10) waveEnemiesLeft += 20; // Extra enemies on final level
+        waveEnemiesLeft = 6 + currentLevel * 3;
+        if (currentLevel >= 6) waveEnemiesLeft += 1;
+        if (currentLevel === 10) waveEnemiesLeft += 10; // Extra enemies on final level
+        waveEnemiesTotal = waveEnemiesLeft;
+        waveResolved = 0;
         enemySpawnTimer = 0;
         waveTransition = 120; // 2 sec transition
+        initStars();
+        updateAirforceThemeUI();
     }
 
     function updateLevelSystem() {
@@ -16395,7 +15359,7 @@ window.openQuickLinks = function () {
         }
         if (waveEnemiesLeft > 0 || enemies.length > 0) {
             enemySpawnTimer++;
-            let baseSpawnRate = Math.max(20, 60 - currentLevel * 5);
+            let baseSpawnRate = Math.max(32, 108 - currentLevel * 8);
             let spawnRate = baseSpawnRate * LEVEL_SPAWN_MULT[currentLevel];
             if (enemySpawnTimer >= spawnRate && waveEnemiesLeft > 0) {
                 enemySpawnTimer = 0;
@@ -16407,7 +15371,7 @@ window.openQuickLinks = function () {
             if (currentLevel < 10) {
                 startLevel(currentLevel + 1);
             } else {
-                startLevel(11); // Continue at maximum difficulty
+                startLevel(10); // Stay at the final sector theme and difficulty
             }
         }
     }
@@ -16431,17 +15395,18 @@ window.openQuickLinks = function () {
         }
 
         // Top HUD bar
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        const theme = getAirforceTheme(currentLevel);
+        ctx.fillStyle = 'rgba(0,0,0,0.42)';
         ctx.fillRect(0, 0, CW, 28);
         ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#06b6d4';
+        ctx.fillStyle = theme.accent;
         ctx.fillText('Score: ' + score, 8, 18);
         ctx.fillStyle = '#ef4444';
         let hearts = '';
         for (let i = 0; i < lives; i++) hearts += '❤️';
         ctx.fillText(hearts, CW / 2 - 30, 19);
-        ctx.fillStyle = '#f97316';
+        ctx.fillStyle = theme.secondary;
         ctx.textAlign = 'right';
         ctx.fillText('LVL ' + currentLevel, CW - 8, 18);
     }
@@ -16449,13 +15414,16 @@ window.openQuickLinks = function () {
     // Update sidebar HUD
     function updateSidebarHUD() {
         let scoreEl = document.getElementById('airforceScore');
+        let highScoreEl = document.getElementById('airforceHighScore');
         let livesEl = document.getElementById('airforceLives');
         let levelEl = document.getElementById('airforceLevel');
         let rankEl = document.getElementById('airforceRank');
         if (scoreEl) scoreEl.textContent = score;
+        if (highScoreEl) highScoreEl.textContent = highScore;
         if (livesEl) livesEl.textContent = lives;
         if (levelEl) levelEl.textContent = currentLevel;
         if (rankEl) rankEl.textContent = getRank(score);
+        updateAirforceThemeUI();
     }
 
     // Game Over
@@ -16474,17 +15442,25 @@ window.openQuickLinks = function () {
 
         // Show game over overlay
         document.getElementById('airforceGameOverOverlay').classList.remove('hidden');
+        const resultTitleEl = document.getElementById('airforceResultTitle');
+        const resultSubtitleEl = document.getElementById('airforceResultSubtitle');
+        if (resultTitleEl) {
+            resultTitleEl.textContent = currentLevel >= 10 ? 'COMMAND FALLEN' : 'MISSION FAILED';
+        }
+        if (resultSubtitleEl) {
+            resultSubtitleEl.textContent = currentLevel >= 10
+                ? 'Final sector reached. Relaunch and finish the siege.'
+                : 'Regroup, relaunch, and push further into the storm.';
+        }
         document.getElementById('airforceFinalScore').textContent = score;
         document.getElementById('airforceFinalLevel').textContent = currentLevel;
         document.getElementById('airforceFinalKills').textContent = kills;
 
         // Save to Firebase leaderboard
-        try {
-            const user = JSON.parse(localStorage.getItem('loggedInUser'));
-            if (user && user.name && typeof window.saveLeaderboardScore === 'function') {
-                window.saveLeaderboardScore('airforce', user.name, score);
-            }
-        } catch (e) { }
+        const pilotName = getStoredAirforcePlayerName() || 'Player';
+        if (typeof window.saveLeaderboardScore === 'function') {
+            window.saveLeaderboardScore('airforce', pilotName, score);
+        }
 
         updateSidebarHUD();
     }
@@ -16492,9 +15468,6 @@ window.openQuickLinks = function () {
     // Main game loop
     function gameLoop() {
         if (!gameRunning) return;
-
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, CW, CH);
 
         updateStars();
         drawStars();
@@ -16504,7 +15477,7 @@ window.openQuickLinks = function () {
 
         // Auto-fire
         autoFireTimer++;
-        let fireRate = rapidFireEnd > Date.now() ? 5 : 12;
+        let fireRate = rapidFireEnd > Date.now() ? 8 : 16;
         if (autoFireTimer >= fireRate) {
             autoFireTimer = 0;
             shoot();
@@ -16535,9 +15508,23 @@ window.openQuickLinks = function () {
 
     // Start game
     window.startAirforceGame = function () {
+        const airforceNameInput = document.getElementById('airforcePlayerNameInput');
+        const airforceNameHint = document.getElementById('airforcePlayerNameHint');
+        const enteredName = airforceNameInput ? airforceNameInput.value.trim() : '';
+        if (!enteredName) {
+            if (airforceNameHint) airforceNameHint.classList.remove('hidden');
+            if (airforceNameInput) airforceNameInput.focus();
+            return;
+        }
+        if (airforceNameHint) airforceNameHint.classList.add('hidden');
+        setStoredAirforcePlayerName(enteredName);
+
         canvas = document.getElementById('airforceCanvas');
         if (!canvas) return;
         ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        CW = canvas.width;
+        CH = canvas.height;
 
         // Hide overlays
         document.getElementById('airforceGameOverOverlay').classList.add('hidden');
@@ -16560,11 +15547,10 @@ window.openQuickLinks = function () {
         powerups = [];
         keysDown = {};
 
-        highScore = parseInt(localStorage.getItem('airforceHighScore')) || 0;
+        highScore = parseInt(localStorage.getItem('airforceHighScore'), 10) || 0;
         let hsEl = document.getElementById('airforceHighScore');
         if (hsEl) hsEl.textContent = highScore;
 
-        initStars();
         startLevel(1);
 
         if (animFrame) cancelAnimationFrame(animFrame);
@@ -16593,6 +15579,23 @@ window.openQuickLinks = function () {
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('keyup', onKeyUp);
 
+    const airforceNameInput = document.getElementById('airforcePlayerNameInput');
+    const airforceNameHint = document.getElementById('airforcePlayerNameHint');
+    if (airforceNameInput) {
+        airforceNameInput.value = getStoredAirforcePlayerName();
+        airforceNameInput.addEventListener('input', function () {
+            if (airforceNameHint && airforceNameInput.value.trim()) {
+                airforceNameHint.classList.add('hidden');
+            }
+        });
+        airforceNameInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                window.startAirforceGame();
+            }
+        });
+    }
+
     // Mouse controls
     document.addEventListener('mousemove', function (e) {
         if (!gameRunning) return;
@@ -16610,8 +15613,8 @@ window.openQuickLinks = function () {
             let mx = (e.clientX - rect.left) * scaleX;
             let my = (e.clientY - rect.top) * scaleY;
 
-            player.x = Math.max(20, Math.min(CW - 20, mx));
-            player.y = Math.max(30, Math.min(CH - 30, my));
+            player.x = player.x * 0.72 + Math.max(20, Math.min(CW - 20, mx)) * 0.28;
+            player.y = player.y * 0.72 + Math.max(30, Math.min(CH - 30, my)) * 0.28;
         }
     });
 
@@ -16633,8 +15636,8 @@ window.openQuickLinks = function () {
         let t = e.touches[0];
         let dx = t.clientX - touchStartX;
         let dy = t.clientY - touchStartY;
-        player.x += dx * 0.5;
-        player.y += dy * 0.5;
+        player.x += dx * 0.35;
+        player.y += dy * 0.35;
         player.x = Math.max(20, Math.min(CW - 20, player.x));
         player.y = Math.max(30, Math.min(CH - 30, player.y));
         touchStartX = t.clientX;
@@ -16648,6 +15651,16 @@ window.openQuickLinks = function () {
             gameRunning = false;
             if (animFrame) cancelAnimationFrame(animFrame);
             keysDown = {};
+            bullets = [];
+            enemies = [];
+            particles = [];
+            powerups = [];
+            const airforceStartScreen = document.getElementById('airforceStartScreen');
+            const airforceGameOverOverlay = document.getElementById('airforceGameOverOverlay');
+            const airforceNameHint = document.getElementById('airforcePlayerNameHint');
+            if (airforceGameOverOverlay) airforceGameOverOverlay.classList.add('hidden');
+            if (airforceStartScreen) airforceStartScreen.classList.remove('hidden');
+            if (airforceNameHint) airforceNameHint.classList.add('hidden');
         }
         if (origBackToHub) origBackToHub(overlayId);
     };
@@ -17265,3 +16278,561 @@ window.openQuickLinks = function () {
     }
 })();
 // #endregion
+
+(function () {
+    const CHESS_ROOM_PREFIX = 'chessRooms';
+    const CHESS_SESSION_KEY = 'chessSessionId';
+    const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const PIECES = {
+        p: '♟', r: '♜', n: '♞', b: '♝', q: '♛', k: '♚',
+        P: '♙', R: '♖', N: '♘', B: '♗', Q: '♕', K: '♔'
+    };
+    const chessState = {
+        mode: 'host',
+        sessionId: localStorage.getItem(CHESS_SESSION_KEY) || `chess_${Math.random().toString(36).slice(2, 10)}`,
+        unsubscribe: null,
+        roomCode: '',
+        role: '',
+        roomData: null,
+        selectedSquare: null,
+        legalTargets: [],
+        audioCtx: null
+    };
+    localStorage.setItem(CHESS_SESSION_KEY, chessState.sessionId);
+
+    function getChessPlayerName() {
+        return (localStorage.getItem(CHESS_PLAYER_NAME_KEY) || '').trim();
+    }
+
+    function setChessPlayerName(name) {
+        localStorage.setItem(CHESS_PLAYER_NAME_KEY, name.trim());
+    }
+
+    function getChessInstance(fen) {
+        if (typeof Chess === 'undefined') return null;
+        return fen ? new Chess(fen) : new Chess();
+    }
+
+    function chessIsGameOver(game) {
+        return typeof game.isGameOver === 'function' ? game.isGameOver() : game.game_over();
+    }
+
+    function chessIsCheckmate(game) {
+        return typeof game.isCheckmate === 'function' ? game.isCheckmate() : game.in_checkmate();
+    }
+
+    function chessIsDraw(game) {
+        return typeof game.isDraw === 'function' ? game.isDraw() : game.in_draw();
+    }
+
+    function chessInCheck(game) {
+        return typeof game.inCheck === 'function' ? game.inCheck() : game.in_check();
+    }
+
+    function getChessRoomRef(code) {
+        return dbRef(db, `${CHESS_ROOM_PREFIX}/${code}`);
+    }
+
+    function playChessTone(type) {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            if (!chessState.audioCtx) chessState.audioCtx = new AudioCtx();
+            const ctx = chessState.audioCtx;
+            if (ctx.state === 'suspended') ctx.resume();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const tones = {
+                move: { f: 320, g: 0.03, d: 0.08 },
+                capture: { f: 220, g: 0.05, d: 0.12 },
+                alert: { f: 520, g: 0.04, d: 0.1 },
+                win: { f: 680, g: 0.05, d: 0.18 }
+            };
+            const tone = tones[type] || tones.move;
+            osc.type = type === 'capture' ? 'square' : 'triangle';
+            osc.frequency.value = tone.f;
+            gain.gain.value = tone.g;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + tone.d);
+        } catch (error) { }
+    }
+
+    function setChessNotice(text) {
+        const el = document.getElementById('chessStatusBanner');
+        if (el) el.textContent = text;
+    }
+
+    function setChessMode(mode) {
+        chessState.mode = mode;
+        document.getElementById('chessHostPanel')?.classList.toggle('hidden', mode !== 'host');
+        document.getElementById('chessJoinPanel')?.classList.toggle('hidden', mode !== 'join');
+        document.getElementById('chessHostTab')?.classList.toggle('active', mode === 'host');
+        document.getElementById('chessJoinTab')?.classList.toggle('active', mode === 'join');
+    }
+
+    function toggleChessPanels(hasRoom) {
+        document.getElementById('chessIntroPanel')?.classList.toggle('hidden', hasRoom);
+        document.getElementById('chessBoardStage')?.classList.toggle('hidden', !hasRoom);
+    }
+
+    function cleanupChessSubscription() {
+        if (typeof chessState.unsubscribe === 'function') chessState.unsubscribe();
+        chessState.unsubscribe = null;
+    }
+
+    function getChessOrientation() {
+        return chessState.role === 'guest' ? 'black' : 'white';
+    }
+
+    function inferChessRole(room) {
+        if (!room) return '';
+        if (room.host?.sessionId === chessState.sessionId) return 'host';
+        if (room.guest?.sessionId === chessState.sessionId) return 'guest';
+        if (room.guestRequest?.sessionId === chessState.sessionId) return 'guestPending';
+        return '';
+    }
+
+    function updateChessMoveFeed(room) {
+        const list = document.getElementById('chessMoveList');
+        if (!list) return;
+        const moves = Array.isArray(room?.moveLog) ? room.moveLog.slice(-8) : [];
+        list.innerHTML = '';
+        if (!moves.length) {
+            list.innerHTML = `<li>${room?.status === 'waiting' ? 'Room is waiting for both players.' : 'No moves yet.'}</li>`;
+            return;
+        }
+        moves.forEach((move, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${move.moveNo || index + 1}. ${move.san} • ${move.byName || 'Player'}`;
+            list.appendChild(li);
+        });
+    }
+
+    function updateChessSidebar(room) {
+        const status = room?.status || 'idle';
+        const pendingRequest = room?.guestRequest && room.guestRequest.status === 'pending' ? room.guestRequest : null;
+        document.getElementById('chessRoomCodeDisplay').textContent = room?.code || chessState.roomCode || '------';
+        document.getElementById('chessHostPlayerName').textContent = room?.host?.name || 'Waiting for host';
+        document.getElementById('chessGuestPlayerName').textContent = room?.guest?.name || 'No opponent yet';
+        document.getElementById('chessRoomModeChip').textContent = status === 'active' ? 'Room Active' : status === 'finished' ? 'Match Complete' : 'Lobby Ready';
+        document.getElementById('chessTurnChip').textContent = status === 'active' ? (room.currentTurn === 'b' ? 'Black to Move' : 'White to Move') : 'Waiting';
+        document.getElementById('chessMatchHeadline').textContent = status === 'active'
+            ? 'Match live'
+            : status === 'finished'
+                ? (room?.resultText || 'Match finished')
+                : chessState.role === 'host'
+                    ? 'Room live. Share the code.'
+                    : chessState.role === 'guestPending'
+                        ? 'Approval pending'
+                        : 'No live room';
+        document.getElementById('chessRoleHint').textContent = chessState.role === 'host'
+            ? 'You are hosting as White.'
+            : chessState.role === 'guest'
+                ? 'You joined as Black.'
+                : chessState.role === 'guestPending'
+                    ? 'Join request sent. Waiting for host approval.'
+                    : 'Choose Host Room or Find Room to begin.';
+        document.getElementById('chessApprovalCard')?.classList.toggle('hidden', !(chessState.role === 'host' && pendingRequest));
+        document.getElementById('chessWaitingCard')?.classList.toggle('hidden', chessState.role !== 'guestPending');
+        if (pendingRequest) {
+            document.getElementById('chessApprovalText').textContent = `${pendingRequest.name} wants to join this room. Approve to start the match.`;
+        }
+        if (chessState.role === 'guestPending') {
+            document.getElementById('chessWaitingText').textContent = room?.guestRequest?.status === 'declined'
+                ? 'Host declined the request. Ask for a new approval or retry.'
+                : 'Waiting for host approval. Stay on this screen until the host accepts.';
+        }
+    }
+
+    function renderChessBoard(room) {
+        const boardEl = document.getElementById('chessBoard');
+        if (!boardEl) return;
+        const game = getChessInstance(room?.fen);
+        if (!game) {
+            setChessNotice('Chess engine failed to load. Refresh once and try again.');
+            return;
+        }
+        const orientation = getChessOrientation();
+        const files = orientation === 'white' ? FILES : [...FILES].reverse();
+        const ranks = orientation === 'white' ? [8, 7, 6, 5, 4, 3, 2, 1] : [1, 2, 3, 4, 5, 6, 7, 8];
+        const canPlay = room?.status === 'active' && ((chessState.role === 'host' && room.currentTurn === 'w') || (chessState.role === 'guest' && room.currentTurn === 'b'));
+        boardEl.innerHTML = '';
+        ranks.forEach((rank, rowIndex) => {
+            files.forEach((file, colIndex) => {
+                const square = `${file}${rank}`;
+                const piece = game.get(square);
+                const isSelected = chessState.selectedSquare === square;
+                const legalTarget = chessState.legalTargets.find(move => move.to === square);
+                const squareBtn = document.createElement('button');
+                squareBtn.type = 'button';
+                squareBtn.className = `chess-square ${(rowIndex + colIndex) % 2 === 0 ? 'light' : 'dark'}${isSelected ? ' selected' : ''}${legalTarget ? ` ${piece ? 'capture' : 'legal'}` : ''}${!canPlay ? ' disabled' : ''}`;
+                squareBtn.onclick = () => handleChessSquareClick(square);
+                if (piece) {
+                    const pieceEl = document.createElement('span');
+                    pieceEl.className = `chess-piece ${piece.color === 'w' ? 'white' : 'black'}`;
+                    pieceEl.textContent = PIECES[piece.color === 'w' ? piece.type.toUpperCase() : piece.type];
+                    squareBtn.appendChild(pieceEl);
+                }
+                if ((orientation === 'white' && rank === 1) || (orientation === 'black' && rank === 8)) {
+                    const coord = document.createElement('span');
+                    coord.className = 'chess-coordinate';
+                    coord.textContent = file;
+                    squareBtn.appendChild(coord);
+                }
+                boardEl.appendChild(squareBtn);
+            });
+        });
+    }
+
+    function updateChessRoomView(room) {
+        chessState.roomData = room;
+        chessState.role = inferChessRole(room);
+        if (!room) {
+            toggleChessPanels(false);
+            document.getElementById('chessRoomCodeDisplay').textContent = '------';
+            document.getElementById('chessHostPlayerName').textContent = 'Waiting for host';
+            document.getElementById('chessGuestPlayerName').textContent = 'No opponent yet';
+            document.getElementById('chessMoveList').innerHTML = '<li>Room not started yet.</li>';
+            document.getElementById('chessMatchHeadline').textContent = 'No live room';
+            document.getElementById('chessRoleHint').textContent = 'Choose Host Room or Find Room to begin.';
+            document.getElementById('chessApprovalCard')?.classList.add('hidden');
+            document.getElementById('chessWaitingCard')?.classList.add('hidden');
+            document.getElementById('chessTurnChip').textContent = 'Waiting';
+            document.getElementById('chessRoomModeChip').textContent = 'Lobby Ready';
+            setChessNotice('Create a room or join an approved room to begin.');
+            return;
+        }
+        toggleChessPanels(true);
+        updateChessSidebar(room);
+        updateChessMoveFeed(room);
+        renderChessBoard(room);
+        if (room.status === 'active') {
+            setChessNotice(`${room.currentTurn === 'w' ? 'White' : 'Black'} to move. ${room.resultText || 'Use clean moves and keep pressure.'}`);
+        } else if (room.status === 'finished') {
+            setChessNotice(room.resultText || 'Match finished.');
+        } else {
+            setChessNotice(chessState.role === 'host' ? 'Room created. Share the code and approve your opponent.' : 'Room waiting for host approval.');
+        }
+    }
+
+    function listenToChessRoom(code) {
+        cleanupChessSubscription();
+        chessState.roomCode = code;
+        chessState.unsubscribe = onValue(getChessRoomRef(code), (snapshot) => {
+            const room = snapshot.val();
+            if (!room) {
+                chessState.roomCode = '';
+                chessState.selectedSquare = null;
+                chessState.legalTargets = [];
+                updateChessRoomView(null);
+                return;
+            }
+            updateChessRoomView(room);
+        });
+    }
+
+    function getCurrentChessColor() {
+        return chessState.role === 'host' ? 'w' : chessState.role === 'guest' ? 'b' : '';
+    }
+
+    async function pushChessMove(from, to) {
+        if (!chessState.roomCode || !chessState.roomData) return;
+        const room = chessState.roomData;
+        const game = getChessInstance(room.fen);
+        if (!game) return;
+        const move = game.move({ from, to, promotion: 'q' });
+        if (!move) {
+            setChessNotice('Illegal move. Pick a valid square.');
+            playChessTone('alert');
+            return;
+        }
+        const nextMoves = [...(room.moveLog || []), {
+            san: move.san,
+            from: move.from,
+            to: move.to,
+            by: chessState.role,
+            byName: chessState.role === 'host' ? room.host?.name : room.guest?.name,
+            moveNo: Math.ceil(game.history().length / 2)
+        }];
+        const payload = {
+            fen: game.fen(),
+            currentTurn: game.turn(),
+            moveLog: nextMoves,
+            updatedAt: Date.now(),
+            status: chessIsGameOver(game) ? 'finished' : 'active',
+            resultText: ''
+        };
+        if (chessIsCheckmate(game)) {
+            payload.resultText = `${chessState.role === 'host' ? room.host?.name : room.guest?.name} wins by checkmate.`;
+        } else if (chessIsDraw(game)) {
+            payload.resultText = 'Draw game. Strong defense from both players.';
+        } else if (chessInCheck(game)) {
+            payload.resultText = `${game.turn() === 'w' ? room.host?.name || 'White' : room.guest?.name || 'Black'} is in check.`;
+        }
+        await update(getChessRoomRef(chessState.roomCode), payload);
+        chessState.selectedSquare = null;
+        chessState.legalTargets = [];
+        playChessTone(move.captured ? 'capture' : 'move');
+        if (payload.status === 'finished') playChessTone('win');
+    }
+
+    function handleChessSquareClick(square) {
+        const room = chessState.roomData;
+        if (!room || room.status !== 'active') return;
+        const color = getCurrentChessColor();
+        if (!color || room.currentTurn !== color) {
+            setChessNotice('Wait for your turn.');
+            return;
+        }
+        const game = getChessInstance(room.fen);
+        if (!game) return;
+        const piece = game.get(square);
+        if (chessState.selectedSquare) {
+            const chosen = chessState.legalTargets.find(move => move.to === square);
+            if (chosen) {
+                pushChessMove(chessState.selectedSquare, square);
+                return;
+            }
+            if (piece && piece.color === color) {
+                chessState.selectedSquare = square;
+                chessState.legalTargets = game.moves({ square, verbose: true });
+                renderChessBoard(room);
+                return;
+            }
+            chessState.selectedSquare = null;
+            chessState.legalTargets = [];
+            renderChessBoard(room);
+            return;
+        }
+        if (piece && piece.color === color) {
+            chessState.selectedSquare = square;
+            chessState.legalTargets = game.moves({ square, verbose: true });
+            renderChessBoard(room);
+        }
+    }
+
+    function generateChessRoomCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let result = '';
+        for (let i = 0; i < 6; i++) result += chars[Math.floor(Math.random() * chars.length)];
+        return result;
+    }
+
+    window.switchChessMode = function (mode) {
+        setChessMode(mode);
+    };
+
+    window.prepareChessOverlay = function () {
+        const storedName = getChessPlayerName();
+        document.getElementById('chessHostNameInput').value = storedName;
+        document.getElementById('chessGuestNameInput').value = storedName;
+        document.getElementById('chessRoomCodeInput').value = '';
+        chessState.selectedSquare = null;
+        chessState.legalTargets = [];
+        updateChessRoomView(null);
+        setChessMode('host');
+    };
+
+    window.createChessRoom = async function () {
+        const hostName = (document.getElementById('chessHostNameInput')?.value || '').trim();
+        if (!hostName) {
+            setChessNotice('Enter your host name before creating the room.');
+            return;
+        }
+        setChessPlayerName(hostName);
+        const game = getChessInstance();
+        if (!game) {
+            setChessNotice('Chess engine load nahi hua. Page refresh karke dobara try karo.');
+            return;
+        }
+        let code = generateChessRoomCode();
+        let snapshot = await get(getChessRoomRef(code));
+        while (snapshot.exists()) {
+            code = generateChessRoomCode();
+            snapshot = await get(getChessRoomRef(code));
+        }
+        const roomPayload = {
+            code,
+            status: 'waiting',
+            fen: game.fen(),
+            currentTurn: 'w',
+            moveLog: [],
+            resultText: '',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            host: { name: hostName, sessionId: chessState.sessionId, color: 'w' },
+            guest: null,
+            guestRequest: null
+        };
+        chessState.role = 'host';
+        chessState.roomCode = code;
+        updateChessRoomView(roomPayload);
+        setChessNotice(`Room ${code} created. Share the code and wait for join request.`);
+        try {
+            await set(getChessRoomRef(code), roomPayload);
+            listenToChessRoom(code);
+            playChessTone('move');
+        } catch (error) {
+            chessState.roomCode = '';
+            chessState.role = '';
+            updateChessRoomView(null);
+            setChessNotice(`Room create nahi ho paya. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    };
+
+    window.joinChessRoom = async function () {
+        const guestName = (document.getElementById('chessGuestNameInput')?.value || '').trim();
+        const code = (document.getElementById('chessRoomCodeInput')?.value || '').trim().toUpperCase();
+        if (!guestName || !code) {
+            setChessNotice('Enter your name and room code before joining.');
+            return;
+        }
+        const roomRef = getChessRoomRef(code);
+        try {
+            const snapshot = await get(roomRef);
+            if (!snapshot.exists()) {
+                setChessNotice('Room not found. Check the code and try again.');
+                playChessTone('alert');
+                return;
+            }
+            const room = snapshot.val();
+            if (room?.guest && room.guest.sessionId !== chessState.sessionId) {
+                setChessNotice('This room already has two players. Ask host for a fresh room.');
+                playChessTone('alert');
+                return;
+            }
+            setChessPlayerName(guestName);
+            await update(roomRef, {
+                guestRequest: {
+                    name: guestName,
+                    sessionId: chessState.sessionId,
+                    status: 'pending',
+                    requestedAt: Date.now()
+                },
+                updatedAt: Date.now()
+            });
+            chessState.role = 'guestPending';
+            listenToChessRoom(code);
+            setChessNotice(`Join request sent to room ${code}. Waiting for host approval.`);
+            playChessTone('move');
+        } catch (error) {
+            setChessNotice(`Join request fail hua. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    };
+
+    window.approveChessGuest = async function () {
+        if (chessState.role !== 'host' || !chessState.roomCode || !chessState.roomData?.guestRequest) return;
+        const room = chessState.roomData;
+        const game = getChessInstance();
+        if (!game) return;
+        await update(getChessRoomRef(chessState.roomCode), {
+            guest: {
+                name: room.guestRequest.name,
+                sessionId: room.guestRequest.sessionId,
+                color: 'b'
+            },
+            guestRequest: null,
+            status: 'active',
+            fen: game.fen(),
+            currentTurn: 'w',
+            moveLog: [],
+            resultText: 'Match approved. White moves first.',
+            updatedAt: Date.now()
+        });
+        playChessTone('win');
+    };
+
+    window.declineChessGuest = async function () {
+        if (chessState.role !== 'host' || !chessState.roomCode || !chessState.roomData?.guestRequest) return;
+        await update(getChessRoomRef(chessState.roomCode), {
+            guestRequest: {
+                ...chessState.roomData.guestRequest,
+                status: 'declined',
+                updatedAt: Date.now()
+            }
+        });
+        playChessTone('alert');
+    };
+
+    window.copyChessRoomCode = async function () {
+        if (!chessState.roomCode) {
+            setChessNotice('Create a room first to copy the code.');
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(chessState.roomCode);
+            setChessNotice(`Room code ${chessState.roomCode} copied. Share it with your opponent.`);
+        } catch (error) {
+            setChessNotice(`Room code: ${chessState.roomCode}`);
+        }
+    };
+
+    window.resetChessBoardIfHost = async function () {
+        if (chessState.role !== 'host' || !chessState.roomCode) {
+            setChessNotice('Only the host can restart the match.');
+            return;
+        }
+        const game = getChessInstance();
+        if (!game) return;
+        await update(getChessRoomRef(chessState.roomCode), {
+            fen: game.fen(),
+            currentTurn: 'w',
+            moveLog: [],
+            status: chessState.roomData?.guest ? 'active' : 'waiting',
+            resultText: chessState.roomData?.guest ? 'Fresh board. White opens the rematch.' : 'Board reset. Waiting for a guest.',
+            updatedAt: Date.now()
+        });
+    };
+
+    async function internalLeaveChessRoom(closeOverlay) {
+        const code = chessState.roomCode;
+        const role = chessState.role;
+        cleanupChessSubscription();
+        chessState.roomCode = '';
+        chessState.role = '';
+        chessState.roomData = null;
+        chessState.selectedSquare = null;
+        chessState.legalTargets = [];
+        if (code) {
+            try {
+                const roomRef = getChessRoomRef(code);
+                if (role === 'host') {
+                    await remove(roomRef);
+                } else if (role === 'guest') {
+                    const game = getChessInstance();
+                    await update(roomRef, {
+                        guest: null,
+                        guestRequest: null,
+                        status: 'waiting',
+                        fen: game.fen(),
+                        currentTurn: 'w',
+                        moveLog: [],
+                        resultText: 'Guest left. Waiting for a new opponent.',
+                        updatedAt: Date.now()
+                    });
+                } else if (role === 'guestPending') {
+                    await update(roomRef, { guestRequest: null, updatedAt: Date.now() });
+                }
+            } catch (error) { }
+        }
+        updateChessRoomView(null);
+        if (closeOverlay) document.getElementById('chessGameOverlay')?.classList.remove('active');
+    }
+
+    window.leaveChessRoom = function () {
+        internalLeaveChessRoom(true).then(() => openGameHub());
+    };
+
+    const originalBackToHub = window.backToHub;
+    window.backToHub = function (overlayId) {
+        if (overlayId === 'chessGameOverlay') {
+            internalLeaveChessRoom(false).then(() => {
+                if (originalBackToHub) originalBackToHub(overlayId);
+            });
+            return;
+        }
+        if (originalBackToHub) originalBackToHub(overlayId);
+    };
+})();
