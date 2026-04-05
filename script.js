@@ -27,19 +27,43 @@ const cloudName = 'dny7jlz0d'; // Replace with your Cloudinary cloud name
 const uploadPreset = 'anonymous_upload'; // Replace with your Cloudinary upload preset
 // ✅ Handle paste event for images
 document.addEventListener("paste", function (event) {
-    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-    for (const item of items) {
-        if (item.type.indexOf("image") === 0) {
-            const file = item.getAsFile();
-            if (file) {
-                const tagInput = document.getElementById("tagInput");
-                const tag = tagInput.value.trim() || "ClipboardImage";
-                const progressBar = document.getElementById("progress");
-                const statusText = document.getElementById("status");
-                uploadFile(file, tag, progressBar, statusText);
+    const clipboardData = event.clipboardData || event.originalEvent?.clipboardData;
+    const items = Array.from(clipboardData?.items || []);
+    const imageFiles = items
+        .filter(item => item.type && item.type.indexOf("image") === 0)
+        .map(item => item.getAsFile())
+        .filter(Boolean);
+
+    if (!imageFiles.length) return;
+
+    event.preventDefault();
+
+    const tagInput = document.getElementById("tagInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const progressBar = document.getElementById("progress");
+    const statusText = document.getElementById("status");
+    const tag = tagInput?.value.trim() || "ClipboardImage";
+    const password = passwordInput?.value.trim() || "";
+
+    let completedCount = 0;
+    const totalFiles = imageFiles.length;
+
+    statusText.textContent = totalFiles > 1 ? `Uploading ${totalFiles} pasted images...` : 'Uploading pasted image...';
+
+    imageFiles.forEach((file, index) => {
+        const safeName = file.name && file.name !== 'image.png'
+            ? file.name
+            : `clipboard-image-${Date.now()}-${index + 1}.png`;
+        const normalizedFile = new File([file], safeName, { type: file.type || 'image/png' });
+
+        uploadFile(normalizedFile, tag, password, progressBar, statusText, null, () => {
+            completedCount++;
+            if (completedCount >= totalFiles) {
+                showMessage(`${totalFiles} pasted image(s) uploaded successfully!`, 'info');
+                if (passwordInput) passwordInput.value = '';
             }
-        }
-    }
+        });
+    });
 });
 
 
@@ -14185,6 +14209,11 @@ window.launchGame = function (gameType) {
         if (typeof window.prepareChessOverlay === 'function') {
             window.prepareChessOverlay();
         }
+    } else if (gameType === 'carrom') {
+        document.getElementById('carromGameOverlay').classList.add('active');
+        if (typeof window.prepareCarromOverlay === 'function') {
+            window.prepareCarromOverlay();
+        }
     }
 };
 
@@ -16296,7 +16325,9 @@ window.openQuickLinks = function () {
         roomData: null,
         selectedSquare: null,
         legalTargets: [],
-        audioCtx: null
+        audioCtx: null,
+        approvalPromptKey: '',
+        approvalPromptOpen: false
     };
     localStorage.setItem(CHESS_SESSION_KEY, chessState.sessionId);
 
@@ -16394,6 +16425,51 @@ window.openQuickLinks = function () {
         return '';
     }
 
+    function isChessPaused(room) {
+        return !!room?.paused;
+    }
+
+    function canControlChessPause() {
+        return chessState.role === 'host' || chessState.role === 'guest';
+    }
+
+    function getChessGuestRequestKey(request) {
+        if (!request?.sessionId) return '';
+        return `${request.sessionId}:${request.requestedAt || 0}`;
+    }
+
+    function maybePromptChessApproval(room) {
+        const pendingRequest = room?.guestRequest && room.guestRequest.status === 'pending' ? room.guestRequest : null;
+        if (chessState.role !== 'host' || !pendingRequest) {
+            if (!pendingRequest) chessState.approvalPromptKey = '';
+            return;
+        }
+
+        const requestKey = getChessGuestRequestKey(pendingRequest);
+        if (!requestKey || chessState.approvalPromptOpen || chessState.approvalPromptKey === requestKey) return;
+
+        chessState.approvalPromptKey = requestKey;
+        chessState.approvalPromptOpen = true;
+        playChessTone('alert');
+
+        window.setTimeout(async () => {
+            const accepted = window.confirm(`${pendingRequest.name || 'A player'} wants to join room ${room.code || chessState.roomCode}. Approve this player?`);
+            chessState.approvalPromptOpen = false;
+
+            const liveRequest = chessState.roomData?.guestRequest;
+            const liveRequestKey = getChessGuestRequestKey(liveRequest);
+            if (chessState.role !== 'host' || !liveRequest || liveRequest.status !== 'pending' || liveRequestKey !== requestKey) {
+                return;
+            }
+
+            if (accepted) {
+                await window.approveChessGuest();
+            } else {
+                await window.declineChessGuest();
+            }
+        }, 0);
+    }
+
     function updateChessMoveFeed(room) {
         const list = document.getElementById('chessMoveList');
         if (!list) return;
@@ -16412,28 +16488,45 @@ window.openQuickLinks = function () {
 
     function updateChessSidebar(room) {
         const status = room?.status || 'idle';
+        const paused = isChessPaused(room);
+        const pauseTarget = status === 'active' ? 'match' : 'room';
         const pendingRequest = room?.guestRequest && room.guestRequest.status === 'pending' ? room.guestRequest : null;
-        document.getElementById('chessRoomCodeDisplay').textContent = room?.code || chessState.roomCode || '------';
-        document.getElementById('chessHostPlayerName').textContent = room?.host?.name || 'Waiting for host';
-        document.getElementById('chessGuestPlayerName').textContent = room?.guest?.name || 'No opponent yet';
-        document.getElementById('chessRoomModeChip').textContent = status === 'active' ? 'Room Active' : status === 'finished' ? 'Match Complete' : 'Lobby Ready';
-        document.getElementById('chessTurnChip').textContent = status === 'active' ? (room.currentTurn === 'b' ? 'Black to Move' : 'White to Move') : 'Waiting';
-        document.getElementById('chessMatchHeadline').textContent = status === 'active'
-            ? 'Match live'
-            : status === 'finished'
-                ? (room?.resultText || 'Match finished')
-                : chessState.role === 'host'
-                    ? 'Room live. Share the code.'
-                    : chessState.role === 'guestPending'
-                        ? 'Approval pending'
-                        : 'No live room';
-        document.getElementById('chessRoleHint').textContent = chessState.role === 'host'
+        const baseRoleHint = chessState.role === 'host'
             ? 'You are hosting as White.'
             : chessState.role === 'guest'
                 ? 'You joined as Black.'
                 : chessState.role === 'guestPending'
                     ? 'Join request sent. Waiting for host approval.'
                     : 'Choose Host Room or Find Room to begin.';
+        document.getElementById('chessRoomCodeDisplay').textContent = room?.code || chessState.roomCode || '------';
+        document.getElementById('chessHostPlayerName').textContent = room?.host?.name || 'Waiting for host';
+        document.getElementById('chessGuestPlayerName').textContent = room?.guest?.name || 'No opponent yet';
+        document.getElementById('chessRoomModeChip').textContent = status === 'finished'
+            ? 'Match Complete'
+            : paused
+                ? (status === 'active' ? 'Match Paused' : 'Room Paused')
+                : status === 'active'
+                    ? 'Room Active'
+                    : 'Lobby Ready';
+        document.getElementById('chessTurnChip').textContent = status === 'active'
+            ? (paused ? 'Paused' : (room.currentTurn === 'b' ? 'Black to Move' : 'White to Move'))
+            : paused
+                ? 'Paused'
+                : 'Waiting';
+        document.getElementById('chessMatchHeadline').textContent = status === 'finished'
+            ? (room?.resultText || 'Match finished')
+            : paused
+                ? (status === 'active' ? 'Match paused' : 'Room paused')
+                : status === 'active'
+                    ? 'Match live'
+                    : chessState.role === 'host'
+                        ? 'Room live. Share the code.'
+                        : chessState.role === 'guestPending'
+                            ? 'Approval pending'
+                            : 'No live room';
+        document.getElementById('chessRoleHint').textContent = paused
+            ? `${baseRoleHint} ${room?.pausedBy ? `${room.pausedBy} paused the ${pauseTarget}.` : `This ${pauseTarget} is paused.`}`
+            : baseRoleHint;
         document.getElementById('chessApprovalCard')?.classList.toggle('hidden', !(chessState.role === 'host' && pendingRequest));
         document.getElementById('chessWaitingCard')?.classList.toggle('hidden', chessState.role !== 'guestPending');
         if (pendingRequest) {
@@ -16444,6 +16537,27 @@ window.openQuickLinks = function () {
                 ? 'Host declined the request. Ask for a new approval or retry.'
                 : 'Waiting for host approval. Stay on this screen until the host accepts.';
         }
+        updateChessActionState(room);
+    }
+
+    function updateChessActionState(room) {
+        const copyBtn = document.getElementById('chessCopyCodeBtn');
+        const restartBtn = document.getElementById('chessRestartBtn');
+        const pauseBtn = document.getElementById('chessPauseBtn');
+        if (copyBtn) copyBtn.disabled = !room?.code;
+        if (restartBtn) restartBtn.disabled = !room || chessState.role !== 'host';
+        if (!pauseBtn) return;
+
+        if (!room) {
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = 'Pause Match';
+            return;
+        }
+
+        pauseBtn.disabled = !canControlChessPause() || room.status === 'finished';
+        pauseBtn.textContent = isChessPaused(room)
+            ? (room.status === 'active' ? 'Resume Match' : 'Resume Room')
+            : (room.status === 'active' ? 'Pause Match' : 'Pause Room');
     }
 
     function renderChessBoard(room) {
@@ -16457,7 +16571,9 @@ window.openQuickLinks = function () {
         const orientation = getChessOrientation();
         const files = orientation === 'white' ? FILES : [...FILES].reverse();
         const ranks = orientation === 'white' ? [8, 7, 6, 5, 4, 3, 2, 1] : [1, 2, 3, 4, 5, 6, 7, 8];
-        const canPlay = room?.status === 'active' && ((chessState.role === 'host' && room.currentTurn === 'w') || (chessState.role === 'guest' && room.currentTurn === 'b'));
+        const canPlay = room?.status === 'active'
+            && !isChessPaused(room)
+            && ((chessState.role === 'host' && room.currentTurn === 'w') || (chessState.role === 'guest' && room.currentTurn === 'b'));
         boardEl.innerHTML = '';
         ranks.forEach((rank, rowIndex) => {
             files.forEach((file, colIndex) => {
@@ -16490,6 +16606,8 @@ window.openQuickLinks = function () {
         chessState.roomData = room;
         chessState.role = inferChessRole(room);
         if (!room) {
+            chessState.approvalPromptKey = '';
+            chessState.approvalPromptOpen = false;
             toggleChessPanels(false);
             document.getElementById('chessRoomCodeDisplay').textContent = '------';
             document.getElementById('chessHostPlayerName').textContent = 'Waiting for host';
@@ -16501,17 +16619,27 @@ window.openQuickLinks = function () {
             document.getElementById('chessWaitingCard')?.classList.add('hidden');
             document.getElementById('chessTurnChip').textContent = 'Waiting';
             document.getElementById('chessRoomModeChip').textContent = 'Lobby Ready';
+            updateChessActionState(null);
             setChessNotice('Create a room or join an approved room to begin.');
             return;
+        }
+        if (room.status !== 'active' || isChessPaused(room)) {
+            chessState.selectedSquare = null;
+            chessState.legalTargets = [];
         }
         toggleChessPanels(true);
         updateChessSidebar(room);
         updateChessMoveFeed(room);
         renderChessBoard(room);
-        if (room.status === 'active') {
-            setChessNotice(`${room.currentTurn === 'w' ? 'White' : 'Black'} to move. ${room.resultText || 'Use clean moves and keep pressure.'}`);
-        } else if (room.status === 'finished') {
+        if (room.status === 'finished') {
             setChessNotice(room.resultText || 'Match finished.');
+        } else if (isChessPaused(room)) {
+            const pauseTarget = room.status === 'active' ? 'match' : 'room';
+            setChessNotice(room.pausedBy
+                ? `${room.pausedBy} paused the ${pauseTarget}. Resume anytime from the same state.`
+                : `The ${pauseTarget} is paused. Resume anytime from the same state.`);
+        } else if (room.status === 'active') {
+            setChessNotice(`${room.currentTurn === 'w' ? 'White' : 'Black'} to move. ${room.resultText || 'Use clean moves and keep pressure.'}`);
         } else {
             setChessNotice(chessState.role === 'host' ? 'Room created. Share the code and approve your opponent.' : 'Room waiting for host approval.');
         }
@@ -16530,6 +16658,7 @@ window.openQuickLinks = function () {
                 return;
             }
             updateChessRoomView(room);
+            maybePromptChessApproval(room);
         });
     }
 
@@ -16540,6 +16669,10 @@ window.openQuickLinks = function () {
     async function pushChessMove(from, to) {
         if (!chessState.roomCode || !chessState.roomData) return;
         const room = chessState.roomData;
+        if (isChessPaused(room)) {
+            setChessNotice('Match is paused. Resume to continue.');
+            return;
+        }
         const game = getChessInstance(room.fen);
         if (!game) return;
         const move = game.move({ from, to, promotion: 'q' });
@@ -16581,6 +16714,10 @@ window.openQuickLinks = function () {
     function handleChessSquareClick(square) {
         const room = chessState.roomData;
         if (!room || room.status !== 'active') return;
+        if (isChessPaused(room)) {
+            setChessNotice(room.pausedBy ? `${room.pausedBy} paused the match. Resume to continue.` : 'Match is paused. Resume to continue.');
+            return;
+        }
         const color = getCurrentChessColor();
         if (!color || room.currentTurn !== color) {
             setChessNotice('Wait for your turn.');
@@ -16629,6 +16766,10 @@ window.openQuickLinks = function () {
         document.getElementById('chessHostNameInput').value = storedName;
         document.getElementById('chessGuestNameInput').value = storedName;
         document.getElementById('chessRoomCodeInput').value = '';
+        if (chessState.roomData && chessState.roomCode) {
+            updateChessRoomView(chessState.roomData);
+            return;
+        }
         chessState.selectedSquare = null;
         chessState.legalTargets = [];
         updateChessRoomView(null);
@@ -16658,6 +16799,9 @@ window.openQuickLinks = function () {
             status: 'waiting',
             fen: game.fen(),
             currentTurn: 'w',
+            paused: false,
+            pausedBy: '',
+            pausedAt: 0,
             moveLog: [],
             resultText: '',
             createdAt: Date.now(),
@@ -16703,15 +16847,23 @@ window.openQuickLinks = function () {
                 playChessTone('alert');
                 return;
             }
+            if (room?.guestRequest?.status === 'pending' && room.guestRequest.sessionId !== chessState.sessionId) {
+                setChessNotice(`${room.guestRequest.name || 'Another player'} is already waiting for host approval. Try again in a moment.`);
+                playChessTone('alert');
+                return;
+            }
             setChessPlayerName(guestName);
+            const requestTime = Date.now();
             await update(roomRef, {
                 guestRequest: {
                     name: guestName,
                     sessionId: chessState.sessionId,
                     status: 'pending',
-                    requestedAt: Date.now()
+                    requestedAt: room?.guestRequest?.sessionId === chessState.sessionId
+                        ? (room.guestRequest.requestedAt || requestTime)
+                        : requestTime
                 },
-                updatedAt: Date.now()
+                updatedAt: requestTime
             });
             chessState.role = 'guestPending';
             listenToChessRoom(code);
@@ -16727,6 +16879,7 @@ window.openQuickLinks = function () {
         const room = chessState.roomData;
         const game = getChessInstance();
         if (!game) return;
+        chessState.approvalPromptKey = '';
         await update(getChessRoomRef(chessState.roomCode), {
             guest: {
                 name: room.guestRequest.name,
@@ -16746,6 +16899,7 @@ window.openQuickLinks = function () {
 
     window.declineChessGuest = async function () {
         if (chessState.role !== 'host' || !chessState.roomCode || !chessState.roomData?.guestRequest) return;
+        chessState.approvalPromptKey = '';
         await update(getChessRoomRef(chessState.roomCode), {
             guestRequest: {
                 ...chessState.roomData.guestRequest,
@@ -16779,11 +16933,60 @@ window.openQuickLinks = function () {
         await update(getChessRoomRef(chessState.roomCode), {
             fen: game.fen(),
             currentTurn: 'w',
+            paused: false,
+            pausedBy: '',
+            pausedAt: 0,
             moveLog: [],
             status: chessState.roomData?.guest ? 'active' : 'waiting',
             resultText: chessState.roomData?.guest ? 'Fresh board. White opens the rematch.' : 'Board reset. Waiting for a guest.',
             updatedAt: Date.now()
         });
+    };
+
+    window.toggleChessPause = async function () {
+        const room = chessState.roomData;
+        if (!room) {
+            setChessNotice('Create or join a room before using pause.');
+            return;
+        }
+        if (!canControlChessPause()) {
+            setChessNotice('Only seated players can control pause and resume.');
+            return;
+        }
+        if (room.status === 'finished') {
+            setChessNotice('Finished match cannot be paused. Restart for a new board.');
+            return;
+        }
+
+        const actor = chessState.role === 'host'
+            ? (room.host?.name || 'White')
+            : (room.guest?.name || 'Black');
+        const nextPaused = !isChessPaused(room);
+        const pauseTarget = room.status === 'active' ? 'match' : 'room';
+        const resultText = nextPaused
+            ? `${actor} paused the ${pauseTarget}. State is saved and can resume anytime.`
+            : `${actor} resumed the ${pauseTarget}. Everything continues from the same state.`;
+        const optimisticRoom = {
+            ...room,
+            paused: nextPaused,
+            pausedBy: nextPaused ? actor : '',
+            pausedAt: nextPaused ? Date.now() : 0,
+            resultText
+        };
+
+        try {
+            updateChessRoomView(optimisticRoom);
+            await update(getChessRoomRef(chessState.roomCode), {
+                paused: nextPaused,
+                pausedBy: nextPaused ? actor : '',
+                pausedAt: nextPaused ? Date.now() : 0,
+                resultText,
+                updatedAt: Date.now()
+            });
+        } catch (error) {
+            updateChessRoomView(room);
+            setChessNotice(`Pause state update failed. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
     };
 
     async function internalLeaveChessRoom(closeOverlay) {
@@ -16808,6 +17011,9 @@ window.openQuickLinks = function () {
                         status: 'waiting',
                         fen: game.fen(),
                         currentTurn: 'w',
+                        paused: false,
+                        pausedBy: '',
+                        pausedAt: 0,
                         moveLog: [],
                         resultText: 'Guest left. Waiting for a new opponent.',
                         updatedAt: Date.now()
@@ -16828,9 +17034,2177 @@ window.openQuickLinks = function () {
     const originalBackToHub = window.backToHub;
     window.backToHub = function (overlayId) {
         if (overlayId === 'chessGameOverlay') {
-            internalLeaveChessRoom(false).then(() => {
-                if (originalBackToHub) originalBackToHub(overlayId);
+            document.getElementById('chessGameOverlay')?.classList.remove('active');
+            openGameHub();
+            return;
+        }
+        if (originalBackToHub) originalBackToHub(overlayId);
+    };
+})();
+
+(function () {
+    const CARROM_ROOM_PREFIX = 'carromRooms';
+    const CARROM_SESSION_KEY = 'carromSessionId';
+    const CARROM_PLAYER_NAME_KEY = 'carromPlayerName';
+    const CARROM_ALLOWED_SEATS = {
+        2: [0, 2],
+        4: [0, 1, 2, 3]
+    };
+    const CARROM_SEATS = [
+        { label: 'South Seat', short: 'South', lane: 'South Baseline', meta: 'Host baseline' },
+        { label: 'West Seat', short: 'West', lane: 'West Rail', meta: 'Left rail' },
+        { label: 'North Seat', short: 'North', lane: 'North Baseline', meta: 'Opposite angle' },
+        { label: 'East Seat', short: 'East', lane: 'East Rail', meta: 'Right rail' }
+    ];
+    const CARROM_TEAMS = {
+        ivory: { label: 'Ivory Team', color: '#f8fafc', stroke: '#f59e0b' },
+        ebony: { label: 'Ebony Team', color: '#0f172a', stroke: '#94a3b8' },
+        queen: { label: 'Queen', color: '#dc2626', stroke: '#fca5a5' }
+    };
+    const carromState = {
+        mode: 'host',
+        roomSize: 2,
+        sessionId: localStorage.getItem(CARROM_SESSION_KEY) || `carrom_${Math.random().toString(36).slice(2, 10)}`,
+        unsubscribe: null,
+        roomCode: '',
+        roomData: null,
+        seatIndex: null,
+        canvas: null,
+        ctx: null,
+        canvasBound: false,
+        localStrikerPercent: 50,
+        aiming: false,
+        aimPointerId: null,
+        aimPoint: null,
+        aimPower: 0,
+        simBoard: null,
+        simFrame: 0,
+        hostResolvingShotId: '',
+        lastVisualShotId: '',
+        approvalPromptKey: '',
+        approvalPromptOpen: false,
+        brandFlashKey: '',
+        brandFlashText: 'SHIVANG',
+        brandFlashStartedAt: 0,
+        brandFlashUntil: 0,
+        brandFlashFrame: 0,
+        brandFlashHue: 0,
+        boardChatPreviewKey: '',
+        boardChatPreviewTimer: 0,
+        aimStrikerLocked: false
+    };
+    localStorage.setItem(CARROM_SESSION_KEY, carromState.sessionId);
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function getCarromGeometry(size) {
+        const playInset = size * 0.108;
+        const playMin = playInset;
+        const playMax = size - playInset;
+        return {
+            size,
+            center: size / 2,
+            playMin,
+            playMax,
+            playSize: playMax - playMin,
+            pocketRadius: size * 0.04,
+            coinRadius: size * 0.0198,
+            strikerRadius: size * 0.026,
+            baselineInset: size * 0.13,
+            laneHalf: size * 0.195,
+            pocketCenters: [
+                { x: playMin + 4, y: playMin + 4 },
+                { x: playMax - 4, y: playMin + 4 },
+                { x: playMin + 4, y: playMax - 4 },
+                { x: playMax - 4, y: playMax - 4 }
+            ]
+        };
+    }
+
+    function getCarromPlayerName() {
+        return (localStorage.getItem(CARROM_PLAYER_NAME_KEY) || '').trim();
+    }
+
+    function setCarromPlayerName(name) {
+        localStorage.setItem(CARROM_PLAYER_NAME_KEY, name.trim());
+    }
+
+    function getCarromRoomRef(code) {
+        return dbRef(db, `${CARROM_ROOM_PREFIX}/${code}`);
+    }
+
+    function getCarromMessagesRef(code) {
+        return dbRef(db, `${CARROM_ROOM_PREFIX}/${code}/messages`);
+    }
+
+    function generateCarromRoomCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let result = '';
+        for (let index = 0; index < 6; index++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+
+    function getAllowedCarromSeats(format) {
+        return CARROM_ALLOWED_SEATS[format] || CARROM_ALLOWED_SEATS[2];
+    }
+
+    function getSeatInfo(seatIndex) {
+        return CARROM_SEATS[seatIndex] || CARROM_SEATS[0];
+    }
+
+    function getCarromTeamForSeat(format, seatIndex) {
+        if (format === 2) {
+            return seatIndex === 0 ? 'ivory' : 'ebony';
+        }
+        return seatIndex === 0 || seatIndex === 2 ? 'ivory' : 'ebony';
+    }
+
+    function getOpponentTeam(team) {
+        return team === 'ivory' ? 'ebony' : 'ivory';
+    }
+
+    function getTeamLabel(team) {
+        return CARROM_TEAMS[team]?.label || 'Team';
+    }
+
+    function createCarromRack() {
+        const geo = getCarromGeometry(760);
+        const pieces = [];
+        const addPiece = (id, type, x, y) => {
+            pieces.push({
+                id,
+                type,
+                x,
+                y,
+                pocketed: false
             });
+        };
+
+        addPiece('queen', 'queen', geo.center, geo.center);
+
+        const innerRadius = geo.coinRadius * 2.25;
+        const outerRadius = geo.coinRadius * 4.45;
+        for (let index = 0; index < 6; index++) {
+            const angle = (Math.PI * 2 * index) / 6;
+            addPiece(
+                `inner_${index}`,
+                index % 2 === 0 ? 'ivory' : 'ebony',
+                geo.center + Math.cos(angle) * innerRadius,
+                geo.center + Math.sin(angle) * innerRadius
+            );
+        }
+        for (let index = 0; index < 12; index++) {
+            const angle = (Math.PI * 2 * index) / 12;
+            addPiece(
+                `outer_${index}`,
+                index % 2 === 0 ? 'ebony' : 'ivory',
+                geo.center + Math.cos(angle) * outerRadius,
+                geo.center + Math.sin(angle) * outerRadius
+            );
+        }
+        return pieces;
+    }
+
+    function buildInitialCarromBoard(format) {
+        return {
+            format,
+            pieces: createCarromRack(),
+            scores: { ivory: 0, ebony: 0 },
+            turnSeat: 0,
+            turnNumber: 1,
+            running: false,
+            paused: false,
+            pausedBy: '',
+            pausedAt: 0,
+            shot: null,
+            resultText: `${format}-player room ready. Fill the seats and break the board.`,
+            winnerTeam: '',
+            winnerLabel: ''
+        };
+    }
+
+    function normalizeCarromRoomData(rawRoom) {
+        if (!rawRoom) return null;
+        const format = Number(rawRoom.format) === 4 ? 4 : 2;
+        const baseBoard = buildInitialCarromBoard(format);
+        const rawBoard = rawRoom.board || {};
+        const joinRequests = (Array.isArray(rawRoom.joinRequests)
+            ? rawRoom.joinRequests.map(request => ({ ...request }))
+            : Object.entries(rawRoom.joinRequests || {}).map(([id, request]) => ({ id, ...(request || {}) })))
+            .filter(request => request && request.sessionId)
+            .sort((left, right) => (left?.requestedAt || 0) - (right?.requestedAt || 0));
+        const pieces = Array.isArray(rawBoard.pieces)
+            ? rawBoard.pieces.map(piece => ({ ...piece }))
+            : Object.values(rawBoard.pieces || {}).map(piece => ({ ...piece }));
+        return {
+            ...rawRoom,
+            format,
+            players: { ...(rawRoom.players || {}) },
+            joinRequests,
+            moveLog: Array.isArray(rawRoom.moveLog) ? rawRoom.moveLog : Object.values(rawRoom.moveLog || {}),
+            messages: (Array.isArray(rawRoom.messages) ? rawRoom.messages : Object.values(rawRoom.messages || {}))
+                .sort((left, right) => (left?.createdAt || 0) - (right?.createdAt || 0)),
+            board: {
+                ...baseBoard,
+                ...rawBoard,
+                pieces: pieces.length ? pieces : baseBoard.pieces,
+                scores: { ivory: 0, ebony: 0, ...(rawBoard.scores || {}) },
+                paused: !!rawBoard.paused,
+                pausedBy: rawBoard.pausedBy || '',
+                pausedAt: rawBoard.pausedAt || 0,
+                shot: rawBoard.shot || null
+            },
+            resultText: rawRoom.resultText || rawBoard.resultText || baseBoard.resultText,
+            status: rawRoom.status || 'waiting'
+        };
+    }
+
+    function cloneCarromPieces(pieces) {
+        return (pieces || []).map(piece => ({ ...piece }));
+    }
+
+    function getCarromSeatBySession(room, sessionId) {
+        if (!room || !room.players) return null;
+        return getAllowedCarromSeats(room.format).find(seatIndex => room.players?.[seatIndex]?.sessionId === sessionId) ?? null;
+    }
+
+    function getOccupiedCarromSeats(room) {
+        if (!room) return [];
+        return getAllowedCarromSeats(room.format).filter(seatIndex => room.players?.[seatIndex]);
+    }
+
+    function serializeCarromJoinRequests(joinRequests) {
+        return (joinRequests || []).reduce((acc, request) => {
+            if (!request?.id || !request?.sessionId) return acc;
+            acc[request.id] = {
+                id: request.id,
+                name: request.name || 'Player',
+                sessionId: request.sessionId,
+                status: request.status || 'pending',
+                requestedAt: request.requestedAt || Date.now(),
+                updatedAt: request.updatedAt || request.requestedAt || Date.now()
+            };
+            return acc;
+        }, {});
+    }
+
+    function getPendingCarromJoinRequests(room) {
+        return (room?.joinRequests || []).filter(request => request?.status === 'pending');
+    }
+
+    function getLatestCarromJoinRequestForSession(room, sessionId) {
+        if (!room || !sessionId) return null;
+        return [...(room.joinRequests || [])].reverse().find(request => request?.sessionId === sessionId) || null;
+    }
+
+    function getCarromJoinRequestKey(request) {
+        if (!request?.id) return '';
+        return `${request.id}:${request.requestedAt || 0}`;
+    }
+
+    function isCarromRoomFull(room) {
+        return getOccupiedCarromSeats(room).length === room.format;
+    }
+
+    function getNextOpenCarromSeat(room) {
+        return getAllowedCarromSeats(room.format).find(seatIndex => !room.players?.[seatIndex]) ?? null;
+    }
+
+    function getNextCarromTurnSeat(room, currentSeat) {
+        const occupiedSeats = getOccupiedCarromSeats(room);
+        if (!occupiedSeats.length) return 0;
+        const currentIndex = occupiedSeats.indexOf(currentSeat);
+        if (currentIndex === -1) return occupiedSeats[0];
+        return occupiedSeats[(currentIndex + 1) % occupiedSeats.length];
+    }
+
+    function getCarromBaselinePoint(seatIndex, percent, geo) {
+        const progress = clamp(Number(percent) || 50, 5, 95) / 100;
+        const min = geo.center - geo.laneHalf;
+        const max = geo.center + geo.laneHalf;
+        if (seatIndex === 0) {
+            return { x: min + (max - min) * progress, y: geo.playMax - geo.baselineInset };
+        }
+        if (seatIndex === 1) {
+            return { x: geo.playMin + geo.baselineInset, y: min + (max - min) * progress };
+        }
+        if (seatIndex === 2) {
+            return { x: max - (max - min) * progress, y: geo.playMin + geo.baselineInset };
+        }
+        return { x: geo.playMax - geo.baselineInset, y: max - (max - min) * progress };
+    }
+
+    function getCarromViewTurns() {
+        return carromState.seatIndex == null ? 0 : (carromState.seatIndex % 4 + 4) % 4;
+    }
+
+    function rotateCarromPointClockwise(point, geo, turns) {
+        let x = point.x;
+        let y = point.y;
+        const normalizedTurns = ((turns % 4) + 4) % 4;
+        for (let index = 0; index < normalizedTurns; index++) {
+            const dx = x - geo.center;
+            const dy = y - geo.center;
+            x = geo.center + dy;
+            y = geo.center - dx;
+        }
+        return { x, y };
+    }
+
+    function rotateCarromPointCounterClockwise(point, geo, turns) {
+        let x = point.x;
+        let y = point.y;
+        const normalizedTurns = ((turns % 4) + 4) % 4;
+        for (let index = 0; index < normalizedTurns; index++) {
+            const dx = x - geo.center;
+            const dy = y - geo.center;
+            x = geo.center - dy;
+            y = geo.center + dx;
+        }
+        return { x, y };
+    }
+
+    function applyCarromViewTransform(ctx, geo, turns) {
+        const normalizedTurns = ((turns % 4) + 4) % 4;
+        if (!normalizedTurns) return;
+        ctx.translate(geo.center, geo.center);
+        ctx.rotate((Math.PI / 2) * normalizedTurns);
+        ctx.translate(-geo.center, -geo.center);
+    }
+
+    function getCurrentCarromStriker(room, useLocalLane) {
+        const geo = getCarromGeometry(760);
+        const activeSeat = room?.board?.turnSeat ?? 0;
+        const percent = useLocalLane && carromState.seatIndex === activeSeat ? carromState.localStrikerPercent : 50;
+        const point = getCarromBaselinePoint(activeSeat, percent, geo);
+        const strikerTeam = room ? getCarromTeamForSeat(room.format, activeSeat) : 'ivory';
+        return {
+            ...point,
+            radius: geo.strikerRadius,
+            team: strikerTeam
+        };
+    }
+
+    function getCarromStrikerPercentFromPoint(seatIndex, point, geo) {
+        const min = geo.center - geo.laneHalf;
+        const max = geo.center + geo.laneHalf;
+        let progress = 0.5;
+        if (seatIndex === 0) {
+            progress = (clamp(point.x, min, max) - min) / (max - min);
+        } else if (seatIndex === 1) {
+            progress = (clamp(point.y, min, max) - min) / (max - min);
+        } else if (seatIndex === 2) {
+            progress = (max - clamp(point.x, min, max)) / (max - min);
+        } else {
+            progress = (max - clamp(point.y, min, max)) / (max - min);
+        }
+        return clamp(progress * 100, 5, 95);
+    }
+
+    function isPointNearCarromControlLane(seatIndex, point, geo) {
+        const min = geo.center - geo.laneHalf;
+        const max = geo.center + geo.laneHalf;
+        const band = geo.strikerRadius * 2.8;
+        if (seatIndex === 0) {
+            return point.x >= min - band && point.x <= max + band && Math.abs(point.y - (geo.playMax - geo.baselineInset)) <= band;
+        }
+        if (seatIndex === 1) {
+            return point.y >= min - band && point.y <= max + band && Math.abs(point.x - (geo.playMin + geo.baselineInset)) <= band;
+        }
+        if (seatIndex === 2) {
+            return point.x >= min - band && point.x <= max + band && Math.abs(point.y - (geo.playMin + geo.baselineInset)) <= band;
+        }
+        return point.y >= min - band && point.y <= max + band && Math.abs(point.x - (geo.playMax - geo.baselineInset)) <= band;
+    }
+
+    function syncCarromStrikerToPoint(room, point) {
+        if (!room) return null;
+        const seatIndex = room.board?.turnSeat ?? 0;
+        const geo = getCarromGeometry(760);
+        carromState.localStrikerPercent = getCarromStrikerPercentFromPoint(seatIndex, point, geo);
+        return getCurrentCarromStriker(room, true);
+    }
+
+    function getCarromAimPointForSeat(seatIndex, striker, point) {
+        return { x: point.x, y: point.y };
+    }
+
+    function getCarromPieceRadius(piece, geo) {
+        return piece.type === 'striker' ? geo.strikerRadius : geo.coinRadius;
+    }
+
+    function getCarromPieceMass(piece) {
+        return piece.type === 'striker' ? 1.35 : 1;
+    }
+
+    function setCarromNotice(text) {
+        const banner = document.getElementById('carromStatusBanner');
+        if (banner) banner.textContent = text;
+    }
+
+    function setCarromMode(mode) {
+        carromState.mode = mode;
+        document.getElementById('carromHostPanel')?.classList.toggle('hidden', mode !== 'host');
+        document.getElementById('carromJoinPanel')?.classList.toggle('hidden', mode !== 'join');
+        document.getElementById('carromHostTab')?.classList.toggle('active', mode === 'host');
+        document.getElementById('carromJoinTab')?.classList.toggle('active', mode === 'join');
+    }
+
+    function setCarromRoomSize(size) {
+        carromState.roomSize = size === 4 ? 4 : 2;
+        document.getElementById('carromFormat2Btn')?.classList.toggle('active', carromState.roomSize === 2);
+        document.getElementById('carromFormat4Btn')?.classList.toggle('active', carromState.roomSize === 4);
+    }
+
+    function toggleCarromPanels(hasRoom) {
+        document.getElementById('carromHeader')?.classList.toggle('hidden', hasRoom);
+        document.getElementById('carromIntroPanel')?.classList.toggle('hidden', hasRoom);
+        document.getElementById('carromBoardStage')?.classList.toggle('hidden', !hasRoom);
+    }
+
+    function clearCarromAimState(resetPower) {
+        carromState.aiming = false;
+        carromState.aimPointerId = null;
+        carromState.aimPoint = null;
+        carromState.aimPower = 0;
+        carromState.aimStrikerLocked = false;
+        if (resetPower !== false) {
+            updateCarromPowerBar(0);
+        }
+    }
+
+    function cancelCarromSimulation(clearVisual) {
+        if (carromState.simFrame) {
+            cancelAnimationFrame(carromState.simFrame);
+            carromState.simFrame = 0;
+        }
+        if (clearVisual !== false) {
+            carromState.simBoard = null;
+        }
+    }
+
+    function cleanupCarromSubscription() {
+        if (typeof carromState.unsubscribe === 'function') {
+            carromState.unsubscribe();
+        }
+        carromState.unsubscribe = null;
+    }
+
+    function isLocalCarromHost(room) {
+        return !!room && room.hostSessionId === carromState.sessionId;
+    }
+
+    function maybePromptCarromApproval(room) {
+        const pendingRequest = getPendingCarromJoinRequests(room)[0];
+        if (!isLocalCarromHost(room) || !pendingRequest) {
+            if (!pendingRequest) carromState.approvalPromptKey = '';
+            return;
+        }
+
+        const requestKey = getCarromJoinRequestKey(pendingRequest);
+        if (!requestKey || carromState.approvalPromptOpen || carromState.approvalPromptKey === requestKey) return;
+
+        carromState.approvalPromptKey = requestKey;
+        carromState.approvalPromptOpen = true;
+
+        window.setTimeout(async () => {
+            const requestPlayerName = pendingRequest.name || 'A player';
+            const requestRoomCode = room.code || carromState.roomCode;
+            const approved = window.confirm(`${requestPlayerName} wants to join room ${requestRoomCode}.\n\nPress OK to approve now.\nPress Cancel to keep the request pending in Approval Queue.`);
+            carromState.approvalPromptOpen = false;
+
+            const liveRequest = getPendingCarromJoinRequests(carromState.roomData)[0];
+            if (!isLocalCarromHost(carromState.roomData) || !liveRequest || getCarromJoinRequestKey(liveRequest) !== requestKey) {
+                return;
+            }
+
+            if (approved) {
+                await window.approveCarromJoinRequest(liveRequest.id);
+            } else {
+                setCarromNotice(`${requestPlayerName} is waiting in Approval Queue. Approve or decline anytime from the sidebar.`);
+            }
+        }, 0);
+    }
+
+    function isCarromPaused(room) {
+        return !!room?.board?.paused;
+    }
+
+    function canLocalPlayCarrom(room) {
+        return !!room
+            && room.status === 'active'
+            && !room.board?.running
+            && !isCarromPaused(room)
+            && carromState.seatIndex === room.board?.turnSeat;
+    }
+
+    function updateCarromPowerBar(power) {
+        const fill = document.getElementById('carromPowerFill');
+        if (fill) fill.style.width = `${Math.round(clamp(power, 0, 1) * 100)}%`;
+    }
+
+    function cancelCarromBrandFlash(resetState) {
+        if (carromState.brandFlashFrame) {
+            cancelAnimationFrame(carromState.brandFlashFrame);
+            carromState.brandFlashFrame = 0;
+        }
+        if (resetState !== false) {
+            carromState.brandFlashStartedAt = 0;
+            carromState.brandFlashUntil = 0;
+        }
+    }
+
+    function scheduleCarromBrandFlashDraw() {
+        if (carromState.brandFlashFrame) {
+            cancelAnimationFrame(carromState.brandFlashFrame);
+        }
+        const tick = () => {
+            if (!carromState.brandFlashUntil) {
+                carromState.brandFlashFrame = 0;
+                return;
+            }
+            drawCarromBoard();
+            if (performance.now() >= carromState.brandFlashUntil) {
+                cancelCarromBrandFlash();
+                drawCarromBoard();
+                return;
+            }
+            carromState.brandFlashFrame = requestAnimationFrame(tick);
+        };
+        carromState.brandFlashFrame = requestAnimationFrame(tick);
+    }
+
+    function startCarromBrandFlash(brandFlash) {
+        const label = String(brandFlash?.text || 'SHIVANG').trim() || 'SHIVANG';
+        carromState.brandFlashText = label;
+        carromState.brandFlashHue = Number.isFinite(Number(brandFlash?.hueSeed))
+            ? Number(brandFlash.hueSeed)
+            : Math.floor(Math.random() * 360);
+        carromState.brandFlashStartedAt = performance.now();
+        carromState.brandFlashUntil = carromState.brandFlashStartedAt + 1900;
+        scheduleCarromBrandFlashDraw();
+    }
+
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+        const cornerRadius = Math.min(radius, width / 2, height / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + cornerRadius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, cornerRadius);
+        ctx.arcTo(x + width, y + height, x, y + height, cornerRadius);
+        ctx.arcTo(x, y + height, x, y, cornerRadius);
+        ctx.arcTo(x, y, x + width, y, cornerRadius);
+        ctx.closePath();
+    }
+
+    function drawCarromBoardSurface(ctx, geo) {
+        ctx.clearRect(0, 0, geo.size, geo.size);
+
+        const wood = ctx.createLinearGradient(0, 0, geo.size, geo.size);
+        wood.addColorStop(0, '#7c4a2d');
+        wood.addColorStop(0.48, '#b26a3a');
+        wood.addColorStop(1, '#6f3d25');
+        drawRoundedRect(ctx, 20, 20, geo.size - 40, geo.size - 40, 44);
+        ctx.fillStyle = wood;
+        ctx.fill();
+
+        const edgeGlow = ctx.createRadialGradient(geo.center, geo.center, geo.size * 0.12, geo.center, geo.center, geo.size * 0.58);
+        edgeGlow.addColorStop(0, 'rgba(255, 247, 237, 0.18)');
+        edgeGlow.addColorStop(1, 'rgba(255, 247, 237, 0)');
+        drawRoundedRect(ctx, 32, 32, geo.size - 64, geo.size - 64, 36);
+        ctx.fillStyle = edgeGlow;
+        ctx.fill();
+
+        drawRoundedRect(ctx, 60, 60, geo.size - 120, geo.size - 120, 30);
+        ctx.fillStyle = '#f6e2bd';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(94, 58, 32, 0.48)';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        drawRoundedRect(ctx, geo.playMin, geo.playMin, geo.playSize, geo.playSize, 22);
+        const playField = ctx.createLinearGradient(0, geo.playMin, geo.size, geo.playMax);
+        playField.addColorStop(0, '#f9ebcf');
+        playField.addColorStop(1, '#efd2a7');
+        ctx.fillStyle = playField;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(120, 74, 34, 0.42)';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(120, 74, 34, 0.28)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(geo.playMin + 22, geo.playMin + 22, geo.playSize - 44, geo.playSize - 44);
+
+        ctx.beginPath();
+        ctx.arc(geo.center, geo.center, geo.playSize * 0.14, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(153, 27, 27, 0.38)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(geo.center, geo.center, geo.playSize * 0.05, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(220, 38, 38, 0.2)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(153, 27, 27, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const lanes = [
+            { x1: geo.center - geo.laneHalf, y1: geo.playMax - geo.baselineInset, x2: geo.center + geo.laneHalf, y2: geo.playMax - geo.baselineInset },
+            { x1: geo.playMin + geo.baselineInset, y1: geo.center - geo.laneHalf, x2: geo.playMin + geo.baselineInset, y2: geo.center + geo.laneHalf },
+            { x1: geo.center - geo.laneHalf, y1: geo.playMin + geo.baselineInset, x2: geo.center + geo.laneHalf, y2: geo.playMin + geo.baselineInset },
+            { x1: geo.playMax - geo.baselineInset, y1: geo.center - geo.laneHalf, x2: geo.playMax - geo.baselineInset, y2: geo.center + geo.laneHalf }
+        ];
+        lanes.forEach(lane => {
+            ctx.beginPath();
+            ctx.moveTo(lane.x1, lane.y1);
+            ctx.lineTo(lane.x2, lane.y2);
+            ctx.strokeStyle = 'rgba(153, 27, 27, 0.46)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        });
+
+        geo.pocketCenters.forEach(pocket => {
+            const pocketGlow = ctx.createRadialGradient(pocket.x, pocket.y, 2, pocket.x, pocket.y, geo.pocketRadius * 1.5);
+            pocketGlow.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
+            pocketGlow.addColorStop(1, 'rgba(15, 23, 42, 0)');
+            ctx.beginPath();
+            ctx.arc(pocket.x, pocket.y, geo.pocketRadius * 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = pocketGlow;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(pocket.x, pocket.y, geo.pocketRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+    }
+
+    function drawCarromCoin(ctx, piece, geo) {
+        const radius = getCarromPieceRadius(piece, geo);
+        const teamKey = piece.type === 'striker' ? (piece.team || 'ivory') : piece.type;
+        const team = CARROM_TEAMS[teamKey] || CARROM_TEAMS.ivory;
+        const fill = ctx.createRadialGradient(piece.x - radius * 0.35, piece.y - radius * 0.45, radius * 0.2, piece.x, piece.y, radius * 1.2);
+        const innerTone = piece.type === 'striker'
+            ? (teamKey === 'ebony' ? '#475569' : '#ffffff')
+            : (piece.type === 'ebony' ? '#475569' : '#ffffff');
+        fill.addColorStop(0, innerTone);
+        fill.addColorStop(1, team.color);
+        ctx.save();
+        ctx.shadowColor = 'rgba(15, 23, 42, 0.25)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(piece.x, piece.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.lineWidth = piece.type === 'striker' ? 5 : 3;
+        ctx.strokeStyle = team.stroke;
+        ctx.stroke();
+        if (piece.type === 'queen') {
+            ctx.beginPath();
+            ctx.arc(piece.x, piece.y, radius * 0.48, 0, Math.PI * 2);
+            ctx.fillStyle = '#fee2e2';
+            ctx.fill();
+        } else if (piece.type === 'striker') {
+            ctx.beginPath();
+            ctx.arc(piece.x, piece.y, radius * 0.42, 0, Math.PI * 2);
+            ctx.strokeStyle = teamKey === 'ebony' ? 'rgba(226, 232, 240, 0.9)' : 'rgba(15, 23, 42, 0.42)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawCarromAimGuide(ctx, striker) {
+        if (!carromState.aiming || !carromState.aimPoint) return;
+        const dx = striker.x - carromState.aimPoint.x;
+        const dy = striker.y - carromState.aimPoint.y;
+        const distance = Math.hypot(dx, dy) || 1;
+        const nx = dx / distance;
+        const ny = dy / distance;
+        const previewLength = 160 + distance * 0.12;
+        ctx.save();
+        ctx.setLineDash([10, 8]);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(249, 115, 22, 0.78)';
+        ctx.beginPath();
+        ctx.moveTo(carromState.aimPoint.x, carromState.aimPoint.y);
+        ctx.lineTo(striker.x, striker.y);
+        ctx.lineTo(striker.x + nx * previewLength, striker.y + ny * previewLength);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(carromState.aimPoint.x, carromState.aimPoint.y, 10, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(249, 115, 22, 0.2)';
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawCarromBrandFlash(ctx, geo) {
+        if (!carromState.brandFlashUntil || performance.now() >= carromState.brandFlashUntil) {
+            return;
+        }
+
+        const total = Math.max(1, carromState.brandFlashUntil - carromState.brandFlashStartedAt);
+        const elapsed = performance.now() - carromState.brandFlashStartedAt;
+        const progress = clamp(elapsed / total, 0, 1);
+        const blink = 0.35 + (Math.abs(Math.sin(progress * Math.PI * 6)) * 0.65);
+        const scale = 0.94 + (blink * 0.1);
+        const hueA = (carromState.brandFlashHue + progress * 300) % 360;
+        const hueB = (hueA + 84) % 360;
+        const hueC = (hueA + 168) % 360;
+        const boxWidth = geo.playSize * 0.68;
+        const boxHeight = geo.playSize * 0.18;
+        const boxX = geo.center - (boxWidth / 2);
+        const boxY = geo.center - (boxHeight / 2);
+
+        ctx.save();
+        drawRoundedRect(ctx, boxX, boxY, boxWidth, boxHeight, 28);
+        ctx.fillStyle = `hsla(${hueA}, 92%, 10%, ${0.16 + blink * 0.14})`;
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = `hsla(${hueB}, 100%, 82%, ${0.26 + blink * 0.4})`;
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `900 ${Math.round(geo.playSize * 0.105 * scale)}px "Trebuchet MS", "Segoe UI", sans-serif`;
+        ctx.shadowColor = `hsla(${hueC}, 100%, 62%, 0.75)`;
+        ctx.shadowBlur = 22 + (blink * 24);
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = `hsla(${hueA}, 100%, 16%, ${0.55 + blink * 0.25})`;
+        const glowGradient = ctx.createLinearGradient(boxX, geo.center, boxX + boxWidth, geo.center);
+        glowGradient.addColorStop(0, `hsla(${hueA}, 100%, 74%, 0.98)`);
+        glowGradient.addColorStop(0.5, `hsla(${hueB}, 100%, 80%, 1)`);
+        glowGradient.addColorStop(1, `hsla(${hueC}, 100%, 72%, 0.98)`);
+        ctx.strokeText(carromState.brandFlashText, geo.center, geo.center + 2);
+        ctx.fillStyle = glowGradient;
+        ctx.fillText(carromState.brandFlashText, geo.center, geo.center);
+        ctx.restore();
+    }
+
+    function drawCarromBoard() {
+        ensureCarromCanvasBindings();
+        if (!carromState.canvas || !carromState.ctx) return;
+
+        const ctx = carromState.ctx;
+        const geo = getCarromGeometry(carromState.canvas.width);
+        const room = carromState.roomData;
+        const board = room?.board || buildInitialCarromBoard(carromState.roomSize);
+        const pieces = carromState.simBoard?.pieces || cloneCarromPieces(board.pieces || []);
+        const striker = carromState.simBoard?.striker
+            || (room ? getCurrentCarromStriker(room, true) : null);
+        const viewTurns = getCarromViewTurns();
+
+        ctx.save();
+        applyCarromViewTransform(ctx, geo, viewTurns);
+        drawCarromBoardSurface(ctx, geo);
+
+        pieces
+            .filter(piece => !piece.pocketed)
+            .forEach(piece => drawCarromCoin(ctx, piece, geo));
+
+        if (striker && !striker.pocketed) {
+            drawCarromCoin(ctx, { ...striker, type: 'striker' }, geo);
+        }
+
+        if (room && canLocalPlayCarrom(room) && striker) {
+            drawCarromAimGuide(ctx, striker);
+        }
+
+        ctx.restore();
+
+        ctx.save();
+        ctx.font = '700 18px Roboto, sans-serif';
+        ctx.fillStyle = 'rgba(120, 74, 34, 0.72)';
+        ctx.textAlign = 'center';
+        ctx.fillText('CARROM CROWN', geo.center, 58);
+        ctx.restore();
+
+        drawCarromBrandFlash(ctx, geo);
+
+        if (room && isCarromPaused(room)) {
+            ctx.save();
+            drawRoundedRect(ctx, geo.playMin + 26, geo.playMin + 26, geo.playSize - 52, geo.playSize - 52, 26);
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.44)';
+            ctx.fill();
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#fde68a';
+            ctx.font = '800 44px Roboto, sans-serif';
+            ctx.fillText('PAUSED', geo.center, geo.center - 10);
+            ctx.font = '600 20px Roboto, sans-serif';
+            ctx.fillStyle = '#ffedd5';
+            ctx.fillText(room.board?.pausedBy ? `Paused by ${room.board.pausedBy}` : 'Waiting to resume', geo.center, geo.center + 28);
+            ctx.restore();
+        }
+    }
+
+    function getCanvasPointFromEvent(event) {
+        if (!carromState.canvas) return { x: 0, y: 0 };
+        const rect = carromState.canvas.getBoundingClientRect();
+        const scaleX = carromState.canvas.width / rect.width;
+        const scaleY = carromState.canvas.height / rect.height;
+        const geo = getCarromGeometry(carromState.canvas.width);
+        const rawPoint = {
+            x: (event.clientX - rect.left) * scaleX,
+            y: (event.clientY - rect.top) * scaleY
+        };
+        return rotateCarromPointCounterClockwise(rawPoint, geo, getCarromViewTurns());
+    }
+
+    async function launchCarromShot(striker, aimPoint) {
+        const room = carromState.roomData;
+        if (!canLocalPlayCarrom(room) || !room || carromState.seatIndex == null) {
+            clearCarromAimState();
+            drawCarromBoard();
+            return;
+        }
+
+        const vectorX = striker.x - aimPoint.x;
+        const vectorY = striker.y - aimPoint.y;
+        const distance = Math.hypot(vectorX, vectorY);
+        if (distance < 18) {
+            clearCarromAimState();
+            drawCarromBoard();
+            return;
+        }
+
+        const power = clamp(distance / 190, 0.08, 1);
+        const speed = 7 + power * 17;
+        const shot = {
+            id: `shot_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            seatIndex: carromState.seatIndex,
+            playerName: room.players?.[carromState.seatIndex]?.name || 'Player',
+            strikerX: striker.x,
+            strikerY: striker.y,
+            vx: (vectorX / distance) * speed,
+            vy: (vectorY / distance) * speed,
+            power: Number(power.toFixed(3)),
+            launchedAt: Date.now()
+        };
+
+        clearCarromAimState();
+        setCarromNotice(`${shot.playerName} tees up the striker...`);
+
+        try {
+            await update(getCarromRoomRef(room.code), {
+                board: {
+                    ...room.board,
+                    running: true,
+                    shot,
+                    resultText: `${shot.playerName} lines up a shot from the ${getSeatInfo(shot.seatIndex).short} side.`
+                },
+                resultText: `${shot.playerName} lines up a shot from the ${getSeatInfo(shot.seatIndex).short} side.`,
+                updatedAt: Date.now()
+            });
+            startCarromShotSimulation(normalizeCarromRoomData({
+                ...room,
+                board: {
+                    ...room.board,
+                    running: true,
+                    shot
+                }
+            }), shot);
+        } catch (error) {
+            setCarromNotice(`Shot could not start. Firebase error: ${error?.message || 'Unknown error'}`);
+            drawCarromBoard();
+        }
+    }
+
+    function ensureCarromCanvasBindings() {
+        if (carromState.canvasBound) return;
+        const canvas = document.getElementById('carromBoardCanvas');
+        if (!canvas) return;
+        carromState.canvas = canvas;
+        carromState.ctx = canvas.getContext('2d');
+
+        canvas.addEventListener('wheel', event => {
+            event.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('pointerdown', event => {
+            const room = carromState.roomData;
+            if (!canLocalPlayCarrom(room)) return;
+            const geo = getCarromGeometry(canvas.width);
+            const point = getCanvasPointFromEvent(event);
+            const striker = getCurrentCarromStriker(room, true);
+            const touchStriker = Math.hypot(point.x - striker.x, point.y - striker.y) <= striker.radius + 18;
+            const touchLane = isPointNearCarromControlLane(room.board?.turnSeat ?? 0, point, geo);
+            if (!touchStriker && !touchLane) return;
+            event.preventDefault();
+            const liveStriker = syncCarromStrikerToPoint(room, point) || striker;
+            carromState.aiming = true;
+            carromState.aimPointerId = event.pointerId;
+            carromState.aimStrikerLocked = false;
+            carromState.aimPoint = { x: liveStriker.x, y: liveStriker.y };
+            carromState.aimPower = 0;
+            updateCarromPowerBar(0);
+            canvas.setPointerCapture(event.pointerId);
+            drawCarromBoard();
+        });
+
+        canvas.addEventListener('pointermove', event => {
+            if (!carromState.aiming || event.pointerId !== carromState.aimPointerId) return;
+            event.preventDefault();
+            const room = carromState.roomData;
+            const geo = getCarromGeometry(canvas.width);
+            const point = getCanvasPointFromEvent(event);
+            const currentSeat = room?.board?.turnSeat ?? 0;
+            let striker = getCurrentCarromStriker(room, true);
+
+            if (!carromState.aimStrikerLocked) {
+                const movedStriker = syncCarromStrikerToPoint(room, point) || striker;
+                const pullDistance = Math.hypot(point.x - movedStriker.x, point.y - movedStriker.y);
+                const stillOnLane = isPointNearCarromControlLane(currentSeat, point, geo);
+                striker = movedStriker;
+
+                if (pullDistance > geo.strikerRadius * 1.7 && !stillOnLane) {
+                    carromState.aimStrikerLocked = true;
+                    striker = getCurrentCarromStriker(room, true);
+                } else {
+                    carromState.aimPoint = { x: striker.x, y: striker.y };
+                    carromState.aimPower = 0;
+                    updateCarromPowerBar(0);
+                    drawCarromBoard();
+                    return;
+                }
+            }
+
+            striker = getCurrentCarromStriker(room, true);
+            carromState.aimPoint = getCarromAimPointForSeat(currentSeat, striker, point);
+            carromState.aimPower = clamp(Math.hypot(striker.x - carromState.aimPoint.x, striker.y - carromState.aimPoint.y) / 190, 0, 1);
+            updateCarromPowerBar(carromState.aimPower);
+            drawCarromBoard();
+        });
+
+        const finishAim = async event => {
+            if (!carromState.aiming || event.pointerId !== carromState.aimPointerId) return;
+            if (!carromState.aimStrikerLocked || !carromState.aimPoint) {
+                if (canvas.hasPointerCapture(event.pointerId)) {
+                    canvas.releasePointerCapture(event.pointerId);
+                }
+                clearCarromAimState();
+                drawCarromBoard();
+                return;
+            }
+            const aimPoint = carromState.aimPoint || getCanvasPointFromEvent(event);
+            const striker = getCurrentCarromStriker(carromState.roomData, true);
+            if (canvas.hasPointerCapture(event.pointerId)) {
+                canvas.releasePointerCapture(event.pointerId);
+            }
+            await launchCarromShot(striker, aimPoint);
+        };
+
+        canvas.addEventListener('pointerup', finishAim);
+        canvas.addEventListener('pointercancel', event => {
+            if (event.pointerId !== carromState.aimPointerId) return;
+            if (canvas.hasPointerCapture(event.pointerId)) {
+                canvas.releasePointerCapture(event.pointerId);
+            }
+            clearCarromAimState();
+            drawCarromBoard();
+        });
+
+        carromState.canvasBound = true;
+        drawCarromBoard();
+    }
+
+    function advanceCarromSimulation(simulation) {
+        const geo = getCarromGeometry(760);
+        const pieces = simulation.pieces;
+        const friction = 0.992;
+        const wallMin = geo.playMin;
+        const wallMax = geo.playMax;
+
+        for (let index = 0; index < pieces.length; index++) {
+            const piece = pieces[index];
+            if (piece.pocketed) continue;
+            piece.x += piece.vx;
+            piece.y += piece.vy;
+            piece.vx *= friction;
+            piece.vy *= friction;
+
+            if (Math.abs(piece.vx) < 0.02) piece.vx = 0;
+            if (Math.abs(piece.vy) < 0.02) piece.vy = 0;
+
+            const radius = getCarromPieceRadius(piece, geo);
+            const pocketed = geo.pocketCenters.some(pocket => Math.hypot(piece.x - pocket.x, piece.y - pocket.y) <= geo.pocketRadius - radius * 0.1);
+            if (pocketed) {
+                piece.pocketed = true;
+                piece.vx = 0;
+                piece.vy = 0;
+                if (piece.type === 'striker') {
+                    simulation.strikerPocketed = true;
+                } else {
+                    simulation.pocketed.push({ id: piece.id, type: piece.type });
+                }
+                continue;
+            }
+
+            if (piece.x - radius < wallMin) {
+                piece.x = wallMin + radius;
+                piece.vx = Math.abs(piece.vx) * 0.98;
+            } else if (piece.x + radius > wallMax) {
+                piece.x = wallMax - radius;
+                piece.vx = -Math.abs(piece.vx) * 0.98;
+            }
+
+            if (piece.y - radius < wallMin) {
+                piece.y = wallMin + radius;
+                piece.vy = Math.abs(piece.vy) * 0.98;
+            } else if (piece.y + radius > wallMax) {
+                piece.y = wallMax - radius;
+                piece.vy = -Math.abs(piece.vy) * 0.98;
+            }
+        }
+
+        for (let leftIndex = 0; leftIndex < pieces.length; leftIndex++) {
+            const leftPiece = pieces[leftIndex];
+            if (leftPiece.pocketed) continue;
+            for (let rightIndex = leftIndex + 1; rightIndex < pieces.length; rightIndex++) {
+                const rightPiece = pieces[rightIndex];
+                if (rightPiece.pocketed) continue;
+
+                const dx = rightPiece.x - leftPiece.x;
+                const dy = rightPiece.y - leftPiece.y;
+                const distance = Math.hypot(dx, dy) || 0.0001;
+                const minDistance = getCarromPieceRadius(leftPiece, geo) + getCarromPieceRadius(rightPiece, geo);
+                if (distance >= minDistance) continue;
+
+                const nx = dx / distance;
+                const ny = dy / distance;
+                const overlap = minDistance - distance;
+                leftPiece.x -= nx * overlap * 0.5;
+                leftPiece.y -= ny * overlap * 0.5;
+                rightPiece.x += nx * overlap * 0.5;
+                rightPiece.y += ny * overlap * 0.5;
+
+                const relativeVX = rightPiece.vx - leftPiece.vx;
+                const relativeVY = rightPiece.vy - leftPiece.vy;
+                const velocityAlongNormal = relativeVX * nx + relativeVY * ny;
+                if (velocityAlongNormal > 0) continue;
+
+                const restitution = 0.985;
+                const impulse = -(1 + restitution) * velocityAlongNormal / ((1 / getCarromPieceMass(leftPiece)) + (1 / getCarromPieceMass(rightPiece)));
+                const impulseX = impulse * nx;
+                const impulseY = impulse * ny;
+
+                leftPiece.vx -= impulseX / getCarromPieceMass(leftPiece);
+                leftPiece.vy -= impulseY / getCarromPieceMass(leftPiece);
+                rightPiece.vx += impulseX / getCarromPieceMass(rightPiece);
+                rightPiece.vy += impulseY / getCarromPieceMass(rightPiece);
+            }
+        }
+
+        const moving = pieces.some(piece => !piece.pocketed && (Math.abs(piece.vx) > 0.04 || Math.abs(piece.vy) > 0.04));
+        simulation.restFrames = moving ? 0 : simulation.restFrames + 1;
+        return simulation.restFrames > 8;
+    }
+
+    function buildCarromSimulation(room, shot) {
+        const pieces = cloneCarromPieces(room.board.pieces)
+            .filter(piece => !piece.pocketed)
+            .map(piece => ({ ...piece, vx: 0, vy: 0 }));
+        const strikerTeam = getCarromTeamForSeat(room.format, shot.seatIndex);
+        const striker = {
+            id: 'striker',
+            type: 'striker',
+            team: strikerTeam,
+            x: shot.strikerX,
+            y: shot.strikerY,
+            vx: shot.vx,
+            vy: shot.vy,
+            pocketed: false
+        };
+        return {
+            shotId: shot.id,
+            pieces: [...pieces, striker],
+            striker,
+            pocketed: [],
+            strikerPocketed: false,
+            restFrames: 0
+        };
+    }
+
+    function summarizeCarromShot(room, shot, simulation, resolvedBoard) {
+        const shooter = shot.playerName || room.players?.[shot.seatIndex]?.name || 'Player';
+        const seat = getSeatInfo(shot.seatIndex).short;
+        const currentTeam = getCarromTeamForSeat(room.format, shot.seatIndex);
+        const opponentTeam = getOpponentTeam(currentTeam);
+        const ownPocketed = simulation.pocketed.filter(item => item.type === currentTeam).length;
+        const opponentPocketed = simulation.pocketed.filter(item => item.type === opponentTeam).length;
+        const queenPocketed = simulation.pocketed.filter(item => item.type === 'queen').length;
+        const parts = [`${shooter} (${seat})`];
+
+        if (!ownPocketed && !opponentPocketed && !queenPocketed && !simulation.strikerPocketed) {
+            parts.push('found no pocket');
+        } else {
+            if (ownPocketed) parts.push(`banked ${ownPocketed} own coin${ownPocketed === 1 ? '' : 's'}`);
+            if (queenPocketed) parts.push(`claimed the queen for ${queenPocketed * 3} bonus`);
+            if (opponentPocketed) parts.push(`fed ${opponentPocketed} coin${opponentPocketed === 1 ? '' : 's'} to ${getTeamLabel(opponentTeam)}`);
+            if (simulation.strikerPocketed) parts.push('took a striker foul');
+        }
+
+        if (resolvedBoard.winnerLabel) {
+            parts.push(resolvedBoard.winnerLabel);
+        } else if (resolvedBoard.turnSeat === shot.seatIndex) {
+            parts.push('keeps the board');
+        } else {
+            parts.push(`next shot: ${getSeatInfo(resolvedBoard.turnSeat).short}`);
+        }
+        return parts.join(' • ');
+    }
+
+    async function resolveCarromShotIfHost(room, shot, simulation) {
+        if (!isLocalCarromHost(room) || carromState.hostResolvingShotId === shot.id) return;
+        carromState.hostResolvingShotId = shot.id;
+        const currentTeam = getCarromTeamForSeat(room.format, shot.seatIndex);
+        const opponentTeam = getOpponentTeam(currentTeam);
+        const baseScores = { ivory: room.board.scores?.ivory || 0, ebony: room.board.scores?.ebony || 0 };
+        const ownPocketed = simulation.pocketed.filter(item => item.type === currentTeam).length;
+        const opponentPocketed = simulation.pocketed.filter(item => item.type === opponentTeam).length;
+        const queenPocketed = simulation.pocketed.filter(item => item.type === 'queen').length;
+        const resolvedAt = Date.now();
+        const scoredCoins = ownPocketed + opponentPocketed + queenPocketed;
+        const keepTurn = !simulation.strikerPocketed && (ownPocketed > 0 || queenPocketed > 0);
+
+        const nextScores = {
+            ivory: baseScores.ivory,
+            ebony: baseScores.ebony
+        };
+        nextScores[currentTeam] = Math.max(0, nextScores[currentTeam] + ownPocketed + (queenPocketed * 3) - (simulation.strikerPocketed ? 1 : 0));
+        nextScores[opponentTeam] = Math.max(0, nextScores[opponentTeam] + opponentPocketed);
+
+        const resolvedPieces = simulation.pieces
+            .filter(piece => piece.type !== 'striker')
+            .map(piece => ({
+                id: piece.id,
+                type: piece.type,
+                x: Number(piece.x.toFixed(2)),
+                y: Number(piece.y.toFixed(2)),
+                pocketed: !!piece.pocketed
+            }));
+
+        const remainingPlayable = resolvedPieces.filter(piece => !piece.pocketed).length;
+        const winnerTeam = remainingPlayable === 0
+            ? (nextScores.ivory === nextScores.ebony ? 'draw' : (nextScores.ivory > nextScores.ebony ? 'ivory' : 'ebony'))
+            : '';
+        const winnerLabel = winnerTeam === 'draw'
+            ? 'Board drawn'
+            : winnerTeam
+                ? `${getTeamLabel(winnerTeam)} wins`
+                : '';
+        const nextTurnSeat = winnerTeam
+            ? shot.seatIndex
+            : (keepTurn ? shot.seatIndex : getNextCarromTurnSeat(room, shot.seatIndex));
+        const resultText = winnerLabel
+            ? `${winnerLabel}. Final score ${nextScores.ivory}-${nextScores.ebony}.`
+            : `${shot.playerName || 'Player'} finishes the shot. ${keepTurn ? `${getSeatInfo(shot.seatIndex).short} keeps the board.` : `${getSeatInfo(nextTurnSeat).short} steps up next.`}`;
+        const resolvedBoard = {
+            ...room.board,
+            pieces: resolvedPieces,
+            scores: nextScores,
+            turnSeat: nextTurnSeat,
+            turnNumber: (room.board.turnNumber || 1) + 1,
+            running: false,
+            shot: null,
+            resultText,
+            winnerTeam,
+            winnerLabel
+        };
+        const nextStatus = winnerTeam ? 'finished' : 'active';
+        const moveLog = [...(room.moveLog || []), summarizeCarromShot(room, shot, simulation, resolvedBoard)].slice(-10);
+        const brandFlash = scoredCoins > 0
+            ? {
+                id: `${shot.id || 'carrom-shot'}:${resolvedAt}`,
+                text: 'SHIVANG',
+                hueSeed: Math.floor(Math.random() * 360),
+                createdAt: resolvedAt
+            }
+            : (room.brandFlash || null);
+
+        try {
+            await update(getCarromRoomRef(room.code), {
+                status: nextStatus,
+                board: resolvedBoard,
+                moveLog,
+                brandFlash,
+                resultText,
+                updatedAt: resolvedAt
+            });
+        } catch (error) {
+            setCarromNotice(`Shot result sync failed. Firebase error: ${error?.message || 'Unknown error'}`);
+        } finally {
+            carromState.hostResolvingShotId = '';
+        }
+    }
+
+    function startCarromShotSimulation(room, shot) {
+        if (!room || !shot) return;
+        if (carromState.simBoard?.shotId === shot.id) return;
+        cancelCarromSimulation();
+        clearCarromAimState();
+        carromState.lastVisualShotId = shot.id;
+        const simulation = buildCarromSimulation(room, shot);
+        carromState.simBoard = simulation;
+
+        const step = () => {
+            if (!carromState.simBoard || carromState.simBoard.shotId !== shot.id) return;
+            let finished = false;
+            for (let index = 0; index < 2; index++) {
+                finished = advanceCarromSimulation(simulation);
+                if (finished) break;
+            }
+            drawCarromBoard();
+            if (finished) {
+                carromState.simFrame = 0;
+                resolveCarromShotIfHost(room, shot, simulation);
+                return;
+            }
+            carromState.simFrame = requestAnimationFrame(step);
+        };
+
+        step();
+    }
+
+    function renderCarromSeatCards(room) {
+        for (let seatIndex = 0; seatIndex < 4; seatIndex++) {
+            const seatCard = document.getElementById(`carromSeat${seatIndex}Card`);
+            const seatName = document.getElementById(`carromSeat${seatIndex}Name`);
+            const seatMeta = document.getElementById(`carromSeat${seatIndex}Meta`);
+            if (!seatCard || !seatName || !seatMeta) continue;
+
+            const seat = getSeatInfo(seatIndex);
+            const seatUsed = !room || getAllowedCarromSeats(room.format).includes(seatIndex);
+            const player = room?.players?.[seatIndex];
+            const team = room ? getCarromTeamForSeat(room.format, seatIndex) : getCarromTeamForSeat(carromState.roomSize, seatIndex);
+            const isCurrentSeat = room?.status === 'active' && room.board?.turnSeat === seatIndex;
+            const isLocalSeat = carromState.seatIndex === seatIndex;
+
+            seatCard.classList.toggle('hidden-seat', !seatUsed);
+            seatCard.classList.toggle('active-seat', isCurrentSeat || isLocalSeat);
+
+            if (!seatUsed) {
+                seatName.textContent = 'Not used in duel';
+                seatMeta.textContent = 'Reserved for 4-player table';
+                continue;
+            }
+
+            if (!player) {
+                seatName.textContent = seatIndex === 0 ? 'Waiting for host' : 'Open seat';
+                seatMeta.textContent = `${getTeamLabel(team)} • ${seat.meta}`;
+                continue;
+            }
+
+            seatName.textContent = player.name;
+            const roleBits = [
+                getTeamLabel(team),
+                player.sessionId === room.hostSessionId ? 'Host' : 'Player'
+            ];
+            if (isLocalSeat) roleBits.push('You');
+            seatMeta.textContent = roleBits.join(' • ');
+        }
+    }
+
+    function renderCarromScoreboard(room) {
+        const container = document.getElementById('carromScoreboard');
+        if (!container) return;
+        if (!room) {
+            container.innerHTML = '';
+            return;
+        }
+
+        const activeTeam = room.status === 'active' ? getCarromTeamForSeat(room.format, room.board.turnSeat) : '';
+        const pieces = room.board?.pieces || [];
+        const markup = ['ivory', 'ebony'].map(team => {
+            const seats = getAllowedCarromSeats(room.format).filter(seatIndex => getCarromTeamForSeat(room.format, seatIndex) === team);
+            const names = seats.map(seatIndex => room.players?.[seatIndex]?.name).filter(Boolean);
+            const remaining = pieces.filter(piece => !piece.pocketed && piece.type === team).length;
+            return `
+                <div class="carrom-score-card ${activeTeam === team ? 'active' : ''}">
+                    <div class="carrom-score-copy">
+                        <div class="carrom-score-name">${getTeamLabel(team)}</div>
+                        <div class="carrom-score-note">${names.length ? names.join(' + ') : 'Waiting for players'} • ${remaining} coin${remaining === 1 ? '' : 's'} left</div>
+                    </div>
+                    <div class="carrom-score-value">${room.board?.scores?.[team] || 0}</div>
+                </div>
+            `;
+        }).join('');
+        container.innerHTML = markup;
+    }
+
+    function renderCarromShotList(room) {
+        const list = document.getElementById('carromShotList');
+        if (!list) return;
+        const entries = room?.moveLog || [];
+        if (!entries.length) {
+            list.innerHTML = '<li>Room not started yet.</li>';
+            return;
+        }
+        list.innerHTML = entries.slice(-8).reverse().map(entry => `<li>${entry}</li>`).join('');
+    }
+
+    function escapeCarromHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char]));
+    }
+
+    function formatCarromChatTime(value) {
+        if (!value) return '';
+        const timestamp = Number(value);
+        if (!Number.isFinite(timestamp)) return '';
+        try {
+            return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        } catch (error) {
+            return '';
+        }
+    }
+
+    function isOwnCarromMessage(message) {
+        if (!message) return false;
+        if (message.sessionId && message.sessionId === carromState.sessionId) return true;
+        return carromState.seatIndex != null && Number(message.seatIndex) === carromState.seatIndex;
+    }
+
+    function clearCarromBoardChatPreview(resetKey) {
+        if (carromState.boardChatPreviewTimer) {
+            clearTimeout(carromState.boardChatPreviewTimer);
+            carromState.boardChatPreviewTimer = 0;
+        }
+        const overlay = document.getElementById('carromBoardChatOverlay');
+        if (overlay) {
+            overlay.innerHTML = '';
+            overlay.classList.add('hidden');
+        }
+        if (resetKey !== false) {
+            carromState.boardChatPreviewKey = '';
+        }
+    }
+
+    function renderCarromBoardChatPreview(messages) {
+        const overlay = document.getElementById('carromBoardChatOverlay');
+        if (!overlay) return;
+        if (!messages?.length) {
+            clearCarromBoardChatPreview();
+            return;
+        }
+
+        const latestMessage = messages[messages.length - 1];
+        const previewKey = `${latestMessage?.createdAt || 0}:${latestMessage?.sessionId || latestMessage?.name || ''}:${latestMessage?.text || ''}`;
+        if (!previewKey || previewKey === carromState.boardChatPreviewKey) {
+            return;
+        }
+
+        const sender = escapeCarromHtml(latestMessage?.name || 'Player');
+        const text = escapeCarromHtml(latestMessage?.text || '');
+        const time = escapeCarromHtml(formatCarromChatTime(latestMessage?.createdAt));
+        const ownClass = isOwnCarromMessage(latestMessage) ? ' own' : '';
+        carromState.boardChatPreviewKey = previewKey;
+        overlay.innerHTML = `
+            <div class="carrom-board-chat-toast${ownClass}">
+                <div class="carrom-board-chat-head">
+                    <span class="carrom-board-chat-name">${sender}</span>
+                    <span class="carrom-board-chat-time">${time}</span>
+                </div>
+                <div class="carrom-board-chat-text">${text}</div>
+            </div>
+        `;
+        overlay.classList.remove('hidden');
+        if (carromState.boardChatPreviewTimer) {
+            clearTimeout(carromState.boardChatPreviewTimer);
+        }
+        carromState.boardChatPreviewTimer = window.setTimeout(() => {
+            const liveOverlay = document.getElementById('carromBoardChatOverlay');
+            if (!liveOverlay || carromState.boardChatPreviewKey !== previewKey) return;
+            liveOverlay.innerHTML = '';
+            liveOverlay.classList.add('hidden');
+            carromState.boardChatPreviewTimer = 0;
+        }, 1000);
+    }
+
+    function renderCarromChat(room) {
+        const list = document.getElementById('carromChatList');
+        const input = document.getElementById('carromChatInput');
+        const sendBtn = document.getElementById('carromChatSendBtn');
+        if (!list || !input || !sendBtn) return;
+
+        if (!room) {
+            list.innerHTML = '<li class="carrom-chat-empty">Create or join a room to start chatting.</li>';
+            input.value = '';
+            input.disabled = true;
+            sendBtn.disabled = true;
+            clearCarromBoardChatPreview();
+            return;
+        }
+
+        const canChat = carromState.seatIndex != null;
+        input.disabled = !canChat;
+        sendBtn.disabled = !canChat;
+        input.placeholder = canChat ? 'Type a room message' : 'Join a seat to chat';
+
+        const messages = room.messages || [];
+        if (!messages.length) {
+            list.innerHTML = '<li class="carrom-chat-empty">No messages yet. Say hello to the table.</li>';
+            clearCarromBoardChatPreview();
+            return;
+        }
+
+        const recentMessages = messages.slice(-18);
+        list.innerHTML = recentMessages.map(message => {
+            const sender = escapeCarromHtml(message?.name || 'Player');
+            const text = escapeCarromHtml(message?.text || '');
+            const time = escapeCarromHtml(formatCarromChatTime(message?.createdAt));
+            const rowClass = isOwnCarromMessage(message) ? 'own' : 'other';
+            return `
+                <li class="carrom-chat-row ${rowClass}">
+                    <div class="carrom-chat-bubble">
+                        <div class="carrom-chat-bubble-head">
+                            <div class="carrom-chat-meta">${sender}</div>
+                            <div class="carrom-chat-time">${time}</div>
+                        </div>
+                        <div class="carrom-chat-text">${text}</div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+        renderCarromBoardChatPreview(recentMessages);
+        list.scrollTop = list.scrollHeight;
+    }
+
+    function updateCarromApprovalState(room) {
+        const approvalCard = document.getElementById('carromApprovalCard');
+        const approvalTitle = document.getElementById('carromApprovalTitle');
+        const approvalText = document.getElementById('carromApprovalText');
+        const approvalActions = document.getElementById('carromApprovalActions');
+        const approvalStartBtn = document.getElementById('carromApprovalStartBtn');
+        const waitingCard = document.getElementById('carromWaitingCard');
+        const waitingText = document.getElementById('carromWaitingText');
+        const host = isLocalCarromHost(room);
+        const fullRoom = !!room && isCarromRoomFull(room);
+        const pendingRequest = getPendingCarromJoinRequests(room)[0] || null;
+        const localRequest = getLatestCarromJoinRequestForSession(room, carromState.sessionId);
+        const showWaiting = !!room && !isLocalCarromHost(room) && carromState.seatIndex == null && !!localRequest;
+        const showQuickStart = !!room && host && !pendingRequest && fullRoom && room.status !== 'active' && room.status !== 'finished';
+
+        approvalCard?.classList.toggle('hidden', !(host && (pendingRequest || showQuickStart)));
+        waitingCard?.classList.toggle('hidden', !showWaiting);
+        approvalActions?.classList.toggle('hidden', !pendingRequest);
+        approvalStartBtn?.classList.toggle('hidden', !showQuickStart);
+
+        if (approvalTitle) {
+            approvalTitle.textContent = pendingRequest ? 'Approval Queue' : 'Ready to Start';
+        }
+
+        if (approvalText) {
+            approvalText.textContent = pendingRequest
+                ? `${pendingRequest.name || 'A player'} is waiting to join this room. Use Approve to assign the next open seat, or Decline to reject later.`
+                : showQuickStart
+                    ? 'Room full ho gaya. Yahin se direct match start kar do.'
+                    : 'No pending request.';
+        }
+
+        if (approvalStartBtn) {
+            approvalStartBtn.disabled = !showQuickStart;
+            approvalStartBtn.textContent = 'Start Match';
+        }
+
+        if (waitingText) {
+            waitingText.textContent = localRequest?.status === 'declined'
+                ? 'Host declined your join request. Send a fresh request when ready.'
+                : 'Your join request is waiting for host approval.';
+        }
+    }
+
+    function updateCarromActionState(room) {
+        const startBtn = document.getElementById('carromStartBtn');
+        const pauseBtn = document.getElementById('carromPauseBtn');
+        const resetBtn = document.getElementById('carromResetBtn');
+        const copyBtn = document.getElementById('carromCopyCodeBtn');
+        if (copyBtn) copyBtn.disabled = !room?.code;
+
+        if (!startBtn || !pauseBtn || !resetBtn) return;
+        if (!room) {
+            startBtn.disabled = true;
+            startBtn.textContent = 'Start Match';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = 'Pause Match';
+            resetBtn.disabled = true;
+            return;
+        }
+
+        const host = isLocalCarromHost(room);
+        const fullRoom = isCarromRoomFull(room);
+        const seatedPlayer = carromState.seatIndex != null;
+        startBtn.disabled = !host || !fullRoom || room.status === 'active';
+        startBtn.textContent = room.status === 'active'
+            ? 'Match Live'
+            : fullRoom
+                ? 'Start Match'
+                : `Waiting ${getOccupiedCarromSeats(room).length}/${room.format}`;
+        pauseBtn.disabled = !seatedPlayer || !!room.board?.running;
+        pauseBtn.textContent = isCarromPaused(room)
+            ? (room.status === 'active' ? 'Resume Match' : 'Resume Room')
+            : (room.status === 'active' ? 'Pause Match' : 'Pause Room');
+        resetBtn.disabled = !host;
+    }
+
+    function updateCarromRoomView(room) {
+        const previousRoom = carromState.roomData;
+        carromState.roomData = room;
+        carromState.seatIndex = getCarromSeatBySession(room, carromState.sessionId);
+        ensureCarromCanvasBindings();
+        toggleCarromPanels(!!room);
+        renderCarromSeatCards(room);
+        renderCarromScoreboard(room);
+        renderCarromShotList(room);
+        renderCarromChat(room);
+        updateCarromApprovalState(room);
+        updateCarromActionState(room);
+
+        const roomCodeDisplay = document.getElementById('carromRoomCodeDisplay');
+        const roomModeChip = document.getElementById('carromRoomModeChip');
+        const turnChip = document.getElementById('carromTurnChip');
+        const turnOwner = document.getElementById('carromTurnOwner');
+        const teamTarget = document.getElementById('carromTeamTarget');
+        const headline = document.getElementById('carromMatchHeadline');
+        const roleHint = document.getElementById('carromRoleHint');
+        const hint = document.getElementById('carromAimHint');
+
+        if (!room) {
+            carromState.approvalPromptKey = '';
+            carromState.approvalPromptOpen = false;
+            carromState.brandFlashKey = '';
+            if (roomCodeDisplay) roomCodeDisplay.textContent = '------';
+            if (roomModeChip) roomModeChip.textContent = 'Lobby Ready';
+            if (turnChip) turnChip.textContent = 'Waiting';
+            if (turnOwner) turnOwner.textContent = 'South Baseline';
+            if (teamTarget) teamTarget.textContent = 'Ivory Team on deck';
+            if (headline) headline.textContent = 'No live room';
+            if (roleHint) roleHint.textContent = 'Choose Host Room or Join Room to begin.';
+            if (hint) hint.textContent = 'When it is your turn, drag the striker across your lane, then pull outward on the board to load power and release.';
+            cancelCarromSimulation();
+            cancelCarromBrandFlash();
+            clearCarromAimState();
+            drawCarromBoard();
+            return;
+        }
+
+        const occupied = getOccupiedCarromSeats(room).length;
+        const fullRoom = isCarromRoomFull(room);
+        const turnSeat = room.board?.turnSeat ?? 0;
+        const turnPlayer = room.players?.[turnSeat]?.name || getSeatInfo(turnSeat).label;
+        const turnTeam = getCarromTeamForSeat(room.format, turnSeat);
+        const localTeam = carromState.seatIndex == null ? '' : getCarromTeamForSeat(room.format, carromState.seatIndex);
+        const localSeatLabel = carromState.seatIndex == null ? 'No seat yet' : getSeatInfo(carromState.seatIndex).label;
+        const pendingRequests = getPendingCarromJoinRequests(room);
+        const localJoinRequest = getLatestCarromJoinRequestForSession(room, carromState.sessionId);
+        const localPendingRequest = carromState.seatIndex == null && localJoinRequest?.status === 'pending' ? localJoinRequest : null;
+        const localDeclinedRequest = carromState.seatIndex == null && localJoinRequest?.status === 'declined' ? localJoinRequest : null;
+
+        if (roomCodeDisplay) roomCodeDisplay.textContent = room.code || '------';
+        if (roomModeChip) {
+            roomModeChip.textContent = room.status === 'active'
+                ? (isCarromPaused(room) ? 'Match Paused' : `${room.format}P Match Live`)
+                : room.status === 'finished'
+                    ? 'Match Complete'
+                    : (isCarromPaused(room) ? 'Room Paused' : pendingRequests.length ? 'Approval Queue' : `${occupied}/${room.format} Seats Filled`);
+        }
+        if (turnChip) {
+            turnChip.textContent = room.status === 'active'
+                ? (isCarromPaused(room) ? 'Paused' : `${getSeatInfo(turnSeat).short} to Shoot`)
+                : isCarromPaused(room)
+                    ? 'Paused'
+                    : localPendingRequest
+                        ? 'Pending'
+                        : fullRoom
+                            ? 'Ready to Start'
+                            : 'Waiting';
+        }
+        if (turnOwner) turnOwner.textContent = `${getSeatInfo(turnSeat).label} • ${turnPlayer}`;
+        if (teamTarget) {
+            teamTarget.textContent = room.status === 'finished'
+                ? (room.board?.winnerLabel || 'Board settled')
+                : isCarromPaused(room)
+                    ? (room.board?.pausedBy ? `Paused by ${room.board.pausedBy}` : 'Table paused')
+                    : `${getTeamLabel(turnTeam)} on deck`;
+        }
+        if (headline) {
+            headline.textContent = localPendingRequest
+                ? 'Approval pending'
+                : localDeclinedRequest
+                    ? 'Request declined'
+                    : room.status === 'active'
+                        ? (isCarromPaused(room) ? 'Match paused' : `${turnPlayer} has the shot`)
+                        : room.status === 'finished'
+                            ? (room.board?.winnerLabel || 'Match complete')
+                            : isCarromPaused(room)
+                                ? 'Room paused'
+                                : isLocalCarromHost(room) && pendingRequests.length
+                                    ? 'Join requests waiting'
+                                    : fullRoom
+                                        ? 'Room full and ready'
+                                        : `${occupied}/${room.format} players joined`;
+        }
+        if (roleHint) {
+            roleHint.textContent = localPendingRequest
+                ? 'Join request sent. Waiting for host approval.'
+                : localDeclinedRequest
+                    ? 'Host declined your last join request. Send a fresh request when ready.'
+                    : carromState.seatIndex == null
+                        ? 'You are not seated in this room yet.'
+                        : `${localSeatLabel} • ${getTeamLabel(localTeam)}${isLocalCarromHost(room) ? ' • Host controls enabled.' : ''}`;
+        }
+        if (hint) {
+            if (room.status === 'finished') {
+                hint.textContent = 'Host can reset the board for a fresh rack.';
+            } else if (room.board?.running) {
+                hint.textContent = 'Shot in progress. Watch the table settle before the next striker placement.';
+            } else if (localPendingRequest) {
+                hint.textContent = 'Host approval is pending. You will get the next open seat once the host accepts your request.';
+            } else if (localDeclinedRequest) {
+                hint.textContent = 'Your request was declined. You can send another join request from the same room.';
+            } else if (isCarromPaused(room)) {
+                hint.textContent = room.board?.pausedBy
+                    ? `${room.board.pausedBy} paused the ${room.status === 'active' ? 'table' : 'room'}. Use ${room.status === 'active' ? 'Resume Match' : 'Resume Room'} when everyone is ready.`
+                    : `The ${room.status === 'active' ? 'table' : 'room'} is paused. Resume anytime from the same state.`;
+            } else if (canLocalPlayCarrom(room)) {
+                hint.textContent = 'Your turn. Drag the striker sideways on your lane, then pull outward and release to shoot.';
+            } else if (room.status === 'active') {
+                hint.textContent = `${turnPlayer} is up from the ${getSeatInfo(turnSeat).short} side.`;
+            } else if (fullRoom) {
+                hint.textContent = 'The room is full. Host can start the match whenever ready.';
+            } else {
+                hint.textContent = `Waiting for ${room.format - occupied} more player${room.format - occupied === 1 ? '' : 's'} to fill the table.`;
+            }
+        }
+
+        if (localPendingRequest) {
+            setCarromNotice(`Join request sent to room ${room.code}. Waiting for host approval.`);
+        } else if (localDeclinedRequest) {
+            setCarromNotice('Host declined your join request. Send a fresh request when ready.');
+        } else if (isLocalCarromHost(room) && pendingRequests.length) {
+            setCarromNotice(`${pendingRequests[0].name || 'A player'} wants to join. Approve or decline the request.`);
+        } else {
+            setCarromNotice(room.board?.resultText || room.resultText || 'Room ready.');
+        }
+
+        const nextBrandFlashId = room.brandFlash?.id || '';
+        const previousBrandFlashId = previousRoom?.brandFlash?.id || '';
+        if (!previousRoom || previousRoom.code !== room.code) {
+            carromState.brandFlashKey = nextBrandFlashId;
+            cancelCarromBrandFlash();
+        } else if (nextBrandFlashId && nextBrandFlashId !== previousBrandFlashId && nextBrandFlashId !== carromState.brandFlashKey) {
+            carromState.brandFlashKey = nextBrandFlashId;
+            startCarromBrandFlash(room.brandFlash);
+        } else if (!nextBrandFlashId) {
+            carromState.brandFlashKey = '';
+        }
+
+        const activeShot = room.board?.shot;
+        if (activeShot) {
+            startCarromShotSimulation(room, activeShot);
+        } else if (carromState.simBoard) {
+            cancelCarromSimulation();
+        }
+        if (!canLocalPlayCarrom(room)) {
+            clearCarromAimState();
+        }
+        drawCarromBoard();
+    }
+
+    function listenToCarromRoom(code) {
+        cleanupCarromSubscription();
+        carromState.unsubscribe = onValue(getCarromRoomRef(code), snapshot => {
+            if (!snapshot.exists()) {
+                const roomWasOpen = !!carromState.roomCode;
+                cancelCarromSimulation();
+                clearCarromAimState();
+                carromState.roomCode = '';
+                updateCarromRoomView(null);
+                if (roomWasOpen) {
+                    setCarromNotice('This carrom room closed or was removed.');
+                }
+                return;
+            }
+            const room = normalizeCarromRoomData(snapshot.val());
+            carromState.roomCode = room.code || code;
+            updateCarromRoomView(room);
+            maybePromptCarromApproval(room);
+        });
+    }
+
+    async function createCarromRoom() {
+        const hostName = (document.getElementById('carromHostNameInput')?.value || '').trim();
+        if (!hostName) {
+            setCarromNotice('Enter your host name before creating a room.');
+            return;
+        }
+        setCarromPlayerName(hostName);
+
+        let code = generateCarromRoomCode();
+        let snapshot = await get(getCarromRoomRef(code));
+        while (snapshot.exists()) {
+            code = generateCarromRoomCode();
+            snapshot = await get(getCarromRoomRef(code));
+        }
+
+        const format = carromState.roomSize;
+        const roomPayload = {
+            code,
+            format,
+            status: 'waiting',
+            hostSessionId: carromState.sessionId,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            players: {
+                0: {
+                    name: hostName,
+                    sessionId: carromState.sessionId,
+                    joinedAt: Date.now()
+                }
+            },
+            board: buildInitialCarromBoard(format),
+            brandFlash: null,
+            joinRequests: {},
+            moveLog: [],
+            resultText: `${format}-player room created. Share the code and fill the table.`
+        };
+
+        carromState.roomCode = code;
+        updateCarromRoomView(normalizeCarromRoomData(roomPayload));
+        setCarromNotice(`Room ${code} created. Share the code and wait for players.`);
+
+        try {
+            await set(getCarromRoomRef(code), roomPayload);
+            listenToCarromRoom(code);
+        } catch (error) {
+            carromState.roomCode = '';
+            updateCarromRoomView(null);
+            setCarromNotice(`Room create nahi ho paya. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    }
+
+    async function joinCarromRoom() {
+        const guestName = (document.getElementById('carromGuestNameInput')?.value || '').trim();
+        const code = (document.getElementById('carromRoomCodeInput')?.value || '').trim().toUpperCase();
+        if (!guestName || !code) {
+            setCarromNotice('Enter your name and the room code before joining.');
+            return;
+        }
+
+        try {
+            const snapshot = await get(getCarromRoomRef(code));
+            if (!snapshot.exists()) {
+                setCarromNotice('Room not found. Check the code and try again.');
+                return;
+            }
+
+            const room = normalizeCarromRoomData(snapshot.val());
+            const existingSeat = getCarromSeatBySession(room, carromState.sessionId);
+            if (existingSeat != null) {
+                setCarromPlayerName(guestName);
+                carromState.roomCode = code;
+                listenToCarromRoom(code);
+                setCarromNotice(`${guestName} rejoined the ${getSeatInfo(existingSeat).short} seat.`);
+                return;
+            }
+
+            if (room.status === 'active') {
+                setCarromNotice('This table is currently live. Wait for the next match reset.');
+                return;
+            }
+
+            const localRequest = getLatestCarromJoinRequestForSession(room, carromState.sessionId);
+            if (localRequest?.status === 'pending') {
+                carromState.roomCode = code;
+                listenToCarromRoom(code);
+                setCarromNotice(`Join request already sent to room ${code}. Waiting for host approval.`);
+                return;
+            }
+
+            const occupiedCount = getOccupiedCarromSeats(room).length;
+            const otherPendingCount = getPendingCarromJoinRequests(room).filter(request => request.sessionId !== carromState.sessionId).length;
+            if (occupiedCount + otherPendingCount >= room.format) {
+                setCarromNotice('This carrom room already has full seats or pending approvals. Wait for the host response.');
+                return;
+            }
+
+            setCarromPlayerName(guestName);
+            const requestTime = Date.now();
+            const requestId = `carrom_request_${requestTime}_${Math.random().toString(36).slice(2, 7)}`;
+            const nextJoinRequests = [
+                ...(room.joinRequests || []).filter(request => request.sessionId !== carromState.sessionId),
+                {
+                    id: requestId,
+                    name: guestName,
+                    sessionId: carromState.sessionId,
+                    status: 'pending',
+                    requestedAt: requestTime,
+                    updatedAt: requestTime
+                }
+            ].sort((left, right) => (left?.requestedAt || 0) - (right?.requestedAt || 0));
+            const resultText = `${guestName} requested to join. Host approval pending.`;
+
+            await update(getCarromRoomRef(code), {
+                joinRequests: serializeCarromJoinRequests(nextJoinRequests),
+                resultText,
+                updatedAt: requestTime
+            });
+
+            carromState.roomCode = code;
+            listenToCarromRoom(code);
+            setCarromNotice(`Join request sent to room ${code}. Waiting for host approval.`);
+        } catch (error) {
+            setCarromNotice(`Join request fail hua. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    }
+
+    window.approveCarromJoinRequest = async function (requestId) {
+        const room = carromState.roomData;
+        if (!isLocalCarromHost(room) || !room?.code) {
+            setCarromNotice('Only the host can approve join requests.');
+            return;
+        }
+
+        const pendingRequests = getPendingCarromJoinRequests(room);
+        const request = pendingRequests.find(item => item.id === requestId) || pendingRequests[0];
+        if (!request) {
+            setCarromNotice('No pending carrom join request to approve.');
+            return;
+        }
+
+        const requestTime = Date.now();
+        const openSeat = getNextOpenCarromSeat(room);
+        if (openSeat == null) {
+            const declinedRequests = (room.joinRequests || []).map(item => item.id === request.id
+                ? { ...item, status: 'declined', updatedAt: requestTime }
+                : item);
+            carromState.approvalPromptKey = '';
+            carromState.approvalPromptOpen = false;
+            await update(getCarromRoomRef(room.code), {
+                joinRequests: serializeCarromJoinRequests(declinedRequests),
+                resultText: `No open seat left for ${request.name || 'that player'}.`,
+                updatedAt: requestTime
+            });
+            return;
+        }
+
+        const players = {
+            ...room.players,
+            [openSeat]: {
+                name: request.name,
+                sessionId: request.sessionId,
+                joinedAt: requestTime
+            }
+        };
+        const nextJoinRequests = (room.joinRequests || []).filter(item => item.id !== request.id);
+        const nextOccupiedCount = getAllowedCarromSeats(room.format).filter(seatIndex => players[seatIndex]).length;
+        const resultText = `${request.name} joined the ${getSeatInfo(openSeat).short} seat. ${nextOccupiedCount}/${room.format} seats filled.`;
+
+        carromState.approvalPromptKey = '';
+        carromState.approvalPromptOpen = false;
+        await update(getCarromRoomRef(room.code), {
+            players,
+            joinRequests: serializeCarromJoinRequests(nextJoinRequests),
+            status: room.status === 'finished' ? 'waiting' : room.status,
+            resultText,
+            updatedAt: requestTime
+        });
+    };
+
+    window.declineCarromJoinRequest = async function (requestId) {
+        const room = carromState.roomData;
+        if (!isLocalCarromHost(room) || !room?.code) {
+            setCarromNotice('Only the host can decline join requests.');
+            return;
+        }
+
+        const pendingRequests = getPendingCarromJoinRequests(room);
+        const request = pendingRequests.find(item => item.id === requestId) || pendingRequests[0];
+        if (!request) {
+            setCarromNotice('No pending carrom join request to decline.');
+            return;
+        }
+
+        const requestTime = Date.now();
+        const nextJoinRequests = (room.joinRequests || []).map(item => item.id === request.id
+            ? { ...item, status: 'declined', updatedAt: requestTime }
+            : item);
+        carromState.approvalPromptKey = '';
+        carromState.approvalPromptOpen = false;
+        await update(getCarromRoomRef(room.code), {
+            joinRequests: serializeCarromJoinRequests(nextJoinRequests),
+            resultText: `${request.name || 'A player'} was declined by the host.`,
+            updatedAt: requestTime
+        });
+    };
+
+    async function startCarromMatchIfHost() {
+        const room = carromState.roomData;
+        if (!isLocalCarromHost(room)) {
+            setCarromNotice('Only the host can start the carrom match.');
+            return;
+        }
+        if (!isCarromRoomFull(room)) {
+            setCarromNotice(`Need ${room.format} players before starting the match.`);
+            return;
+        }
+
+        const nextBoard = buildInitialCarromBoard(room.format);
+        nextBoard.resultText = `Match live. ${room.players?.[0]?.name || 'South Seat'} opens the break from the South side.`;
+
+        try {
+            await update(getCarromRoomRef(room.code), {
+                status: 'active',
+                board: nextBoard,
+                brandFlash: null,
+                moveLog: [`${room.players?.[0]?.name || 'Host'} opened a fresh rack.`],
+                resultText: nextBoard.resultText,
+                updatedAt: Date.now()
+            });
+        } catch (error) {
+            setCarromNotice(`Match start failed. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    }
+
+    async function resetCarromMatchIfHost() {
+        const room = carromState.roomData;
+        if (!isLocalCarromHost(room)) {
+            setCarromNotice('Only the host can reset the board.');
+            return;
+        }
+
+        const fullRoom = isCarromRoomFull(room);
+        const nextBoard = buildInitialCarromBoard(room.format);
+        nextBoard.resultText = fullRoom
+            ? `Fresh rack ready. ${room.players?.[0]?.name || 'South Seat'} breaks first again.`
+            : 'Board reset. Waiting for all seats to fill.';
+
+        try {
+            await update(getCarromRoomRef(room.code), {
+                status: fullRoom ? 'active' : 'waiting',
+                board: nextBoard,
+                brandFlash: null,
+                moveLog: [],
+                resultText: nextBoard.resultText,
+                updatedAt: Date.now()
+            });
+        } catch (error) {
+            setCarromNotice(`Board reset failed. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    }
+
+    async function toggleCarromPause() {
+        const room = carromState.roomData;
+        if (!room) {
+            setCarromNotice('Create or join a room before using pause.');
+            return;
+        }
+        if (room.board?.running) {
+            setCarromNotice('Wait for the current shot to finish before pausing.');
+            return;
+        }
+        if (carromState.seatIndex == null) {
+            setCarromNotice('Join a seat in the room before controlling pause/resume.');
+            return;
+        }
+
+        const actor = room.players?.[carromState.seatIndex]?.name || 'Player';
+        const nextPaused = !isCarromPaused(room);
+        const targetLabel = room.status === 'active' ? 'table' : 'room';
+        const resultText = nextPaused
+            ? `${actor} paused the ${targetLabel}. State is saved and can resume anytime.`
+            : `${actor} resumed the ${targetLabel}. Everything continues from the same state.`;
+
+        try {
+            await update(getCarromRoomRef(room.code), {
+                board: {
+                    ...room.board,
+                    paused: nextPaused,
+                    pausedBy: nextPaused ? actor : '',
+                    pausedAt: nextPaused ? Date.now() : 0,
+                    resultText
+                },
+                resultText,
+                updatedAt: Date.now()
+            });
+        } catch (error) {
+            setCarromNotice(`Pause state update failed. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    }
+
+    async function sendCarromChatMessage() {
+        const room = carromState.roomData;
+        const input = document.getElementById('carromChatInput');
+        if (!room || !input) {
+            setCarromNotice('Create or join a room before sending chat.');
+            return;
+        }
+        if (carromState.seatIndex == null) {
+            setCarromNotice('Join a seat in the room before sending chat.');
+            return;
+        }
+
+        const text = input.value.trim();
+        if (!text) return;
+
+        const player = room.players?.[carromState.seatIndex];
+        try {
+            await push(getCarromMessagesRef(room.code), {
+                name: player?.name || 'Player',
+                seatIndex: carromState.seatIndex,
+                sessionId: carromState.sessionId,
+                text,
+                createdAt: Date.now()
+            });
+            input.value = '';
+        } catch (error) {
+            setCarromNotice(`Chat send failed. Firebase error: ${error?.message || 'Unknown error'}`);
+        }
+    }
+
+    async function copyCarromRoomCode() {
+        if (!carromState.roomCode) {
+            setCarromNotice('Create or join a room first to copy the code.');
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(carromState.roomCode);
+            setCarromNotice(`Room code ${carromState.roomCode} copied. Share it with the table.`);
+        } catch (error) {
+            setCarromNotice(`Room code: ${carromState.roomCode}`);
+        }
+    }
+
+    async function internalLeaveCarromRoom(closeOverlay) {
+        const room = carromState.roomData;
+        const code = carromState.roomCode;
+        const seatIndex = carromState.seatIndex;
+
+        cleanupCarromSubscription();
+        cancelCarromSimulation();
+        cancelCarromBrandFlash();
+        clearCarromAimState();
+
+        carromState.roomCode = '';
+        carromState.roomData = null;
+        carromState.seatIndex = null;
+        carromState.approvalPromptKey = '';
+        carromState.approvalPromptOpen = false;
+
+        if (code && room) {
+            try {
+                const roomRef = getCarromRoomRef(code);
+                if (isLocalCarromHost(room)) {
+                    await remove(roomRef);
+                } else if (seatIndex != null) {
+                    const nextPlayers = { ...room.players };
+                    delete nextPlayers[seatIndex];
+                    const remainingSeats = getAllowedCarromSeats(room.format).filter(index => nextPlayers[index]);
+                    if (!remainingSeats.length) {
+                        await remove(roomRef);
+                    } else {
+                        const nextBoard = buildInitialCarromBoard(room.format);
+                        await update(roomRef, {
+                            players: nextPlayers,
+                            status: 'waiting',
+                            board: nextBoard,
+                            brandFlash: null,
+                            moveLog: [],
+                            resultText: `${getSeatInfo(seatIndex).short} seat left the table. Room reset and waiting for players.`,
+                            updatedAt: Date.now()
+                        });
+                    }
+                } else {
+                    const nextJoinRequests = (room.joinRequests || []).filter(request => request.sessionId !== carromState.sessionId);
+                    if (nextJoinRequests.length !== (room.joinRequests || []).length) {
+                        await update(roomRef, {
+                            joinRequests: serializeCarromJoinRequests(nextJoinRequests),
+                            updatedAt: Date.now()
+                        });
+                    }
+                }
+            } catch (error) { }
+        }
+
+        updateCarromRoomView(null);
+        if (closeOverlay) {
+            document.getElementById('carromGameOverlay')?.classList.remove('active');
+        }
+    }
+
+    window.switchCarromMode = function (mode) {
+        setCarromMode(mode);
+    };
+
+    window.setCarromRoomSize = function (size) {
+        setCarromRoomSize(size);
+    };
+
+    window.prepareCarromOverlay = function () {
+        ensureCarromCanvasBindings();
+        const storedName = getCarromPlayerName();
+        const hostInput = document.getElementById('carromHostNameInput');
+        const guestInput = document.getElementById('carromGuestNameInput');
+        const codeInput = document.getElementById('carromRoomCodeInput');
+        if (hostInput) hostInput.value = storedName;
+        if (guestInput) guestInput.value = storedName;
+        if (codeInput) codeInput.value = '';
+        if (carromState.roomData && carromState.roomCode) {
+            updateCarromRoomView(carromState.roomData);
+            return;
+        }
+        carromState.localStrikerPercent = 50;
+        clearCarromAimState();
+        setCarromMode('host');
+        setCarromRoomSize(carromState.roomSize);
+        if (!carromState.roomCode) {
+            updateCarromRoomView(null);
+        } else {
+            drawCarromBoard();
+        }
+    };
+
+    window.createCarromRoom = createCarromRoom;
+    window.joinCarromRoom = joinCarromRoom;
+    window.startCarromMatchIfHost = startCarromMatchIfHost;
+    window.toggleCarromPause = toggleCarromPause;
+    window.handleCarromJoinKey = function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            joinCarromRoom();
+        }
+    };
+    window.sendCarromChatMessage = sendCarromChatMessage;
+    window.handleCarromChatKey = function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendCarromChatMessage();
+        }
+    };
+    window.resetCarromMatchIfHost = resetCarromMatchIfHost;
+    window.copyCarromRoomCode = copyCarromRoomCode;
+    window.leaveCarromRoom = function () {
+        internalLeaveCarromRoom(true).then(() => openGameHub());
+    };
+
+    const originalBackToHub = window.backToHub;
+    window.backToHub = function (overlayId) {
+        if (overlayId === 'carromGameOverlay') {
+            document.getElementById('carromGameOverlay')?.classList.remove('active');
+            openGameHub();
             return;
         }
         if (originalBackToHub) originalBackToHub(overlayId);
