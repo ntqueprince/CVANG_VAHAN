@@ -16101,7 +16101,7 @@ window.openQuickLinks = function () {
     // ──── Open / Close with Password ────
     window.openSongsHub = function () {
         var password = prompt('🔒 Enter Password to open Songs Hub:');
-        if (password !== 'shiva') {
+        if (password !== 'fintech') {
             if (password !== null) alert('❌ Wrong Password!');
             return;
         }
