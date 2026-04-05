@@ -1478,12 +1478,12 @@
 
     <!-- 🎮 Game Hub Modal -->
     <div class="memory-game-overlay" id="gameHubOverlay">
-        <div class="memory-game-container game-hub-container" style="max-width: 700px;">
+        <div class="memory-game-container game-hub-container" style="max-width: 860px;">
             <div class="memory-game-header">
                 <h2>🎮 Welcome to Game Hub</h2>
                 <p class="memory-game-subtitle">Take a quick break and play!</p>
             </div>
-            <div class="game-hub-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+            <div class="game-hub-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
                 <button class="game-select-btn bg-gradient-to-r from-green-500 to-teal-600"
                     onclick="launchGame('snake')">
                     <span class="text-3xl">🐍</span>
@@ -1503,6 +1503,11 @@
                     onclick="launchGame('chess')">
                     <span class="text-3xl">♟️</span>
                     <span>Royal Chess</span>
+                </button>
+                <button class="game-select-btn bg-gradient-to-r from-amber-700 via-orange-600 to-yellow-500"
+                    onclick="launchGame('carrom')">
+                    <span class="text-3xl">◎</span>
+                    <span>Carrom Lounge</span>
                 </button>
             </div>
             <div class="memory-game-buttons mt-6">
@@ -1934,7 +1939,7 @@
                 <div class="chess-sidebar">
                     <button class="mem-btn w-full text-base font-semibold"
                         style="background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(251, 191, 36, 0.16);"
-                        onclick="backToHub('chessGameOverlay')">Exit to Hub</button>
+                        onclick="backToHub('chessGameOverlay')">Back to Hub</button>
 
                     <div class="chess-side-card">
                         <div class="chess-side-eyebrow">Room Control</div>
@@ -1987,8 +1992,224 @@
                     <div class="chess-side-card">
                         <div class="chess-side-eyebrow">Action</div>
                         <div class="chess-action-group">
-                            <button class="chess-primary-btn" onclick="resetChessBoardIfHost()">Restart Match</button>
+                            <button id="chessRestartBtn" class="chess-primary-btn"
+                                onclick="resetChessBoardIfHost()">Restart Match</button>
+                            <button id="chessPauseBtn" class="chess-secondary-btn"
+                                onclick="toggleChessPause()">Pause Match</button>
                             <button class="chess-secondary-btn" onclick="leaveChessRoom()">Leave Room</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="memory-game-overlay" id="carromGameOverlay">
+        <div class="memory-game-container carrom-shell"
+            style="max-width: 1360px; background: radial-gradient(circle at top, rgba(251,191,36,0.12), rgba(17,24,39,0.98) 36%), linear-gradient(155deg, #28160f, #3f2417 42%, #1f2937 100%); border: 1px solid rgba(251,191,36,0.14); box-shadow: 0 42px 110px rgba(15, 23, 42, 0.62);">
+            <div id="carromHeader" class="memory-game-header carrom-header">
+                <div>
+                    <h2 style="letter-spacing: 0.04em;">Carrom Crown Arena</h2>
+                    <p class="memory-game-subtitle text-sm text-amber-100/80">Live room code play for 2-player duels
+                        and 4-player table battles with smooth arcade-style rules.</p>
+                    <p class="memory-game-subtitle text-sm font-semibold mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style="color: #fff7ed; background: linear-gradient(90deg, rgba(251,191,36,0.16), rgba(249,115,22,0.14)); border: 1px solid rgba(253,186,116,0.18); box-shadow: 0 8px 22px rgba(251,191,36,0.09);">
+                        <span
+                            style="background: linear-gradient(90deg, #fde68a, #fdba74, #fca5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent;">Created
+                            by Shivang</span>
+                    </p>
+                </div>
+                <div class="carrom-header-badge">2 / 4 Player Firebase Room</div>
+            </div>
+
+            <div class="carrom-layout">
+                <div class="carrom-board-panel">
+                    <div id="carromIntroPanel" class="carrom-intro-panel">
+                        <div class="carrom-tab-row">
+                            <button id="carromHostTab" class="carrom-tab-btn active"
+                                onclick="switchCarromMode('host')">Host Room</button>
+                            <button id="carromJoinTab" class="carrom-tab-btn"
+                                onclick="switchCarromMode('join')">Join Room</button>
+                        </div>
+
+                        <div id="carromHostPanel" class="carrom-form-panel">
+                            <label class="carrom-label" for="carromHostNameInput">Host Name</label>
+                            <input id="carromHostNameInput" class="carrom-text-input" type="text" maxlength="18"
+                                placeholder="Enter host name">
+
+                            <div class="carrom-format-block">
+                                <div class="carrom-format-label">Match Format</div>
+                                <div class="carrom-format-grid">
+                                    <button id="carromFormat2Btn" class="carrom-format-btn active"
+                                        onclick="setCarromRoomSize(2)">2 Player Duel</button>
+                                    <button id="carromFormat4Btn" class="carrom-format-btn"
+                                        onclick="setCarromRoomSize(4)">4 Player Table</button>
+                                </div>
+                            </div>
+
+                            <p class="carrom-helper-text">Create a private room, share the code, and fill the table.
+                                When the room is full, the host can start a fast, polished arcade carrom match.</p>
+                            <button class="carrom-primary-btn" onclick="createCarromRoom()">Create Carrom Room</button>
+                        </div>
+
+                        <div id="carromJoinPanel" class="carrom-form-panel hidden">
+                            <label class="carrom-label" for="carromGuestNameInput">Player Name</label>
+                            <input id="carromGuestNameInput" class="carrom-text-input" type="text" maxlength="18"
+                                placeholder="Enter your name" onkeydown="handleCarromJoinKey(event)">
+
+                            <label class="carrom-label mt-4" for="carromRoomCodeInput">Room Code</label>
+                            <input id="carromRoomCodeInput" class="carrom-text-input carrom-room-code-input" type="text"
+                                maxlength="6" placeholder="CAR123" onkeydown="handleCarromJoinKey(event)">
+
+                            <p class="carrom-helper-text">Paste the room code and take the next open seat. 2-player
+                                rooms fill opposite sides, while 4-player rooms fill the full table clockwise.</p>
+                            <button class="carrom-primary-btn" onclick="joinCarromRoom()">Join Carrom Room</button>
+                        </div>
+
+                        <div class="carrom-feature-grid">
+                            <div class="carrom-feature-card">
+                                <div class="carrom-feature-title">Room Code Matchmaking</div>
+                                <div class="carrom-feature-copy">Fast 6-letter private rooms with instant sync.</div>
+                            </div>
+                            <div class="carrom-feature-card">
+                                <div class="carrom-feature-title">Dual Modes</div>
+                                <div class="carrom-feature-copy">Choose a 2-player duel or a full 4-player table.</div>
+                            </div>
+                            <div class="carrom-feature-card">
+                                <div class="carrom-feature-title">Arcade Carrom Rules</div>
+                                <div class="carrom-feature-copy">Quick queen bonus, live turn flow, smooth striker
+                                    aiming.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="carromBoardStage" class="carrom-board-stage hidden">
+                        <div class="carrom-canvas-shell">
+                            <div id="carromBoardChatOverlay" class="carrom-board-chat-overlay hidden" aria-live="polite"></div>
+                            <canvas id="carromBoardCanvas" width="760" height="760" aria-label="Carrom Board"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carrom-sidebar">
+                    <button class="mem-btn w-full text-base font-semibold carrom-back-btn"
+                        onclick="backToHub('carromGameOverlay')">Back to Hub</button>
+
+                    <div id="carromApprovalCard" class="carrom-side-card carrom-approval-card hidden">
+                        <div id="carromApprovalTitle" class="carrom-side-eyebrow">Approval Queue</div>
+                        <div id="carromApprovalText" class="carrom-approval-text">No pending request.</div>
+                        <div id="carromApprovalActions" class="carrom-approval-actions">
+                            <button class="carrom-primary-btn" onclick="approveCarromJoinRequest()">Approve</button>
+                            <button class="carrom-secondary-btn" onclick="declineCarromJoinRequest()">Decline</button>
+                        </div>
+                        <button id="carromApprovalStartBtn" class="carrom-primary-btn hidden mt-4"
+                            onclick="startCarromMatchIfHost()">Start Match</button>
+                    </div>
+
+                    <div class="carrom-side-card carrom-chat-card">
+                        <div class="carrom-side-eyebrow">Room Chat</div>
+                        <ul id="carromChatList" class="carrom-chat-list">
+                            <li class="carrom-chat-empty">Messages will appear here.</li>
+                        </ul>
+                        <div class="carrom-chat-compose">
+                            <input id="carromChatInput" class="carrom-chat-input" type="text" maxlength="140"
+                                placeholder="Type a room message" onkeydown="handleCarromChatKey(event)">
+                            <button id="carromChatSendBtn" class="carrom-secondary-btn"
+                                onclick="sendCarromChatMessage()">Send</button>
+                        </div>
+                    </div>
+
+                    <div class="carrom-side-card">
+                        <div class="carrom-side-eyebrow">Table View</div>
+                        <div class="carrom-topline carrom-topline-sidebar">
+                            <div class="carrom-chip" id="carromRoomModeChip">Lobby Ready</div>
+                            <div class="carrom-chip" id="carromTurnChip">Waiting</div>
+                        </div>
+                        <div id="carromStatusBanner" class="carrom-status-banner">Create a room or join one to begin.
+                        </div>
+                        <div class="carrom-board-toolbar carrom-board-toolbar-sidebar">
+                            <div class="carrom-turn-pill" id="carromTurnOwner">South Baseline</div>
+                            <div class="carrom-turn-pill" id="carromTeamTarget">Ivory Team on deck</div>
+                        </div>
+                        <div class="carrom-control-dock carrom-control-dock-sidebar">
+                            <div class="carrom-drag-guide">
+                                <div class="carrom-inline-label">Mouse / Touch Control</div>
+                                <p class="carrom-drag-copy">Grab the striker on your lane, slide it sideways on the
+                                    board, then pull outward and release to fire.</p>
+                            </div>
+                            <div class="carrom-power-rail">
+                                <span class="carrom-inline-label">Shot Power</span>
+                                <div class="carrom-power-bar">
+                                    <div id="carromPowerFill" class="carrom-power-fill"></div>
+                                </div>
+                            </div>
+                            <p id="carromAimHint" class="carrom-aim-hint">When it is your turn, drag the striker across
+                                your lane, then pull outward on the board to load power and release.</p>
+                        </div>
+                    </div>
+
+                    <div class="carrom-side-card">
+                        <div class="carrom-side-eyebrow">Room Control</div>
+                        <div class="carrom-room-code-box">
+                            <div class="carrom-room-code-label">Room Code</div>
+                            <div id="carromRoomCodeDisplay" class="carrom-room-code-value">------</div>
+                            <button id="carromCopyCodeBtn" class="carrom-secondary-btn"
+                                onclick="copyCarromRoomCode()">Copy Code</button>
+                        </div>
+                        <div class="carrom-player-stack">
+                            <div id="carromSeat0Card" class="carrom-player-card active-seat">
+                                <div class="carrom-player-role">South Seat</div>
+                                <div id="carromSeat0Name" class="carrom-player-name">Waiting for host</div>
+                                <div id="carromSeat0Meta" class="carrom-player-meta">Host baseline</div>
+                            </div>
+                            <div id="carromSeat1Card" class="carrom-player-card">
+                                <div class="carrom-player-role">West Seat</div>
+                                <div id="carromSeat1Name" class="carrom-player-name">Open seat</div>
+                                <div id="carromSeat1Meta" class="carrom-player-meta">Team Ebony</div>
+                            </div>
+                            <div id="carromSeat2Card" class="carrom-player-card">
+                                <div class="carrom-player-role">North Seat</div>
+                                <div id="carromSeat2Name" class="carrom-player-name">Open seat</div>
+                                <div id="carromSeat2Meta" class="carrom-player-meta">Opposite angle</div>
+                            </div>
+                            <div id="carromSeat3Card" class="carrom-player-card">
+                                <div class="carrom-player-role">East Seat</div>
+                                <div id="carromSeat3Name" class="carrom-player-name">Open seat</div>
+                                <div id="carromSeat3Meta" class="carrom-player-meta">Team Ebony</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="carromWaitingCard" class="carrom-side-card hidden">
+                        <div class="carrom-side-eyebrow">Waiting</div>
+                        <div id="carromWaitingText" class="carrom-approval-text">Your join request is waiting for host
+                            approval.</div>
+                    </div>
+
+                    <div class="carrom-side-card">
+                        <div class="carrom-side-eyebrow">Match Status</div>
+                        <div id="carromMatchHeadline" class="carrom-match-headline">No live room</div>
+                        <div id="carromRoleHint" class="carrom-role-hint">Choose Host Room or Join Room to begin.</div>
+                        <div id="carromScoreboard" class="carrom-scoreboard"></div>
+                    </div>
+
+                    <div class="carrom-side-card">
+                        <div class="carrom-side-eyebrow">Shot Feed</div>
+                        <ul id="carromShotList" class="carrom-shot-list">
+                            <li>Room not started yet.</li>
+                        </ul>
+                    </div>
+
+                    <div class="carrom-side-card">
+                        <div class="carrom-side-eyebrow">Action</div>
+                        <div class="carrom-action-group">
+                            <button id="carromStartBtn" class="carrom-primary-btn"
+                                onclick="startCarromMatchIfHost()">Start Match</button>
+                            <button id="carromPauseBtn" class="carrom-secondary-btn"
+                                onclick="toggleCarromPause()">Pause Match</button>
+                            <button id="carromResetBtn" class="carrom-secondary-btn"
+                                onclick="resetCarromMatchIfHost()">Reset Board</button>
+                            <button class="carrom-secondary-btn" onclick="leaveCarromRoom()">Leave Room</button>
                         </div>
                     </div>
                 </div>
