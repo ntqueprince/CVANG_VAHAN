@@ -3110,7 +3110,7 @@ button:hover {
 }
 
 .chess-header {
-    display: flex;
+    display: none;
     justify-content: space-between;
     gap: 18px;
     align-items: flex-start;
@@ -3131,8 +3131,9 @@ button:hover {
 
 .chess-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.32fr) 320px;
-    gap: 18px;
+    grid-template-columns: minmax(0, 1.12fr) 360px;
+    gap: 16px;
+    align-items: start;
 }
 
 .chess-board-panel,
@@ -3144,15 +3145,15 @@ button:hover {
 }
 
 .chess-board-panel {
-    padding: 18px;
+    padding: 14px;
 }
 
 .chess-topline {
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .chess-chip {
@@ -3177,6 +3178,22 @@ button:hover {
     background:
         radial-gradient(circle at top, rgba(251, 191, 36, 0.12), transparent 30%),
         linear-gradient(180deg, rgba(2, 6, 23, 0.92), rgba(2, 6, 23, 0.72));
+}
+
+.chess-sidebar .chess-intro-panel {
+    min-height: auto;
+    padding: 22px;
+}
+
+.chess-sidebar .chess-intro-panel.live {
+    border-color: rgba(251, 191, 36, 0.24);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 18px 40px rgba(15, 23, 42, 0.22);
+}
+
+.chess-sidebar .chess-feature-grid {
+    grid-template-columns: 1fr;
 }
 
 .chess-tab-row {
@@ -3245,6 +3262,12 @@ button:hover {
     font-size: 0.94rem;
 }
 
+.chess-inline-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+}
+
 .chess-feature-grid {
     margin-top: 24px;
     display: grid;
@@ -3276,7 +3299,10 @@ button:hover {
 }
 
 .chess-board-stage {
-    min-height: 680px;
+    min-height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .chess-status-banner {
@@ -3290,15 +3316,37 @@ button:hover {
     line-height: 1.55;
 }
 
+.chess-status-banner,
+.chess-warning-banner,
+.chess-board-move-banner {
+    display: none !important;
+}
+
+.chess-board-move-banner {
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(14, 165, 233, 0.14));
+    border: 1px solid rgba(56, 189, 248, 0.34);
+    color: #e0f2fe;
+    font-weight: 700;
+    line-height: 1.5;
+    box-shadow: 0 12px 24px rgba(8, 47, 73, 0.18);
+}
+
 .chess-board {
-    width: min(100%, 720px);
+    width: min(100%, 580px);
     aspect-ratio: 1 / 1;
     display: grid;
     grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, minmax(0, 1fr));
     border-radius: 28px;
     overflow: hidden;
     border: 1px solid rgba(251, 191, 36, 0.14);
     box-shadow: 0 28px 70px rgba(2, 6, 23, 0.55);
+    align-items: stretch;
+    justify-items: stretch;
+    margin: 0 auto;
 }
 
 .chess-square {
@@ -3309,8 +3357,17 @@ button:hover {
     border: none;
     padding: 0;
     cursor: pointer;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: 0;
+    line-height: 1;
+    appearance: none;
+    -webkit-appearance: none;
     font-size: clamp(1.8rem, 3.1vw, 3rem);
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    transition: box-shadow 0.16s ease, background 0.16s ease;
 }
 
 .chess-square.light {
@@ -3323,6 +3380,79 @@ button:hover {
 
 .chess-square.selected {
     box-shadow: inset 0 0 0 4px rgba(59, 130, 246, 0.88);
+}
+
+.chess-square.last-from {
+    box-shadow:
+        inset 0 0 0 4px rgba(251, 191, 36, 0.95),
+        inset 0 0 28px rgba(251, 191, 36, 0.32);
+}
+
+.chess-square.light.last-from {
+    background: linear-gradient(180deg, #ffe6a3, #d8a438);
+}
+
+.chess-square.dark.last-from {
+    background: linear-gradient(180deg, #b7791f, #744210);
+}
+
+.chess-square.last-to {
+    box-shadow:
+        inset 0 0 0 4px rgba(34, 197, 94, 0.98),
+        inset 0 0 30px rgba(34, 197, 94, 0.34);
+}
+
+.chess-square.light.last-to {
+    background: linear-gradient(180deg, #c8facc, #7ddf85);
+}
+
+.chess-square.dark.last-to {
+    background: linear-gradient(180deg, #2f855a, #276749);
+}
+
+.chess-square.last-from.last-to {
+    box-shadow:
+        inset 0 0 0 4px rgba(168, 85, 247, 0.95),
+        inset 0 0 30px rgba(168, 85, 247, 0.3);
+}
+
+.chess-square.light.last-from.last-to {
+    background: linear-gradient(180deg, #e9d5ff, #c084fc);
+}
+
+.chess-square.dark.last-from.last-to {
+    background: linear-gradient(180deg, #7c3aed, #5b21b6);
+}
+
+.chess-square.last-from::before,
+.chess-square.last-to::before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0f172a;
+    z-index: 3;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+}
+
+.chess-square.last-from::before {
+    content: "From";
+    background: #fbbf24;
+}
+
+.chess-square.last-to::before {
+    content: "To";
+    background: #4ade80;
+}
+
+.chess-square.last-from.last-to::before {
+    content: "Move";
+    background: #c084fc;
 }
 
 .chess-square.legal::after {
@@ -3375,6 +3505,10 @@ button:hover {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 6px;
 }
 
 .chess-side-card {
@@ -3395,6 +3529,12 @@ button:hover {
     border-radius: 18px;
     background: rgba(15, 23, 42, 0.72);
     border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.chess-room-code-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .chess-room-code-label {
@@ -3454,6 +3594,21 @@ button:hover {
     font-size: 0.92rem;
 }
 
+.chess-last-move-indicator {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.22), rgba(14, 165, 233, 0.16));
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #f8fafc;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.5;
+    box-shadow:
+        inset 0 0 0 1px rgba(56, 189, 248, 0.12),
+        0 12px 24px rgba(8, 47, 73, 0.2);
+}
+
 .chess-approval-actions,
 .chess-action-group {
     display: flex;
@@ -3485,9 +3640,12 @@ button:hover {
 
 .chess-primary-btn:hover,
 .chess-secondary-btn:hover,
-.chess-tab-btn:hover,
-.chess-square:hover {
+.chess-tab-btn:hover {
     transform: translateY(-1px);
+}
+
+.chess-square:hover {
+    transform: none;
 }
 
 .chess-move-list {
@@ -3510,6 +3668,259 @@ button:hover {
     font-size: 0.9rem;
 }
 
+.chess-move-list li.latest {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(14, 165, 233, 0.14));
+    border-color: rgba(56, 189, 248, 0.42);
+    color: #f8fafc;
+    box-shadow: 0 10px 24px rgba(8, 47, 73, 0.18);
+}
+
+.chess-chat-list {
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: none;
+    min-height: 128px;
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 22px;
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.68), rgba(30, 41, 59, 0.5)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.03), transparent 45%);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.chess-chat-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 440px;
+}
+
+.chess-chat-card.live {
+    border-color: rgba(56, 189, 248, 0.28);
+    background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.12), transparent 42%),
+        linear-gradient(180deg, rgba(7, 12, 26, 0.98), rgba(17, 24, 39, 0.9));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 22px 48px rgba(8, 47, 73, 0.22);
+}
+
+.chess-chat-card.live .chess-side-eyebrow {
+    color: #7dd3fc;
+}
+
+.chess-chat-card.live .chess-chat-compose {
+    background: rgba(8, 47, 73, 0.34);
+    border-color: rgba(56, 189, 248, 0.26);
+}
+
+.chess-chat-card.live .chess-chat-list {
+    border-color: rgba(56, 189, 248, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.06);
+}
+
+.chess-chat-row {
+    display: flex;
+}
+
+.chess-chat-row.own {
+    justify-content: flex-end;
+}
+
+.chess-chat-row.other {
+    justify-content: flex-start;
+}
+
+.chess-chat-bubble {
+    max-width: min(84%, 260px);
+    padding: 10px 12px 9px;
+    border-radius: 18px 18px 18px 8px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.96), rgba(51, 65, 85, 0.88));
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.2);
+}
+
+.chess-chat-row.own .chess-chat-bubble {
+    border-radius: 18px 18px 8px 18px;
+    background: linear-gradient(135deg, rgba(22, 101, 52, 0.96), rgba(21, 128, 61, 0.9));
+    border-color: rgba(187, 247, 208, 0.3);
+}
+
+.chess-chat-row.other .chess-chat-bubble {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(67, 56, 202, 0.74));
+    border-color: rgba(165, 180, 252, 0.26);
+}
+
+.chess-chat-empty {
+    text-align: center;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    padding: 10px 12px;
+}
+
+.chess-chat-meta {
+    color: #fcd34d;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.chess-chat-row.own .chess-chat-meta {
+    color: #dcfce7;
+}
+
+.chess-chat-bubble-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.chess-chat-time {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.chess-chat-text {
+    color: #f8fafc;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    word-break: break-word;
+}
+
+.chess-chat-compose {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 84px;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    align-items: center;
+}
+
+.chess-chat-input {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: rgba(15, 23, 42, 0.24);
+    color: #f8fafc;
+    outline: none;
+}
+
+.chess-chat-input:focus {
+    border-color: rgba(56, 189, 248, 0.4);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+#chessChatSendBtn {
+    min-width: 0;
+}
+
+.chess-warning-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(2, 6, 23, 0.72);
+    backdrop-filter: blur(10px);
+}
+
+.chess-warning-modal.hidden {
+    display: none;
+}
+
+.chess-warning-modal-card {
+    width: min(92vw, 760px);
+    padding: 34px 30px 28px;
+    border-radius: 32px;
+    background:
+        radial-gradient(circle at top, rgba(248, 113, 113, 0.18), transparent 36%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.94));
+    border: 1px solid rgba(248, 113, 113, 0.34);
+    box-shadow: 0 38px 90px rgba(2, 6, 23, 0.48);
+    text-align: center;
+}
+
+.chess-warning-modal-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(248, 113, 113, 0.28), rgba(239, 68, 68, 0.18));
+    border: 1px solid rgba(248, 113, 113, 0.34);
+    color: #fecaca;
+    font-size: 0.84rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.chess-warning-modal-title {
+    margin: 18px 0 12px;
+    color: #fff7ed;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.08;
+    font-weight: 900;
+}
+
+.chess-warning-modal-text {
+    margin: 0;
+    color: #e2e8f0;
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    line-height: 1.7;
+}
+
+.chess-warning-modal-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.chess-warning-modal-actions .chess-primary-btn {
+    width: auto;
+    min-width: 180px;
+    padding-inline: 28px;
+}
+
+@media (min-width: 1101px) {
+    .chess-board-panel {
+        position: sticky;
+        top: 16px;
+        align-self: start;
+        height: fit-content;
+        max-height: none;
+    }
+
+    .chess-sidebar {
+        max-height: calc(100vh - 48px);
+    }
+
+    .chess-chat-card {
+        min-height: 520px;
+    }
+
+    .chess-chat-compose {
+        margin-top: 10px;
+    }
+}
+
 @media (max-width: 1100px) {
     .chess-layout {
         grid-template-columns: 1fr;
@@ -3517,8 +3928,13 @@ button:hover {
 
     .chess-board {
         width: 100%;
-        max-width: 720px;
+        max-width: 580px;
         margin: 0 auto;
+    }
+
+    .chess-sidebar {
+        max-height: none;
+        overflow: visible;
     }
 }
 
@@ -3540,6 +3956,12 @@ button:hover {
     .chess-approval-actions,
     .chess-action-group {
         flex-direction: column;
+    }
+
+    .chess-chat-compose {
+        display: flex;
+        flex-direction: column;
+        border-radius: 22px;
     }
 }
 
@@ -3580,7 +4002,7 @@ button:hover {
 
 .carrom-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.58fr) 328px;
+    grid-template-columns: minmax(0, 1.72fr) 320px;
     gap: 16px;
     flex: 1;
     min-height: 0;
@@ -3822,17 +4244,19 @@ button:hover {
     border: 1px solid rgba(251, 191, 36, 0.12);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 14px;
     overflow: hidden;
     overscroll-behavior: contain;
     position: relative;
 }
 
 #carromBoardCanvas {
-    width: min(100%, 860px, calc(100vh - 220px));
+    width: min(100%, 920px, calc(100vh - 180px));
     aspect-ratio: 1 / 1;
-    max-height: min(860px, calc(100vh - 220px));
+    max-height: min(920px, calc(100vh - 180px));
     height: auto;
     display: block;
     margin: 0 auto;
@@ -3840,6 +4264,31 @@ button:hover {
     box-shadow: 0 28px 80px rgba(15, 23, 42, 0.46);
     background: #321f17;
     touch-action: none;
+}
+
+.carrom-board-power-rail {
+    width: min(100%, 860px, calc(100vh - 220px));
+    max-width: 100%;
+    padding: 12px 16px 14px;
+    border-radius: 22px;
+    background:
+        linear-gradient(180deg, rgba(38, 22, 16, 0.94), rgba(17, 24, 39, 0.92)),
+        radial-gradient(circle at top, rgba(251, 191, 36, 0.14), transparent 45%);
+    border: 1px solid rgba(251, 191, 36, 0.18);
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.22);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.carrom-board-power-rail.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.carrom-board-power-rail.hidden {
+    display: block;
 }
 
 .carrom-board-chat-overlay {
@@ -4015,7 +4464,7 @@ button:hover {
 }
 
 .carrom-control-dock-sidebar .carrom-power-rail {
-    gap: 8px;
+    display: none;
 }
 
 .carrom-control-dock-sidebar .carrom-aim-hint {
