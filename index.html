@@ -12,27 +12,31 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="stealth-buttons-hidden">
     <!-- #region 🔒 NAVIGATION BUTTONS -->
     <div class="flex flex-wrap gap-4 justify-center p-10 bg-gradient-to-tr from-blue-100 to-purple-100">
-        <button class="animated-btn bg-gradient-to-r from-blue-500 to-blue-700" onclick="openCSATModal()">CSAT
+        <button class="animated-btn bg-gradient-to-r from-blue-500 to-blue-700" data-cvang-button="true" onclick="openCSATModal()">CSAT
             Calculator</button>
-        <button class="animated-btn bg-gradient-to-r from-green-500 to-green-700" onclick="openEndorsementPage()">
+        <button class="animated-btn bg-gradient-to-r from-green-500 to-green-700" data-cvang-button="true" onclick="openEndorsementPage()">
             <div style="line-height: 1.2;">
                 <div>ENDORSEMENT</div>
                 <div style="font-size: 11px; opacity: 0.85;">Last Update: 02-04-2026</div>
             </div>
         </button><button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700"
+            data-cvang-button="true"
             onclick="openManualVIPage()">MANUAL-VI &amp; Claim Coverage</button>
         <button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700"
+            data-cvang-button="true"
             onclick="openClaimCountNSTPPage()">Claim_Count &amp; NSTP</button>
         <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700"
+            data-cvang-button="true"
             onclick="openInspectionWaiverPage()">Inspection Waiver</button>
-        <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" onclick="openRSAPage()">RSA &amp;
+        <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" data-cvang-button="true" onclick="openRSAPage()">RSA &amp;
             CONTACT</button>
         <button class="animated-btn bg-gradient-to-r from-purple-500 to-purple-700"
+            data-cvang-button="true"
             onclick="window.open('https://ntqueprince.github.io/notebook/', '_blank')">NOTEBOOK</button>
-        <button class="animated-btn bg-gradient-to-r from-pink-500 to-pink-700" onclick="openIncentiveModal()">INCENTIVE
+        <button class="animated-btn bg-gradient-to-r from-pink-500 to-pink-700" data-cvang-button="true" onclick="openIncentiveModal()">INCENTIVE
             CALCULATOR</button>
         <button class="animated-btn bg-gradient-to-r from-teal-500 to-emerald-700"
             onclick="window.open('https://ntqueprince.github.io/mail/', '_blank')">TICKETING MAIL</button>
@@ -52,9 +56,9 @@
             Piano</button>
         <button class="animated-btn bg-gradient-to-r from-fuchsia-500 to-violet-700" onclick="openSongsHub()">🎵
             Songs</button>
-        <button class="animated-btn bg-gradient-to-r from-teal-500 to-teal-700" onclick="openScorecardModal()">📊
+        <button class="animated-btn bg-gradient-to-r from-teal-500 to-teal-700" data-cvang-button="true" onclick="openScorecardModal()">📊
             IB-SCORECARD</button>
-        <button class="secondary cov-btn" id="btnCompanyOwned">Company Owned Not Allowed</button>
+        <button class="secondary cov-btn" data-cvang-button="true" id="btnCompanyOwned">Company Owned Not Allowed</button>
     </div>
     <!-- Renamed Manual VI button -->
     <!-- New button for Claim_Count & NSTP -->
@@ -1895,7 +1899,8 @@
                         <div id="chessStatusBanner" class="chess-status-banner">Create a room or join an approved room
                             to begin.</div>
                         <div id="chessWarningBanner" class="chess-warning-banner hidden"></div>
-                        <div id="chessBoardMoveBanner" class="chess-board-move-banner hidden">Last move will appear here.</div>
+                        <div id="chessBoardMoveBanner" class="chess-board-move-banner hidden">Last move will appear
+                            here.</div>
                         <div id="chessChatToast" class="chess-chat-toast hidden" aria-live="polite"></div>
                         <div id="chessBoard" class="chess-board" aria-label="Chess Board"></div>
                     </div>
@@ -1936,11 +1941,12 @@
                             <input id="chessRoomCodeInput" class="chess-text-input chess-room-code-input" type="text"
                                 maxlength="6" placeholder="ROOM42">
                             <p class="chess-helper-text">Paste the host code, request entry, and wait for approval.</p>
-                        <div class="chess-inline-actions">
-                            <button class="chess-primary-btn" onclick="joinChessRoom()">Request Entry</button>
-                            <button class="chess-secondary-btn" data-chat-launcher="true" onclick="openExternalChatForChess(event)">Open External
-                                Chat</button>
-                            <button class="chess-secondary-btn" onclick="pasteChessCodeFromClipboard()">Paste
+                            <div class="chess-inline-actions">
+                                <button class="chess-primary-btn" onclick="joinChessRoom()">Request Entry</button>
+                                <button class="chess-secondary-btn" data-chat-launcher="true"
+                                    onclick="openExternalChatForChess(event)">Open External
+                                    Chat</button>
+                                <button class="chess-secondary-btn" onclick="pasteChessCodeFromClipboard()">Paste
                                     Code</button>
                             </div>
                         </div>
@@ -1980,10 +1986,12 @@
                             <div class="chess-room-code-label">Room Code</div>
                             <div id="chessRoomCodeDisplay" class="chess-room-code-value">------</div>
                             <div class="chess-room-code-actions">
-                                <button id="chessCopyCodeBtn" class="chess-secondary-btn" onclick="copyChessRoomCode()">Copy
+                                <button id="chessCopyCodeBtn" class="chess-secondary-btn"
+                                    onclick="copyChessRoomCode()">Copy
                                     Code</button>
-                                <button id="chessSidebarShareCodeBtn" class="chess-secondary-btn" data-chat-launcher="true"
-                                    onclick="shareChessCodeToExternalChat()">Share in External Chat</button>
+                                <button id="chessSidebarShareCodeBtn" class="chess-secondary-btn"
+                                    data-chat-launcher="true" onclick="shareChessCodeToExternalChat()">Share in External
+                                    Chat</button>
                                 <button class="chess-secondary-btn" data-chat-launcher="true"
                                     onclick="openExternalChatForChess(event)">Open External Chat</button>
                             </div>
@@ -2019,7 +2027,8 @@
                         <div class="chess-side-eyebrow">Match Status</div>
                         <div id="chessMatchHeadline" class="chess-match-headline">No live room</div>
                         <div id="chessRoleHint" class="chess-role-hint">Choose Host Room or Find Room to begin.</div>
-                        <div id="chessLastMoveIndicator" class="chess-last-move-indicator hidden">Last move will appear here.</div>
+                        <div id="chessLastMoveIndicator" class="chess-last-move-indicator hidden">Last move will appear
+                            here.</div>
                     </div>
 
                     <div id="chessMoveFeedCard" class="chess-side-card">
@@ -2139,7 +2148,8 @@
                                 rooms fill opposite sides, while 4-player rooms fill the full table clockwise.</p>
                             <div class="carrom-inline-actions">
                                 <button class="carrom-primary-btn" onclick="joinCarromRoom()">Join Carrom Room</button>
-                                <button class="carrom-secondary-btn" data-chat-launcher="true" onclick="openExternalChatForCarrom(event)">Open External
+                                <button class="carrom-secondary-btn" data-chat-launcher="true"
+                                    onclick="openExternalChatForCarrom(event)">Open External
                                     Chat</button>
                                 <button class="carrom-secondary-btn" onclick="pasteCarromCodeFromClipboard()">Paste
                                     Code</button>
@@ -2167,7 +2177,8 @@
                         <div class="carrom-canvas-shell">
                             <div id="carromBoardChatOverlay" class="carrom-board-chat-overlay hidden"
                                 aria-live="polite"></div>
-                            <div id="carromBoardCoinsToast" class="carrom-board-coins-toast hidden" aria-live="polite"></div>
+                            <div id="carromBoardCoinsToast" class="carrom-board-coins-toast hidden" aria-live="polite">
+                            </div>
                             <canvas id="carromBoardCanvas" width="760" height="760" aria-label="Carrom Board"></canvas>
                             <div id="carromBoardPowerRail" class="carrom-board-power-rail hidden" aria-live="polite">
                                 <div class="carrom-power-head">
@@ -2195,12 +2206,16 @@
                         <div id="carromApprovalTitle" class="carrom-side-eyebrow">Approval Queue</div>
                         <div id="carromApprovalText" class="carrom-approval-text">No pending request.</div>
                         <div id="carromApprovalQueueNav" class="carrom-approval-actions hidden">
-                            <button id="carromApprovalPrevBtn" class="carrom-secondary-btn" onclick="showPreviousCarromApproval()">Previous</button>
-                            <button id="carromApprovalNextBtn" class="carrom-secondary-btn" onclick="showNextCarromApproval()">Next</button>
+                            <button id="carromApprovalPrevBtn" class="carrom-secondary-btn"
+                                onclick="showPreviousCarromApproval()">Previous</button>
+                            <button id="carromApprovalNextBtn" class="carrom-secondary-btn"
+                                onclick="showNextCarromApproval()">Next</button>
                         </div>
                         <div id="carromApprovalActions" class="carrom-approval-actions">
-                            <button id="carromApprovalPrimaryBtn" class="carrom-primary-btn" onclick="approveCarromJoinRequest()">Approve</button>
-                            <button id="carromApprovalSecondaryBtn" class="carrom-secondary-btn" onclick="declineCarromJoinRequest()">Decline</button>
+                            <button id="carromApprovalPrimaryBtn" class="carrom-primary-btn"
+                                onclick="approveCarromJoinRequest()">Approve</button>
+                            <button id="carromApprovalSecondaryBtn" class="carrom-secondary-btn"
+                                onclick="declineCarromJoinRequest()">Decline</button>
                         </div>
                         <button id="carromApprovalStartBtn" class="carrom-primary-btn hidden mt-4"
                             onclick="startCarromMatchIfHost()">Start Match</button>
