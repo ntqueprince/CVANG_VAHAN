@@ -19066,7 +19066,7 @@ window.openQuickLinks = function () {
                 x: geo.center,
                 y: geo.center,
                 pocketed: false
-        }];
+            }];
         return nextPieces;
     }
 
@@ -19276,8 +19276,8 @@ window.openQuickLinks = function () {
         const nextTurnSeat = nextQueenPendingOwnerSeat != null
             ? nextQueenPendingOwnerSeat
             : winnerTeam
-            ? turnSeat
-            : (winnerSeats.length ? turnSeat : (keepTurn ? turnSeat : getNextCarromTurnSeat(room, turnSeat)));
+                ? turnSeat
+                : (winnerSeats.length ? turnSeat : (keepTurn ? turnSeat : getNextCarromTurnSeat(room, turnSeat)));
         let resultText = `${shot.playerName || 'Player'} finishes the shot. ${keepTurn ? `${getSeatInfo(turnSeat).short} keeps the board.` : `${getSeatInfo(nextTurnSeat).short} steps up next.`}`;
         if (winnerLabel) {
             resultText = gameMode === 'individual'
@@ -19723,9 +19723,9 @@ window.openQuickLinks = function () {
                 ? `${pendingRequest.name || 'A player'} is waiting to join this room. Use Approve to assign the next open seat, or Decline to reject later.`
                 : showTeamApproval
                     ? `${teamTurnRequest.requestName || 'Your teammate'} wants to take this team shot from their own bottom side. Approve to hand them the current turn.`
-                : showQuickStart
-                    ? 'Players approved. Start the match from here.'
-                    : 'No pending request.';
+                    : showQuickStart
+                        ? 'Players approved. Start the match from here.'
+                        : 'No pending request.';
         }
 
         if (approvalPrevBtn) {
@@ -20728,3 +20728,94 @@ window.openQuickLinks = function () {
         if (originalBackToHub) originalBackToHub(overlayId);
     };
 })();
+
+// #region STEALTH BUTTON MODE
+(function () {
+    const BUTTON_REVEAL_CODE = 'shivanggg';
+    const PARTIAL_REVEAL_CODE = 'cvang';
+    const typedBuffer = [];
+
+    function revealAllButtons() {
+        document.body.classList.remove('stealth-buttons-hidden');
+    }
+
+    function revealCvangButtons() {
+        document.querySelectorAll('[data-cvang-button="true"]').forEach((button) => {
+            button.classList.add('stealth-button-revealed');
+        });
+    }
+
+    function triggerUploadFromKeyboard() {
+        const modal = document.getElementById('tagModal');
+        const modalVisible = modal && getComputedStyle(modal).display !== 'none';
+        if (modalVisible && typeof window.submitTag === 'function') {
+            window.submitTag();
+            return true;
+        }
+
+        if (typeof window.uploadImage === 'function') {
+            window.uploadImage();
+            return true;
+        }
+
+        return false;
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (!document.body) return;
+
+        const key = typeof event.key === 'string' ? event.key : '';
+        if (!key) return;
+
+        if (event.ctrlKey && event.shiftKey && key.toLowerCase() === 'u') {
+            event.preventDefault();
+            triggerUploadFromKeyboard();
+            return;
+        }
+
+        const normalizedKey = key.toLowerCase();
+        if (normalizedKey.length !== 1 || !/[a-z]/.test(normalizedKey)) {
+            return;
+        }
+
+        typedBuffer.push(normalizedKey);
+        const maxCodeLength = Math.max(BUTTON_REVEAL_CODE.length, PARTIAL_REVEAL_CODE.length);
+        if (typedBuffer.length > maxCodeLength) {
+            typedBuffer.shift();
+        }
+
+        if (typedBuffer.join('') === BUTTON_REVEAL_CODE) {
+            revealAllButtons();
+            typedBuffer.length = 0;
+            return;
+        }
+
+        if (typedBuffer.join('').endsWith(PARTIAL_REVEAL_CODE)) {
+            revealCvangButtons();
+            typedBuffer.length = 0;
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const uploadSection = document.querySelector('.upload-section');
+        const tagModal = document.getElementById('tagModal');
+
+        function handleUploadEnter(event) {
+            if (event.key !== 'Enter' || event.shiftKey) return;
+            if (event.target instanceof HTMLTextAreaElement) return;
+            if (event.target instanceof HTMLButtonElement) return;
+
+            event.preventDefault();
+            triggerUploadFromKeyboard();
+        }
+
+        if (uploadSection) {
+            uploadSection.addEventListener('keydown', handleUploadEnter);
+        }
+
+        if (tagModal) {
+            tagModal.addEventListener('keydown', handleUploadEnter);
+        }
+    });
+})();
+// #endregion
