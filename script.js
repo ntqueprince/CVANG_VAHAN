@@ -17630,6 +17630,8 @@ window.openQuickLinks = function () {
         brandFlashHue: 0,
         boardChatPreviewKey: '',
         boardChatPreviewTimer: 0,
+        coinsToastTimer: 0,
+        lastCoinsSnapshot: '',
         aimStrikerLocked: false,
         aimSyncTimer: 0,
         lastAimSyncAt: 0,
@@ -17900,6 +17902,8 @@ window.openQuickLinks = function () {
             teamTurnRequest: null,
             queenCovered: false,
             queenOwnerSeat: null,
+            queenPendingOwnerSeat: null,
+            queenPendingTeam: '',
             queenReturned: false,
             resultText: `${format}-player ${gameMode === 'individual' ? 'individual' : gameMode === 'team' ? 'team' : 'duel'} room ready. Fill the seats and break the board.`,
             winnerTeam: '',
@@ -17943,6 +17947,8 @@ window.openQuickLinks = function () {
                 aimPreview: rawBoard.aimPreview || null,
                 queenCovered: !!rawBoard.queenCovered,
                 queenOwnerSeat: rawBoard.queenOwnerSeat ?? null,
+                queenPendingOwnerSeat: rawBoard.queenPendingOwnerSeat ?? null,
+                queenPendingTeam: rawBoard.queenPendingTeam || '',
                 queenReturned: !!rawBoard.queenReturned,
                 winnerSeats: Array.isArray(rawBoard.winnerSeats) ? rawBoard.winnerSeats : []
             },
@@ -19051,9 +19057,41 @@ window.openQuickLinks = function () {
 
     function restoreCarromQueenToCenter(pieces) {
         const geo = getCarromGeometry(760);
-        return pieces.map(piece => piece.id === 'queen'
+        const hasQueen = (pieces || []).some(piece => piece.id === 'queen');
+        const nextPieces = hasQueen ? (pieces || []).map(piece => piece.id === 'queen'
             ? { ...piece, pocketed: false, x: geo.center, y: geo.center }
-            : piece);
+            : piece) : [...(pieces || []), {
+                id: 'queen',
+                type: 'queen',
+                x: geo.center,
+                y: geo.center,
+                pocketed: false
+        }];
+        return nextPieces;
+    }
+
+    function restorePenaltyCoinToBoard(pieces, pieceType) {
+        if (!pieceType) return { pieces: pieces || [], restored: null };
+        const geo = getCarromGeometry(760);
+        const penaltySpots = [
+            { x: geo.center - geo.coinRadius * 2.6, y: geo.center },
+            { x: geo.center + geo.coinRadius * 2.6, y: geo.center },
+            { x: geo.center, y: geo.center - geo.coinRadius * 2.6 },
+            { x: geo.center, y: geo.center + geo.coinRadius * 2.6 }
+        ];
+        let restored = null;
+        const nextPieces = (pieces || []).map(piece => {
+            if (restored || piece.type !== pieceType || !piece.pocketed) return piece;
+            const spot = penaltySpots[0];
+            restored = {
+                ...piece,
+                pocketed: false,
+                x: Number(spot.x.toFixed(2)),
+                y: Number(spot.y.toFixed(2))
+            };
+            return restored;
+        });
+        return { pieces: nextPieces, restored };
     }
 
     function getCarromIndividualWinners(playerScores) {
@@ -19073,6 +19111,7 @@ window.openQuickLinks = function () {
         const ownPocketed = simulation.pocketed.filter(item => item.type === currentTeam).length;
         const opponentPocketed = simulation.pocketed.filter(item => item.type === opponentTeam).length;
         const queenPocketed = simulation.pocketed.filter(item => item.type === 'queen').length;
+        const queenPendingShot = room.board?.queenPendingOwnerSeat != null && Number(room.board.queenPendingOwnerSeat) === shot.seatIndex;
         const parts = [`${shooter} (${seat})`];
 
         if (!ownPocketed && !opponentPocketed && !queenPocketed && !simulation.strikerPocketed) {
@@ -19084,7 +19123,11 @@ window.openQuickLinks = function () {
                 if (ownPocketed) parts.push(`banked ${ownPocketed} own coin${ownPocketed === 1 ? '' : 's'}`);
                 if (opponentPocketed) parts.push(`fed ${opponentPocketed} coin${opponentPocketed === 1 ? '' : 's'} to ${getTeamLabel(opponentTeam)}`);
             }
-            if (queenPocketed) parts.push(simulation.queenCounted ? 'queen counted' : 'queen returned');
+            if (queenPocketed) {
+                parts.push(simulation.queenCounted ? 'queen counted' : 'queen awaiting cover');
+            } else if (queenPendingShot) {
+                parts.push(simulation.queenCounted ? 'queen covered' : 'queen returned');
+            }
             if (simulation.strikerPocketed) parts.push('took a striker foul');
         }
 
@@ -19144,12 +19187,21 @@ window.openQuickLinks = function () {
                 pocketed: !!piece.pocketed
             }));
         const normalRemainingAfterShot = rawResolvedPieces.filter(piece => !piece.pocketed && piece.type !== 'queen').length;
-        const queenCounted = queenPocketed > 0 && (normalPocketed > 0 || normalRemainingAfterShot === 0);
-        const keepTurn = !simulation.strikerPocketed && (
+        const hadPendingQueen = room.board?.queenPendingOwnerSeat != null;
+        const pendingQueenOwnerSeat = hadPendingQueen ? Number(room.board.queenPendingOwnerSeat) : null;
+        const pendingQueenTeam = room.board?.queenPendingTeam || (pendingQueenOwnerSeat != null ? getCarromTeamForSeat(room.format, pendingQueenOwnerSeat) : '');
+        const isPendingQueenCoverShot = pendingQueenOwnerSeat != null && pendingQueenOwnerSeat === shot.seatIndex;
+        const coverCoinPocketed = ownPocketed > 0;
+        const queenImmediateCounted = queenPocketed > 0 && normalRemainingAfterShot === 0 && !simulation.strikerPocketed;
+        const queenCoverSucceeded = isPendingQueenCoverShot && !simulation.strikerPocketed && (coverCoinPocketed || normalRemainingAfterShot === 0);
+        const queenCounted = queenImmediateCounted || queenCoverSucceeded;
+        const queenNeedsCover = queenPocketed > 0 && !queenImmediateCounted && !simulation.strikerPocketed;
+        const queenCoverFailed = isPendingQueenCoverShot && !queenCoverSucceeded;
+        const keepTurn = queenNeedsCover || (!simulation.strikerPocketed && (
             gameMode === 'individual'
                 ? simulation.pocketed.some(item => item.type !== 'queen') || queenCounted
                 : (ownPocketed > 0 || queenCounted)
-        );
+        ));
 
         const nextScores = {
             ivory: baseScores.ivory,
@@ -19167,6 +19219,9 @@ window.openQuickLinks = function () {
                 if (item.type === 'queen' && !queenCounted) return;
                 nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) + getCarromPointValue(item.type));
             });
+            if (queenCoverSucceeded) {
+                nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) + getCarromPointValue('queen'));
+            }
         } else {
             nextScores[currentTeam] = Math.max(0, nextScores[currentTeam] + ownPocketed + (queenCounted ? 1 : 0) - (simulation.strikerPocketed ? 1 : 0));
             nextScores[opponentTeam] = Math.max(0, nextScores[opponentTeam] + opponentPocketed);
@@ -19176,13 +19231,29 @@ window.openQuickLinks = function () {
         }
 
         let resolvedPieces = rawResolvedPieces;
-        if (queenPocketed && !queenCounted) {
+        if (queenCoverFailed || (queenPocketed && simulation.strikerPocketed)) {
             resolvedPieces = restoreCarromQueenToCenter(resolvedPieces);
+        }
+        let restoredPenaltyCoin = null;
+        if (simulation.strikerPocketed) {
+            const penaltyRestore = restorePenaltyCoinToBoard(resolvedPieces, currentTeam);
+            resolvedPieces = penaltyRestore.pieces;
+            restoredPenaltyCoin = penaltyRestore.restored;
+            if (restoredPenaltyCoin) {
+                if (gameMode === 'individual') {
+                    nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) - getCarromPointValue(restoredPenaltyCoin.type));
+                } else {
+                    nextScores[currentTeam] = Math.max(0, nextScores[currentTeam] - 1);
+                }
+            }
         }
 
         const remainingCoins = resolvedPieces.filter(piece => !piece.pocketed && piece.type !== 'queen');
-        const teamFinished = gameMode !== 'individual' && remainingCoins.every(piece => piece.type !== currentTeam);
-        const allFinished = resolvedPieces.every(piece => piece.pocketed);
+        const nextQueenCovered = queenCounted || room.board?.queenCovered;
+        const nextQueenPendingOwnerSeat = queenNeedsCover ? shot.seatIndex : null;
+        const nextQueenPendingTeam = queenNeedsCover ? currentTeam : '';
+        const teamFinished = nextQueenCovered && gameMode !== 'individual' && remainingCoins.every(piece => piece.type !== currentTeam);
+        const allFinished = nextQueenCovered && resolvedPieces.every(piece => piece.pocketed);
         const winnerTeam = gameMode === 'individual'
             ? ''
             : (teamFinished
@@ -19202,14 +19273,25 @@ window.openQuickLinks = function () {
                 : winnerTeam
                     ? `${getTeamLabel(winnerTeam)} wins`
                     : '';
-        const nextTurnSeat = winnerTeam
+        const nextTurnSeat = nextQueenPendingOwnerSeat != null
+            ? nextQueenPendingOwnerSeat
+            : winnerTeam
             ? turnSeat
             : (winnerSeats.length ? turnSeat : (keepTurn ? turnSeat : getNextCarromTurnSeat(room, turnSeat)));
-        const resultText = winnerLabel
-            ? (gameMode === 'individual'
+        let resultText = `${shot.playerName || 'Player'} finishes the shot. ${keepTurn ? `${getSeatInfo(turnSeat).short} keeps the board.` : `${getSeatInfo(nextTurnSeat).short} steps up next.`}`;
+        if (winnerLabel) {
+            resultText = gameMode === 'individual'
                 ? `${winnerLabel}. Final points ${Object.entries(nextPlayerScores).filter(([, score]) => Number(score) > 0).map(([seat, score]) => `${room.players?.[seat]?.name || getSeatInfo(Number(seat)).short}: ${score}`).join(', ')}.`
-                : `${winnerLabel}. Final score ${nextScores.ivory}-${nextScores.ebony}.`)
-            : `${shot.playerName || 'Player'} finishes the shot. ${keepTurn ? `${getSeatInfo(turnSeat).short} keeps the board.` : `${getSeatInfo(nextTurnSeat).short} steps up next.`}`;
+                : `${winnerLabel}. Final score ${nextScores.ivory}-${nextScores.ebony}.`;
+        } else if (queenNeedsCover) {
+            resultText = `${shot.playerName || 'Player'} pocketed the queen. ${getSeatInfo(shot.seatIndex).short} gets one cover chance now.`;
+        } else if (queenCoverSucceeded) {
+            resultText = `${shot.playerName || 'Player'} covered the queen successfully and keeps the game alive.`;
+        } else if (queenCoverFailed) {
+            resultText = `${shot.playerName || 'Player'} could not cover the queen, so it returns to the center.`;
+        } else if (restoredPenaltyCoin) {
+            resultText = `${shot.playerName || 'Player'} pocketed the striker, so one ${restoredPenaltyCoin.type} coin returns to the board as penalty.`;
+        }
         const resolvedBoard = {
             ...room.board,
             pieces: resolvedPieces,
@@ -19224,9 +19306,11 @@ window.openQuickLinks = function () {
             resultText,
             winnerTeam,
             winnerSeats,
-            queenCovered: queenCounted || room.board?.queenCovered,
-            queenOwnerSeat: queenCounted ? shot.seatIndex : room.board?.queenOwnerSeat ?? null,
-            queenReturned: queenPocketed > 0 && !queenCounted,
+            queenCovered: nextQueenCovered,
+            queenOwnerSeat: queenCounted ? (queenCoverSucceeded ? pendingQueenOwnerSeat : shot.seatIndex) : room.board?.queenOwnerSeat ?? null,
+            queenPendingOwnerSeat: nextQueenPendingOwnerSeat,
+            queenPendingTeam: nextQueenPendingTeam,
+            queenReturned: queenCoverFailed || (queenPocketed > 0 && simulation.strikerPocketed),
             winnerLabel
         };
         const nextStatus = winnerTeam || winnerSeats.length ? 'finished' : 'active';
@@ -19365,6 +19449,94 @@ window.openQuickLinks = function () {
                 `;
             }).join('');
         container.innerHTML = markup;
+    }
+
+    function clearCarromCoinsToast() {
+        const toast = document.getElementById('carromBoardCoinsToast');
+        if (toast) {
+            toast.textContent = '';
+            toast.classList.add('hidden');
+        }
+        if (carromState.coinsToastTimer) {
+            clearTimeout(carromState.coinsToastTimer);
+            carromState.coinsToastTimer = 0;
+        }
+    }
+
+    function showCarromCoinsToast(message) {
+        const toast = document.getElementById('carromBoardCoinsToast');
+        if (!toast || !message) return;
+        clearCarromCoinsToast();
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        carromState.coinsToastTimer = window.setTimeout(() => {
+            clearCarromCoinsToast();
+        }, 2000);
+    }
+
+    function renderCarromCoinsTracker(room) {
+        const container = document.getElementById('carromCoinsTracker');
+        if (!container) return;
+        if (!room) {
+            container.innerHTML = '';
+            carromState.lastCoinsSnapshot = '';
+            clearCarromCoinsToast();
+            return;
+        }
+
+        const pieces = room.board?.pieces || [];
+        const gameMode = getCarromGameMode(room);
+        const entries = getAllowedCarromSeats(room.format).map(seatIndex => {
+            const player = room.players?.[seatIndex];
+            const team = getCarromTeamForSeat(room.format, seatIndex);
+            const totalCoins = pieces.filter(piece => piece.type === team).length;
+            const pocketedCoins = pieces.filter(piece => piece.type === team && piece.pocketed).length;
+            const pendingCoins = Math.max(0, totalCoins - pocketedCoins);
+            return {
+                seatIndex,
+                title: player?.name || getSeatInfo(seatIndex).label,
+                subtitle: gameMode === 'individual' ? getSeatInfo(seatIndex).label : `${getTeamLabel(team)} coins`,
+                pocketedCoins,
+                pendingCoins
+            };
+        });
+
+        container.innerHTML = entries.map(entry => `
+            <div class="carrom-coins-card">
+                <div class="carrom-coins-head">
+                    <div>
+                        <div class="carrom-coins-name">${escapeCarromHtml(entry.title)}</div>
+                        <div class="carrom-coins-team">${escapeCarromHtml(entry.subtitle)}</div>
+                    </div>
+                </div>
+                <div class="carrom-coins-badges">
+                    <div class="carrom-coins-badge">
+                        <div class="carrom-coins-label">Pocketed</div>
+                        <div class="carrom-coins-value">${entry.pocketedCoins}</div>
+                    </div>
+                    <div class="carrom-coins-badge">
+                        <div class="carrom-coins-label">Pending</div>
+                        <div class="carrom-coins-value">${entry.pendingCoins}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        const snapshot = JSON.stringify(entries.map(entry => ({
+            seatIndex: entry.seatIndex,
+            pocketedCoins: entry.pocketedCoins,
+            pendingCoins: entry.pendingCoins
+        })));
+        if (carromState.lastCoinsSnapshot && snapshot !== carromState.lastCoinsSnapshot) {
+            const changedEntry = entries.find((entry, index) => {
+                const prev = JSON.parse(carromState.lastCoinsSnapshot)[index];
+                return prev && (prev.pocketedCoins !== entry.pocketedCoins || prev.pendingCoins !== entry.pendingCoins);
+            }) || entries[0];
+            if (changedEntry) {
+                showCarromCoinsToast(`${changedEntry.title}: pocketed ${changedEntry.pocketedCoins}, pending ${changedEntry.pendingCoins}`);
+            }
+        }
+        carromState.lastCoinsSnapshot = snapshot;
     }
 
     function renderCarromShotList(room) {
@@ -19637,6 +19809,8 @@ window.openQuickLinks = function () {
     }
 
     function updateCarromSidebarLayout(room) {
+        const sidebar = document.querySelector('.carrom-sidebar');
+        const coinsCard = document.getElementById('carromCoinsCard');
         const chatCard = document.getElementById('carromChatCard');
         const roomControlCard = document.getElementById('carromRoomControlCard');
         const approvalCard = document.getElementById('carromApprovalCard');
@@ -19650,8 +19824,19 @@ window.openQuickLinks = function () {
         if (chatCard) {
             chatCard.classList.toggle('hidden', !liveMatch);
         }
+        if (coinsCard) {
+            if (room) {
+                coinsCard.classList.remove('hidden');
+            } else {
+                coinsCard.classList.add('hidden');
+            }
+        }
+        if (sidebar && room) {
+            sidebar.scrollTop = 0;
+        }
 
         if (liveMatch) {
+            setSidebarCardOrder(coinsCard, -9);
             setSidebarCardOrder(approvalCard, -8);
             setSidebarCardOrder(chatCard, -7);
             setSidebarCardOrder(tableViewCard, -6);
@@ -19663,6 +19848,7 @@ window.openQuickLinks = function () {
             return;
         }
 
+        setSidebarCardOrder(coinsCard, -9);
         setSidebarCardOrder(approvalCard, -8);
         setSidebarCardOrder(roomControlCard, -7);
         setSidebarCardOrder(waitingCard, -6);
@@ -19694,6 +19880,7 @@ window.openQuickLinks = function () {
         toggleCarromPanels(!!room);
         renderCarromSeatCards(room);
         renderCarromScoreboard(room);
+        renderCarromCoinsTracker(room);
         renderCarromShotList(room);
         renderCarromChat(room);
         updateCarromResultModal(room);
@@ -19707,6 +19894,7 @@ window.openQuickLinks = function () {
         const turnOwner = document.getElementById('carromTurnOwner');
         const teamTarget = document.getElementById('carromTeamTarget');
         const headline = document.getElementById('carromMatchHeadline');
+        const queenStatus = document.getElementById('carromQueenStatus');
         const roleHint = document.getElementById('carromRoleHint');
         const hint = document.getElementById('carromAimHint');
 
@@ -19721,6 +19909,10 @@ window.openQuickLinks = function () {
             if (turnOwner) turnOwner.textContent = 'South Baseline';
             if (teamTarget) teamTarget.textContent = 'Ivory Team on deck';
             if (headline) headline.textContent = 'No live room';
+            if (queenStatus) {
+                queenStatus.textContent = 'Queen awaiting cover.';
+                queenStatus.classList.add('hidden');
+            }
             if (roleHint) roleHint.textContent = 'Choose Host Room or Join Room to begin.';
             if (hint) hint.textContent = 'When it is your turn, drag the striker across your lane, then pull outward on the board to load power and release.';
             cancelCarromSimulation();
@@ -19741,6 +19933,8 @@ window.openQuickLinks = function () {
         const localTeam = carromState.seatIndex == null ? '' : getCarromTeamForSeat(room.format, carromState.seatIndex);
         const localSeatLabel = carromState.seatIndex == null ? 'No seat yet' : getSeatInfo(carromState.seatIndex).label;
         const teamTurnRequest = getActiveCarromTeamTurnRequest(room);
+        const queenPendingSeat = room.board?.queenPendingOwnerSeat != null ? Number(room.board.queenPendingOwnerSeat) : null;
+        const queenPendingName = queenPendingSeat != null ? (room.players?.[queenPendingSeat]?.name || getSeatInfo(queenPendingSeat).short) : '';
         const pendingRequests = getPendingCarromJoinRequests(room);
         const localJoinRequest = getLatestCarromJoinRequestForSession(room, carromState.sessionId);
         const localPendingRequest = carromState.seatIndex == null && localJoinRequest?.status === 'pending' ? localJoinRequest : null;
@@ -19772,6 +19966,15 @@ window.openQuickLinks = function () {
                 : isCarromPaused(room)
                     ? (room.board?.pausedBy ? `Paused by ${room.board.pausedBy}` : 'Table paused')
                     : (gameMode === 'individual' ? `${turnPlayer} on deck` : `${getTeamLabel(turnTeam)} on deck`);
+        }
+        if (queenStatus) {
+            if (queenPendingSeat != null) {
+                queenStatus.textContent = `Queen awaiting cover by ${queenPendingName}. Wrong-color coin se cover valid nahi hoga.`;
+                queenStatus.classList.remove('hidden');
+            } else {
+                queenStatus.textContent = 'Queen awaiting cover.';
+                queenStatus.classList.add('hidden');
+            }
         }
         if (headline) {
             headline.textContent = localPendingRequest
