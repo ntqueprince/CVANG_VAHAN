@@ -2167,6 +2167,7 @@
                         <div class="carrom-canvas-shell">
                             <div id="carromBoardChatOverlay" class="carrom-board-chat-overlay hidden"
                                 aria-live="polite"></div>
+                            <div id="carromBoardCoinsToast" class="carrom-board-coins-toast hidden" aria-live="polite"></div>
                             <canvas id="carromBoardCanvas" width="760" height="760" aria-label="Carrom Board"></canvas>
                             <div id="carromBoardPowerRail" class="carrom-board-power-rail hidden" aria-live="polite">
                                 <div class="carrom-power-head">
@@ -2184,6 +2185,11 @@
                 <div class="carrom-sidebar">
                     <button class="mem-btn w-full text-base font-semibold carrom-back-btn"
                         onclick="backToHub('carromGameOverlay')">Back to Hub</button>
+
+                    <div id="carromCoinsCard" class="carrom-side-card">
+                        <div class="carrom-side-eyebrow">Coins Tracker</div>
+                        <div id="carromCoinsTracker" class="carrom-coins-tracker"></div>
+                    </div>
 
                     <div id="carromApprovalCard" class="carrom-side-card carrom-approval-card hidden">
                         <div id="carromApprovalTitle" class="carrom-side-eyebrow">Approval Queue</div>
@@ -2290,6 +2296,7 @@
                     <div id="carromMatchStatusCard" class="carrom-side-card">
                         <div class="carrom-side-eyebrow">Match Status</div>
                         <div id="carromMatchHeadline" class="carrom-match-headline">No live room</div>
+                        <div id="carromQueenStatus" class="carrom-role-hint hidden">Queen awaiting cover.</div>
                         <div id="carromRoleHint" class="carrom-role-hint">Choose Host Room or Join Room to begin.</div>
                         <div id="carromScoreboard" class="carrom-scoreboard"></div>
                     </div>
