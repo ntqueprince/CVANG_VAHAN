@@ -5489,6 +5489,14 @@ body.stealth-buttons-hidden .colorful-upload-btn {
     pointer-events: auto !important;
 }
 
+body.stealth-buttons-hidden .download-btn,
+body.stealth-buttons-hidden .gallery-btn-group,
+body.stealth-buttons-hidden .gallery-btn-group button {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
 body.stealth-buttons-hidden button[onclick="openCSATModal()"] {
     opacity: 1 !important;
     visibility: visible !important;
