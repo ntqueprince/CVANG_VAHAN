@@ -5474,3 +5474,101 @@ button:hover {
     transform: scale(1.1);
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
+
+body.stealth-buttons-hidden button,
+body.stealth-buttons-hidden #companyUpdatesButton,
+body.stealth-buttons-hidden #notebookButton {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body.stealth-buttons-hidden .colorful-upload-btn {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden button[onclick="openCSATModal()"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden #csatModal button,
+body.stealth-buttons-hidden #csatModal select,
+body.stealth-buttons-hidden #csatModal input,
+body.stealth-buttons-hidden #csatModal label,
+body.stealth-buttons-hidden #csatModal .button-container {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden #tagModal button,
+body.stealth-buttons-hidden #tagModal input,
+body.stealth-buttons-hidden #tagModal label,
+body.stealth-buttons-hidden #tagModal .modal-content {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden #scorecardModal button,
+body.stealth-buttons-hidden #scorecardModal select,
+body.stealth-buttons-hidden #scorecardModal input,
+body.stealth-buttons-hidden #scorecardModal label,
+body.stealth-buttons-hidden #scorecardModal .scorecard-modal-content,
+body.stealth-buttons-hidden #scorecardModal .scorecard-buttons,
+body.stealth-buttons-hidden #scorecardModal .scorecard-layout,
+body.stealth-buttons-hidden #scorecardModal .scorecard-inputs,
+body.stealth-buttons-hidden #scorecardModal .scorecard-outputs {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden #incentiveModal button,
+body.stealth-buttons-hidden #incentiveModal select,
+body.stealth-buttons-hidden #incentiveModal input,
+body.stealth-buttons-hidden #incentiveModal label,
+body.stealth-buttons-hidden #incentiveModal .incentive-modal-content,
+body.stealth-buttons-hidden #incentiveModal .button-container,
+body.stealth-buttons-hidden #incentiveModal .result-section,
+body.stealth-buttons-hidden #incentiveModal .input-row {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden #endorsementPage button,
+body.stealth-buttons-hidden #endorsementPage select,
+body.stealth-buttons-hidden #endorsementPage input,
+body.stealth-buttons-hidden #endorsementPage label,
+body.stealth-buttons-hidden #endorsementPage .endorsement-container,
+body.stealth-buttons-hidden #endorsementPage .back-btn,
+body.stealth-buttons-hidden #endorsementPage .PB_DROPDOWN,
+body.stealth-buttons-hidden #endorsementPage #output {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden #covModal button,
+body.stealth-buttons-hidden #covModal .modalBox,
+body.stealth-buttons-hidden #covModal .modalHeader,
+body.stealth-buttons-hidden #covModal .modalBtns,
+body.stealth-buttons-hidden #covModal .modalContent,
+body.stealth-buttons-hidden #covModal #covList {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body.stealth-buttons-hidden button.stealth-button-revealed,
+body.stealth-buttons-hidden #companyUpdatesButton.stealth-button-revealed,
+body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
