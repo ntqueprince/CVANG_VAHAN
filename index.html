@@ -1190,13 +1190,14 @@
     <script type="module" src="script.js"></script>
     <!-- Floating Chat Button -->
     <button id="openChatBtn"
-        class="fixed bottom-4 right-4 w-14 h-14 rounded-full shadow-lg text-white text-2xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-110 transition z-50">
+        class="fixed bottom-4 right-4 w-14 h-14 rounded-full shadow-lg text-white text-2xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-110 transition z-[5000]"
+        data-chat-launcher="true">
         💬
     </button>
 
     <!-- Chat Canvas (Vertical full screen height) -->
     <div id="chatCanvas"
-        class="fixed bottom-0 right-0 w-full sm:w-[450px] h-[85vh] bg-white shadow-2xl rounded-tl-2xl border-t-4 border-indigo-600 flex flex-col z-50 translate-y-full transition-transform duration-500">
+        class="fixed bottom-0 right-0 w-full sm:w-[450px] h-[85vh] bg-white shadow-2xl rounded-tl-2xl border-t-4 border-indigo-600 flex flex-col z-[5001] translate-y-full transition-transform duration-500">
         <div
             class="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-tl-2xl">
             <span class="text-base font-semibold">External Chat</span>
@@ -1877,14 +1878,35 @@
                 <div class="chess-header-badge">2 Player Firebase Match</div>
             </div>
 
+            <div id="chessApprovalPopup" class="chess-alert-popup hidden">
+                <div>
+                    <div class="chess-alert-title">Join request waiting</div>
+                    <div id="chessApprovalPopupText" class="chess-alert-copy">A player wants to join your room.</div>
+                </div>
+                <div class="chess-alert-actions">
+                    <button class="chess-primary-btn" onclick="approveChessGuest()">Approve</button>
+                    <button class="chess-secondary-btn" onclick="declineChessGuest()">Decline</button>
+                </div>
+            </div>
+
             <div class="chess-layout">
                 <div class="chess-board-panel">
-                    <div class="chess-topline">
-                        <div class="chess-chip" id="chessRoomModeChip">Lobby Ready</div>
-                        <div class="chess-chip" id="chessTurnChip">Waiting</div>
+                    <div id="chessBoardStage" class="chess-board-stage hidden">
+                        <div id="chessStatusBanner" class="chess-status-banner">Create a room or join an approved room
+                            to begin.</div>
+                        <div id="chessWarningBanner" class="chess-warning-banner hidden"></div>
+                        <div id="chessBoardMoveBanner" class="chess-board-move-banner hidden">Last move will appear here.</div>
+                        <div id="chessChatToast" class="chess-chat-toast hidden" aria-live="polite"></div>
+                        <div id="chessBoard" class="chess-board" aria-label="Chess Board"></div>
                     </div>
+                </div>
 
-                    <div id="chessIntroPanel" class="chess-intro-panel">
+                <div class="chess-sidebar">
+                    <button class="mem-btn w-full text-base font-semibold"
+                        style="background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(251, 191, 36, 0.16);"
+                        onclick="backToHub('chessGameOverlay')">Back to Hub</button>
+
+                    <div id="chessIntroPanel" class="chess-intro-panel chess-side-card">
                         <div class="chess-tab-row">
                             <button id="chessHostTab" class="chess-tab-btn active"
                                 onclick="switchChessMode('host')">Host Room</button>
@@ -1896,9 +1918,14 @@
                             <label class="chess-label" for="chessHostNameInput">Host Name</label>
                             <input id="chessHostNameInput" class="chess-text-input" type="text" maxlength="18"
                                 placeholder="Enter host name">
-                            <p class="chess-helper-text">You create the room, share the code, then approve your opponent
-                                before the board unlocks.</p>
-                            <button class="chess-primary-btn" onclick="createChessRoom()">Create Room</button>
+                            <p class="chess-helper-text">Create a room, share the code, and approve your opponent.</p>
+                            <div class="chess-inline-actions">
+                                <button class="chess-primary-btn" onclick="createChessRoom()">Create Room</button>
+                                <button id="chessShareCodeBtn" class="chess-secondary-btn" data-chat-launcher="true"
+                                    onclick="shareChessCodeToExternalChat()">Share Code in External Chat</button>
+                                <button class="chess-secondary-btn" data-chat-launcher="true"
+                                    onclick="openExternalChatForChess(event)">Open External Chat</button>
+                            </div>
                         </div>
 
                         <div id="chessJoinPanel" class="chess-form-panel hidden">
@@ -1908,9 +1935,14 @@
                             <label class="chess-label mt-4" for="chessRoomCodeInput">Room Code</label>
                             <input id="chessRoomCodeInput" class="chess-text-input chess-room-code-input" type="text"
                                 maxlength="6" placeholder="ROOM42">
-                            <p class="chess-helper-text">Paste the host code, send join request, then wait for approval.
-                            </p>
+                            <p class="chess-helper-text">Paste the host code, request entry, and wait for approval.</p>
+                        <div class="chess-inline-actions">
                             <button class="chess-primary-btn" onclick="joinChessRoom()">Request Entry</button>
+                            <button class="chess-secondary-btn" data-chat-launcher="true" onclick="openExternalChatForChess(event)">Open External
+                                Chat</button>
+                            <button class="chess-secondary-btn" onclick="pasteChessCodeFromClipboard()">Paste
+                                    Code</button>
+                            </div>
                         </div>
 
                         <div class="chess-feature-grid">
@@ -1929,25 +1961,32 @@
                         </div>
                     </div>
 
-                    <div id="chessBoardStage" class="chess-board-stage hidden">
-                        <div id="chessStatusBanner" class="chess-status-banner">Create a room or join an approved room
-                            to begin.</div>
-                        <div id="chessBoard" class="chess-board" aria-label="Chess Board"></div>
+                    <div id="chessChatCard" class="chess-side-card chess-chat-card">
+                        <div class="chess-side-eyebrow">Room Chat</div>
+                        <ul id="chessChatList" class="chess-chat-list">
+                            <li class="chess-chat-empty">Players can chat here once the match starts.</li>
+                        </ul>
+                        <div class="chess-chat-compose">
+                            <input id="chessChatInput" class="chess-chat-input" type="text" maxlength="140"
+                                placeholder="Type a room message" onkeydown="handleChessChatKey(event)">
+                            <button id="chessChatSendBtn" class="chess-secondary-btn"
+                                onclick="sendChessChatMessage()">Send</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="chess-sidebar">
-                    <button class="mem-btn w-full text-base font-semibold"
-                        style="background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(251, 191, 36, 0.16);"
-                        onclick="backToHub('chessGameOverlay')">Back to Hub</button>
-
-                    <div class="chess-side-card">
+                    <div id="chessRoomControlCard" class="chess-side-card">
                         <div class="chess-side-eyebrow">Room Control</div>
                         <div class="chess-room-code-box">
                             <div class="chess-room-code-label">Room Code</div>
                             <div id="chessRoomCodeDisplay" class="chess-room-code-value">------</div>
-                            <button id="chessCopyCodeBtn" class="chess-secondary-btn" onclick="copyChessRoomCode()">Copy
-                                Code</button>
+                            <div class="chess-room-code-actions">
+                                <button id="chessCopyCodeBtn" class="chess-secondary-btn" onclick="copyChessRoomCode()">Copy
+                                    Code</button>
+                                <button id="chessSidebarShareCodeBtn" class="chess-secondary-btn" data-chat-launcher="true"
+                                    onclick="shareChessCodeToExternalChat()">Share in External Chat</button>
+                                <button class="chess-secondary-btn" data-chat-launcher="true"
+                                    onclick="openExternalChatForChess(event)">Open External Chat</button>
+                            </div>
                         </div>
                         <div class="chess-player-stack">
                             <div class="chess-player-card chess-player-white">
@@ -1976,28 +2015,53 @@
                             approval.</div>
                     </div>
 
-                    <div class="chess-side-card">
+                    <div id="chessMatchStatusCard" class="chess-side-card">
                         <div class="chess-side-eyebrow">Match Status</div>
                         <div id="chessMatchHeadline" class="chess-match-headline">No live room</div>
                         <div id="chessRoleHint" class="chess-role-hint">Choose Host Room or Find Room to begin.</div>
+                        <div id="chessLastMoveIndicator" class="chess-last-move-indicator hidden">Last move will appear here.</div>
                     </div>
 
-                    <div class="chess-side-card">
+                    <div id="chessMoveFeedCard" class="chess-side-card">
                         <div class="chess-side-eyebrow">Move Feed</div>
                         <ul id="chessMoveList" class="chess-move-list">
                             <li>Room not started yet.</li>
                         </ul>
                     </div>
 
-                    <div class="chess-side-card">
+                    <div id="chessActionCard" class="chess-side-card">
                         <div class="chess-side-eyebrow">Action</div>
                         <div class="chess-action-group">
                             <button id="chessRestartBtn" class="chess-primary-btn"
                                 onclick="resetChessBoardIfHost()">Restart Match</button>
-                            <button id="chessPauseBtn" class="chess-secondary-btn"
-                                onclick="toggleChessPause()">Pause Match</button>
+                            <button id="chessPauseBtn" class="chess-secondary-btn" onclick="toggleChessPause()">Pause
+                                Match</button>
                             <button class="chess-secondary-btn" onclick="leaveChessRoom()">Leave Room</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chessWarningModal" class="chess-warning-modal hidden">
+                <div class="chess-warning-modal-card">
+                    <div id="chessWarningModalBadge" class="chess-warning-modal-badge">Check</div>
+                    <h3 id="chessWarningModalTitle" class="chess-warning-modal-title">King Under Attack</h3>
+                    <p id="chessWarningModalText" class="chess-warning-modal-text">A warning will appear here.</p>
+                    <div class="chess-warning-modal-actions">
+                        <button class="chess-primary-btn" onclick="closeChessWarningModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chessResultModal" class="chess-result-modal hidden">
+                <div class="chess-result-card">
+                    <div id="chessResultBadge" class="chess-result-badge">Match Finished</div>
+                    <h3 id="chessResultTitle" class="chess-result-title">Game Over</h3>
+                    <p id="chessResultText" class="chess-result-copy">Result will appear here.</p>
+                    <div class="chess-result-actions">
+                        <button class="chess-primary-btn" onclick="closeChessResultModal()">Close</button>
+                        <button id="chessResultRestartBtn" class="chess-secondary-btn"
+                            onclick="resetChessBoardIfHost()">Play Again</button>
                     </div>
                 </div>
             </div>
@@ -2028,8 +2092,8 @@
                         <div class="carrom-tab-row">
                             <button id="carromHostTab" class="carrom-tab-btn active"
                                 onclick="switchCarromMode('host')">Host Room</button>
-                            <button id="carromJoinTab" class="carrom-tab-btn"
-                                onclick="switchCarromMode('join')">Join Room</button>
+                            <button id="carromJoinTab" class="carrom-tab-btn" onclick="switchCarromMode('join')">Join
+                                Room</button>
                         </div>
 
                         <div id="carromHostPanel" class="carrom-form-panel">
@@ -2044,6 +2108,16 @@
                                         onclick="setCarromRoomSize(2)">2 Player Duel</button>
                                     <button id="carromFormat4Btn" class="carrom-format-btn"
                                         onclick="setCarromRoomSize(4)">4 Player Table</button>
+                                </div>
+                            </div>
+
+                            <div id="carromModeBlock" class="carrom-format-block hidden">
+                                <div class="carrom-format-label">4 Player Mode</div>
+                                <div class="carrom-format-grid">
+                                    <button id="carromModeTeamBtn" class="carrom-format-btn active"
+                                        onclick="setCarromGameMode('team')">Team Battle</button>
+                                    <button id="carromModeIndividualBtn" class="carrom-format-btn"
+                                        onclick="setCarromGameMode('individual')">Individual Points</button>
                                 </div>
                             </div>
 
@@ -2063,7 +2137,13 @@
 
                             <p class="carrom-helper-text">Paste the room code and take the next open seat. 2-player
                                 rooms fill opposite sides, while 4-player rooms fill the full table clockwise.</p>
-                            <button class="carrom-primary-btn" onclick="joinCarromRoom()">Join Carrom Room</button>
+                            <div class="carrom-inline-actions">
+                                <button class="carrom-primary-btn" onclick="joinCarromRoom()">Join Carrom Room</button>
+                                <button class="carrom-secondary-btn" data-chat-launcher="true" onclick="openExternalChatForCarrom(event)">Open External
+                                    Chat</button>
+                                <button class="carrom-secondary-btn" onclick="pasteCarromCodeFromClipboard()">Paste
+                                    Code</button>
+                            </div>
                         </div>
 
                         <div class="carrom-feature-grid">
@@ -2085,8 +2165,18 @@
 
                     <div id="carromBoardStage" class="carrom-board-stage hidden">
                         <div class="carrom-canvas-shell">
-                            <div id="carromBoardChatOverlay" class="carrom-board-chat-overlay hidden" aria-live="polite"></div>
+                            <div id="carromBoardChatOverlay" class="carrom-board-chat-overlay hidden"
+                                aria-live="polite"></div>
                             <canvas id="carromBoardCanvas" width="760" height="760" aria-label="Carrom Board"></canvas>
+                            <div id="carromBoardPowerRail" class="carrom-board-power-rail hidden" aria-live="polite">
+                                <div class="carrom-power-head">
+                                    <span class="carrom-inline-label">Shot Power</span>
+                                    <span id="carromBoardPowerPercent" class="carrom-power-percent">0%</span>
+                                </div>
+                                <div class="carrom-power-bar">
+                                    <div id="carromBoardPowerFill" class="carrom-power-fill"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2098,15 +2188,19 @@
                     <div id="carromApprovalCard" class="carrom-side-card carrom-approval-card hidden">
                         <div id="carromApprovalTitle" class="carrom-side-eyebrow">Approval Queue</div>
                         <div id="carromApprovalText" class="carrom-approval-text">No pending request.</div>
+                        <div id="carromApprovalQueueNav" class="carrom-approval-actions hidden">
+                            <button id="carromApprovalPrevBtn" class="carrom-secondary-btn" onclick="showPreviousCarromApproval()">Previous</button>
+                            <button id="carromApprovalNextBtn" class="carrom-secondary-btn" onclick="showNextCarromApproval()">Next</button>
+                        </div>
                         <div id="carromApprovalActions" class="carrom-approval-actions">
-                            <button class="carrom-primary-btn" onclick="approveCarromJoinRequest()">Approve</button>
-                            <button class="carrom-secondary-btn" onclick="declineCarromJoinRequest()">Decline</button>
+                            <button id="carromApprovalPrimaryBtn" class="carrom-primary-btn" onclick="approveCarromJoinRequest()">Approve</button>
+                            <button id="carromApprovalSecondaryBtn" class="carrom-secondary-btn" onclick="declineCarromJoinRequest()">Decline</button>
                         </div>
                         <button id="carromApprovalStartBtn" class="carrom-primary-btn hidden mt-4"
                             onclick="startCarromMatchIfHost()">Start Match</button>
                     </div>
 
-                    <div class="carrom-side-card carrom-chat-card">
+                    <div id="carromChatCard" class="carrom-side-card carrom-chat-card">
                         <div class="carrom-side-eyebrow">Room Chat</div>
                         <ul id="carromChatList" class="carrom-chat-list">
                             <li class="carrom-chat-empty">Messages will appear here.</li>
@@ -2119,7 +2213,7 @@
                         </div>
                     </div>
 
-                    <div class="carrom-side-card">
+                    <div id="carromTableViewCard" class="carrom-side-card">
                         <div class="carrom-side-eyebrow">Table View</div>
                         <div class="carrom-topline carrom-topline-sidebar">
                             <div class="carrom-chip" id="carromRoomModeChip">Lobby Ready</div>
@@ -2138,7 +2232,10 @@
                                     board, then pull outward and release to fire.</p>
                             </div>
                             <div class="carrom-power-rail">
-                                <span class="carrom-inline-label">Shot Power</span>
+                                <div class="carrom-power-head">
+                                    <span class="carrom-inline-label">Shot Power</span>
+                                    <span id="carromPowerPercent" class="carrom-power-percent">0%</span>
+                                </div>
                                 <div class="carrom-power-bar">
                                     <div id="carromPowerFill" class="carrom-power-fill"></div>
                                 </div>
@@ -2148,13 +2245,17 @@
                         </div>
                     </div>
 
-                    <div class="carrom-side-card">
+                    <div id="carromRoomControlCard" class="carrom-side-card">
                         <div class="carrom-side-eyebrow">Room Control</div>
                         <div class="carrom-room-code-box">
                             <div class="carrom-room-code-label">Room Code</div>
                             <div id="carromRoomCodeDisplay" class="carrom-room-code-value">------</div>
                             <button id="carromCopyCodeBtn" class="carrom-secondary-btn"
                                 onclick="copyCarromRoomCode()">Copy Code</button>
+                            <button id="carromShareCodeBtn" class="carrom-secondary-btn mt-3" data-chat-launcher="true"
+                                onclick="shareCarromCodeToExternalChat()">Share in External Chat</button>
+                            <button class="carrom-secondary-btn mt-3" data-chat-launcher="true"
+                                onclick="openExternalChatForCarrom(event)">Open External Chat</button>
                         </div>
                         <div class="carrom-player-stack">
                             <div id="carromSeat0Card" class="carrom-player-card active-seat">
@@ -2186,31 +2287,44 @@
                             approval.</div>
                     </div>
 
-                    <div class="carrom-side-card">
+                    <div id="carromMatchStatusCard" class="carrom-side-card">
                         <div class="carrom-side-eyebrow">Match Status</div>
                         <div id="carromMatchHeadline" class="carrom-match-headline">No live room</div>
                         <div id="carromRoleHint" class="carrom-role-hint">Choose Host Room or Join Room to begin.</div>
                         <div id="carromScoreboard" class="carrom-scoreboard"></div>
                     </div>
 
-                    <div class="carrom-side-card">
+                    <div id="carromShotFeedCard" class="carrom-side-card">
                         <div class="carrom-side-eyebrow">Shot Feed</div>
                         <ul id="carromShotList" class="carrom-shot-list">
                             <li>Room not started yet.</li>
                         </ul>
                     </div>
 
-                    <div class="carrom-side-card">
+                    <div id="carromActionCard" class="carrom-side-card">
                         <div class="carrom-side-eyebrow">Action</div>
                         <div class="carrom-action-group">
-                            <button id="carromStartBtn" class="carrom-primary-btn"
-                                onclick="startCarromMatchIfHost()">Start Match</button>
-                            <button id="carromPauseBtn" class="carrom-secondary-btn"
-                                onclick="toggleCarromPause()">Pause Match</button>
+                            <button id="carromRequestTurnBtn" class="carrom-primary-btn hidden"
+                                onclick="requestCarromTeamApproval()">Request Team Approval</button>
+                            <button id="carromPauseBtn" class="carrom-secondary-btn" onclick="toggleCarromPause()">Pause
+                                Match</button>
                             <button id="carromResetBtn" class="carrom-secondary-btn"
                                 onclick="resetCarromMatchIfHost()">Reset Board</button>
                             <button class="carrom-secondary-btn" onclick="leaveCarromRoom()">Leave Room</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="carromResultModal" class="chess-result-modal hidden">
+                <div class="chess-result-card">
+                    <div id="carromResultBadge" class="chess-result-badge">Match Finished</div>
+                    <h3 id="carromResultTitle" class="chess-result-title">Carrom Over</h3>
+                    <p id="carromResultText" class="chess-result-copy">Result will appear here.</p>
+                    <div class="chess-result-actions">
+                        <button class="chess-primary-btn" onclick="closeCarromResultModal()">Close</button>
+                        <button id="carromResultRestartBtn" class="chess-secondary-btn"
+                            onclick="resetCarromMatchIfHost()">Play Again</button>
                     </div>
                 </div>
             </div>
