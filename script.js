@@ -20732,7 +20732,7 @@ window.openQuickLinks = function () {
 // #region STEALTH BUTTON MODE
 (function () {
     const BUTTON_REVEAL_CODE = 'shivanggg';
-    const PARTIAL_REVEAL_CODE = 'cvang';
+    const PARTIAL_REVEAL_CODE = 'mlm';
     const typedBuffer = [];
 
     function revealAllButtons() {
