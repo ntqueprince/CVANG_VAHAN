@@ -2411,6 +2411,87 @@
         <button class="mini-player-stop" onclick="stopSongsChannel()">✖</button>
     </div>
 
+    <div id="calmMiniPlayer" class="calm-mini-player" style="display: none;">
+        <div class="calm-mini-info" onclick="maximizeCalmPlayer()">
+            <span class="calm-mini-icon">🎧</span>
+            <div class="calm-mini-text-wrap">
+                <span class="calm-mini-text" id="calmMiniPlayerText">CALM Playing...</span>
+            </div>
+            <span class="calm-mini-expand">⛶</span>
+        </div>
+        <button class="calm-mini-stop" onclick="stopCalmPlayback()">✕</button>
+    </div>
+
+    <div id="calmOverlay" class="calm-overlay">
+        <div class="calm-shell">
+            <button class="calm-minimize-btn" onclick="minimizeCalmPlayer()">−</button>
+            <button class="calm-close-btn" onclick="stopCalmPlayback()">✕</button>
+
+            <div class="calm-hero">
+                <div class="calm-hero-copy">
+                    <span class="calm-badge">GitHub Audio Shelf</span>
+                    <h2>CALM</h2>
+                    <button class="calm-refresh-btn" type="button" onclick="refreshCalmTracks()">↻ Refresh Tracks</button>
+                </div>
+                <div class="calm-disc-wrap">
+                    <div class="calm-disc" id="calmDisc">
+                        <div class="calm-disc-core"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calm-player-card">
+                <div class="calm-now-playing">
+                    <div class="calm-now-label">Now Playing</div>
+                    <div class="calm-track-title" id="calmTrackTitle">No track selected</div>
+                    <div class="calm-track-meta" id="calmTrackMeta">Uploaded tracks yahan se play honge</div>
+                </div>
+
+                <div class="calm-progress-block">
+                    <span class="calm-time" id="calmCurrentTime">0:00</span>
+                    <input id="calmSeekBar" class="calm-seek-bar" type="range" min="0" max="100" value="0" oninput="seekCalmTrack(this.value)" />
+                    <span class="calm-time" id="calmDuration">0:00</span>
+                </div>
+
+                <div class="calm-controls">
+                    <button class="calm-control-btn" type="button" onclick="toggleCalmShuffle()" id="calmShuffleBtn" title="Shuffle">🔀</button>
+                    <button class="calm-control-btn" type="button" onclick="prevCalmTrack()" title="Previous">⏮</button>
+                    <button class="calm-control-btn calm-play-btn" type="button" onclick="toggleCalmPlayPause()" id="calmPlayPauseBtn" title="Play/Pause">▶</button>
+                    <button class="calm-control-btn" type="button" onclick="nextCalmTrack()" title="Next">⏭</button>
+                    <button class="calm-control-btn" type="button" onclick="toggleCalmRepeat()" id="calmRepeatBtn" title="Repeat">🔁</button>
+                </div>
+
+                <div class="calm-speed-row">
+                    <span class="calm-speed-label">⚡ Speed:</span>
+                    <select class="calm-speed-select" id="calmSpeedSelect" onchange="setCalmSpeed(this.value)">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x Normal</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+                </div>
+
+                <div class="calm-volume-row">
+                    <span class="calm-volume-icon" id="calmVolumeIcon" onclick="toggleCalmMute()">🔊</span>
+                    <input id="calmVolumeSlider" class="calm-volume-slider" type="range" min="0" max="100" value="80" oninput="setCalmVolume(this.value)" />
+                </div>
+            </div>
+
+            <div class="calm-playlist-card">
+                <div class="calm-list-header">
+                    <div>
+                        <div class="calm-list-title">Uploaded Audio Files</div>
+                        <div class="calm-list-subtitle" id="calmListSubtitle">Loading tracks...</div>
+                    </div>
+                </div>
+                <div id="calmStatusMessage" class="calm-status-message">GitHub se playlist fetch ki ja rahi hai...</div>
+                <ul id="calmTrackList" class="calm-track-list"></ul>
+            </div>
+        </div>
+    </div>
+    <audio id="calmAudioPlayer" preload="metadata"></audio>
 </body>
 
 
