@@ -1574,7 +1574,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "No",
-        "Any Exception": "For Ticketing associate: Raise endorsement with XML sheet",
+        "Any Exception": "For Ticketing associate: Raise endorsement with XML sheet NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -1586,7 +1586,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "No",
-        "Any Exception": "For Ticketing associate: Raise endorsement with XML sheet",
+        "Any Exception": "For Ticketing associate: Raise endorsement with XML sheet NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -2054,7 +2054,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "No",
-        "Any Exception": "",
+        "Any Exception": "NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -2066,7 +2066,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "",
+        "Any Exception": "NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -6838,12 +6838,12 @@ const endorsementData = [
         "Insurer": "Indusind",
         "Requirement": "NCB Certificate",
         "Endorsement type": "Financial Endt",
-        "Documents or any other requirement": "Sale Letter and cancellation declaration",
+        "Documents or any other requirement": "If Vehicle not sold:  Only Customer declaration required - \"Vehicle not sold and I want to purchase new car. Kindly send ncb recovery link. I am ready to pay ncb recovery amount  If vehicle sold and the policy transfered to New owner name:  Sell letter  If vehicle sold and the policy not transferred: a) If New owner booked new insurance and the older owner have the access to the same -  Sell letter and alternate policy shared with new owner name (current policy will be cancelled)  b) If New owner booked new insurance and the older owner do not have the access to the same -  Sell letter and Form 29-30 with sale letter, with customer declaration that he/she is okay with \"OD part will be cancelled and TP will be retain\"",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "Maybe",
-        "Any Exception": "Inspection to be raised from Reliance portal (from insurer end)",
-        "Declaration format (if declaration required)": "Please confirm from the below scenario from the customer and share information: 1. In case customer want to cancel policy then alternate policy or sell proof will be required and ncb will be recovered, also refund amount will be declared as per U/W  2. If customer don't want to cancel only ncb will be recovered and cx can process ownership transfer also"
+        "Any Exception": "NCB Certificate will be issued only if vehcle is sold with in policy period (the same could be processed if request received after policy End date under 90 days with sale proof)  Cancelled cheque will additionally be required if customer is requesting for Ncb Certificate after 170 days from policy start date  KYC docs (Pan and Aadhar) will be required if cancellation is requied",
+        "Declaration format (if declaration required)": ""
     },
     {
         "InsurerRequirement": "IndusindRegistration Date",
@@ -9254,7 +9254,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "No",
-        "Any Exception": "",
+        "Any Exception": "NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -9266,7 +9266,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "No",
-        "Any Exception": "",
+        "Any Exception": "NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -10694,7 +10694,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "No",
-        "Any Exception": "",
+        "Any Exception": "NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -10706,7 +10706,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "Maybe",
-        "Any Exception": "",
+        "Any Exception": "NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -11174,7 +11174,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "No",
-        "Any Exception": "Correction possible after policy start date",
+        "Any Exception": "Correction possible after policy start date NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -11186,7 +11186,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Maybe",
         "Inspection": "Maybe",
-        "Any Exception": "Correction possible after policy start date",
+        "Any Exception": "Correction possible after policy start date NEW CAR POLICY ENDT: No charges or inspection required",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -11218,7 +11218,7 @@ const endorsementData = [
         "Insurer": "United",
         "Requirement": "Period of Insurance (POI)",
         "Endorsement type": "Non Financial Endt",
-        "Documents or any other requirement": "PYP",
+        "Documents or any other requirement": "For SAOD: Both PYP OD and Bundled TP are required For Comprehensive Policy: Either a PYP Comprehensive policy or both PYP OD and Bundled TP are required",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
@@ -11510,7 +11510,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "No",
-        "Any Exception": "Non brand New Car: 1.Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy) 2. SAOD policy cancellation: Alteranate bundle policy required 3. TP cancellation - Alternate (comprehensive/TP) should be from UIIC",
+        "Any Exception": "Non brand New Car: 1.Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy). 2.SAOD policy cancellation: Alteranate bundle policy required 3.TP cancellation - Alternate (comprehensive/TP) should be from UIIC",
         "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________. I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy. I declare that the alternate policy no. ____________________ is an active policy.\""
     },
     {
