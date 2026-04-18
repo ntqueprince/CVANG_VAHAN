@@ -33,6 +33,8 @@
         <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" data-cvang-button="true"
             onclick="openRSAPage()">RSA &amp;
             CONTACT</button>
+        <button class="animated-btn bg-gradient-to-r from-red-500 to-orange-600" data-cvang-button="true"
+            onclick="openRSAGuidanceModal()">🚗 RSA Guidance</button>
         <button class="animated-btn bg-gradient-to-r from-purple-500 to-purple-700" data-cvang-button="true"
             onclick="window.open('https://ntqueprince.github.io/notebook/', '_blank')">NOTEBOOK</button>
         <button class="animated-btn bg-gradient-to-r from-pink-500 to-pink-700" data-cvang-button="true"
@@ -59,7 +61,8 @@
         <button class="animated-btn bg-gradient-to-r from-teal-500 to-teal-700" data-cvang-button="true"
             onclick="openScorecardModal()">📊
             IB-SCORECARD</button>
-        <button class="animated-btn bg-gradient-to-r from-sky-400 to-indigo-500" onclick="openCalmPlayer()">CALM</button>
+        <button class="animated-btn bg-gradient-to-r from-sky-400 to-indigo-500"
+            onclick="openCalmPlayer()">CALM</button>
         <button class="secondary cov-btn" data-cvang-button="true" id="btnCompanyOwned">Company Owned Not
             Allowed</button>
     </div>
@@ -188,6 +191,18 @@
             <h2>Company Updates</h2>
             <div id="updatesContainer">
                 <!-- Updates will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!-- #region RSA GUIDANCE MODAL -->
+    <div class="rsa-guidance-modal" id="rsaGuidanceModal" hidden aria-hidden="true">
+        <div class="rsa-guidance-content">
+            <button class="rsa-guidance-close" onclick="closeRSAGuidanceModal()" type="button">×</button>
+            <h2>RSA Guidance</h2>
+            <p>Policy segment se RSA call flow dekhne ke liye neeche image refer karein.</p>
+            <div class="rsa-guidance-image-wrap">
+                <img src="./guidance_images/rsa_guidance.png" alt="RSA guidance steps" class="rsa-guidance-image" />
             </div>
         </div>
     </div>
@@ -2432,7 +2447,8 @@
                 <div class="calm-hero-copy">
                     <span class="calm-badge">GitHub Audio Shelf</span>
                     <h2>CALM</h2>
-                    <button class="calm-refresh-btn" type="button" onclick="refreshCalmTracks()">↻ Refresh Tracks</button>
+                    <button class="calm-refresh-btn" type="button" onclick="refreshCalmTracks()">↻ Refresh
+                        Tracks</button>
                 </div>
                 <div class="calm-disc-wrap">
                     <div class="calm-disc" id="calmDisc">
@@ -2450,16 +2466,20 @@
 
                 <div class="calm-progress-block">
                     <span class="calm-time" id="calmCurrentTime">0:00</span>
-                    <input id="calmSeekBar" class="calm-seek-bar" type="range" min="0" max="100" value="0" oninput="seekCalmTrack(this.value)" />
+                    <input id="calmSeekBar" class="calm-seek-bar" type="range" min="0" max="100" value="0"
+                        oninput="seekCalmTrack(this.value)" />
                     <span class="calm-time" id="calmDuration">0:00</span>
                 </div>
 
                 <div class="calm-controls">
-                    <button class="calm-control-btn" type="button" onclick="toggleCalmShuffle()" id="calmShuffleBtn" title="Shuffle">🔀</button>
+                    <button class="calm-control-btn" type="button" onclick="toggleCalmShuffle()" id="calmShuffleBtn"
+                        title="Shuffle">🔀</button>
                     <button class="calm-control-btn" type="button" onclick="prevCalmTrack()" title="Previous">⏮</button>
-                    <button class="calm-control-btn calm-play-btn" type="button" onclick="toggleCalmPlayPause()" id="calmPlayPauseBtn" title="Play/Pause">▶</button>
+                    <button class="calm-control-btn calm-play-btn" type="button" onclick="toggleCalmPlayPause()"
+                        id="calmPlayPauseBtn" title="Play/Pause">▶</button>
                     <button class="calm-control-btn" type="button" onclick="nextCalmTrack()" title="Next">⏭</button>
-                    <button class="calm-control-btn" type="button" onclick="toggleCalmRepeat()" id="calmRepeatBtn" title="Repeat">🔁</button>
+                    <button class="calm-control-btn" type="button" onclick="toggleCalmRepeat()" id="calmRepeatBtn"
+                        title="Repeat">🔁</button>
                 </div>
 
                 <div class="calm-speed-row">
@@ -2476,7 +2496,8 @@
 
                 <div class="calm-volume-row">
                     <span class="calm-volume-icon" id="calmVolumeIcon" onclick="toggleCalmMute()">🔊</span>
-                    <input id="calmVolumeSlider" class="calm-volume-slider" type="range" min="0" max="100" value="80" oninput="setCalmVolume(this.value)" />
+                    <input id="calmVolumeSlider" class="calm-volume-slider" type="range" min="0" max="100" value="80"
+                        oninput="setCalmVolume(this.value)" />
                 </div>
             </div>
 
