@@ -200,6 +200,13 @@
     <!-- #region RSA GUIDANCE MODAL -->
     <div class="rsa-guidance-modal" id="rsaGuidanceModal" hidden aria-hidden="true">
         <div class="rsa-guidance-content">
+            <div class="guidance-toolbar">
+                <div class="guidance-zoom-controls">
+                    <button class="guidance-zoom-btn" onclick="adjustGuidanceZoom('rsaGuidanceModal', -1)" type="button">-</button>
+                    <span class="guidance-zoom-label" id="rsaGuidanceZoomLabel">85%</span>
+                    <button class="guidance-zoom-btn" onclick="adjustGuidanceZoom('rsaGuidanceModal', 1)" type="button">+</button>
+                </div>
+            </div>
             <button class="rsa-guidance-close" onclick="closeRSAGuidanceModal()" type="button">×</button>
             <h2>RSA Guidance</h2>
             <p>Policy segment se RSA call flow dekhne ke liye neeche image refer karein.</p>
@@ -212,6 +219,13 @@
     <!-- #region ENDORSEMENT GUIDANCE MODAL -->
     <div class="rsa-guidance-modal" id="endorsementGuidanceModal" hidden aria-hidden="true">
         <div class="rsa-guidance-content endorsement-guidance-content">
+            <div class="guidance-toolbar">
+                <div class="guidance-zoom-controls">
+                    <button class="guidance-zoom-btn" onclick="adjustGuidanceZoom('endorsementGuidanceModal', -1)" type="button">-</button>
+                    <span class="guidance-zoom-label" id="endorsementGuidanceZoomLabel">85%</span>
+                    <button class="guidance-zoom-btn" onclick="adjustGuidanceZoom('endorsementGuidanceModal', 1)" type="button">+</button>
+                </div>
+            </div>
             <button class="rsa-guidance-close" onclick="closeEndorsementGuidanceModal()" type="button">×</button>
             <h2>Endorsement Guidance</h2>
             <p>Endorsement request raise karne ke liye ye step-by-step flow follow karein.</p>
