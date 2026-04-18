@@ -21311,6 +21311,7 @@ window.openQuickLinks = function () {
 function openRSAGuidanceModal() {
     const modal = document.getElementById('rsaGuidanceModal');
     if (!modal) return;
+    setGuidanceZoom('rsaGuidanceModal', 0.85);
     modal.hidden = false;
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -21327,6 +21328,7 @@ function closeRSAGuidanceModal() {
 function openEndorsementGuidanceModal() {
     const modal = document.getElementById('endorsementGuidanceModal');
     if (!modal) return;
+    setGuidanceZoom('endorsementGuidanceModal', 0.85);
     modal.hidden = false;
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -21340,10 +21342,40 @@ function closeEndorsementGuidanceModal() {
     document.body.style.overflow = '';
 }
 
+function setGuidanceZoom(modalId, zoomValue) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    const content = modal.querySelector('.rsa-guidance-content');
+    if (!content) return;
+
+    const safeZoom = Math.min(1.6, Math.max(0.6, Number(zoomValue) || 0.85));
+    content.style.setProperty('--guidance-zoom', safeZoom.toFixed(2));
+
+    const labelId = modalId === 'rsaGuidanceModal' ? 'rsaGuidanceZoomLabel' : 'endorsementGuidanceZoomLabel';
+    const label = document.getElementById(labelId);
+    if (label) {
+        label.textContent = `${Math.round(safeZoom * 100)}%`;
+    }
+}
+
+function adjustGuidanceZoom(modalId, direction) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    const content = modal.querySelector('.rsa-guidance-content');
+    if (!content) return;
+
+    const currentZoom = parseFloat(getComputedStyle(content).getPropertyValue('--guidance-zoom')) || 0.85;
+    const nextZoom = currentZoom + (direction * 0.15);
+    setGuidanceZoom(modalId, nextZoom);
+}
+
 window.openRSAGuidanceModal = openRSAGuidanceModal;
 window.closeRSAGuidanceModal = closeRSAGuidanceModal;
 window.openEndorsementGuidanceModal = openEndorsementGuidanceModal;
 window.closeEndorsementGuidanceModal = closeEndorsementGuidanceModal;
+window.adjustGuidanceZoom = adjustGuidanceZoom;
 
 document.addEventListener('click', function (event) {
     const rsaGuidanceModal = document.getElementById('rsaGuidanceModal');
