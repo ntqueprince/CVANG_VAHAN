@@ -21308,6 +21308,38 @@ window.openQuickLinks = function () {
     }, true);
 })();
 
+function openRSAGuidanceModal() {
+    const modal = document.getElementById('rsaGuidanceModal');
+    if (!modal) return;
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRSAGuidanceModal() {
+    const modal = document.getElementById('rsaGuidanceModal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+}
+
+window.openRSAGuidanceModal = openRSAGuidanceModal;
+window.closeRSAGuidanceModal = closeRSAGuidanceModal;
+
+document.addEventListener('click', function (event) {
+    const rsaGuidanceModal = document.getElementById('rsaGuidanceModal');
+    if (rsaGuidanceModal && event.target === rsaGuidanceModal) {
+        closeRSAGuidanceModal();
+    }
+});
+
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+        closeRSAGuidanceModal();
+    }
+});
+
 // #region STEALTH BUTTON MODE
 (function () {
     const BUTTON_REVEAL_CODE = 'jcvang';
