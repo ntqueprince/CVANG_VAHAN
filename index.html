@@ -26,6 +26,8 @@
             </div>
         </button><button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700" data-cvang-button="true"
             onclick="openManualVIPage()">MANUAL-VI &amp; Claim Coverage</button>
+        <button class="animated-btn bg-gradient-to-r from-emerald-500 to-teal-700" data-cvang-button="true"
+            onclick="openEndorsementGuidanceModal()">Endorsement Guidance</button>
         <button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700" data-cvang-button="true"
             onclick="openClaimCountNSTPPage()">Claim_Count &amp; NSTP</button>
         <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" data-cvang-button="true"
@@ -203,6 +205,73 @@
             <p>Policy segment se RSA call flow dekhne ke liye neeche image refer karein.</p>
             <div class="rsa-guidance-image-wrap">
                 <img src="./guidance_images/rsa_guidance.png" alt="RSA guidance steps" class="rsa-guidance-image" />
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!-- #region ENDORSEMENT GUIDANCE MODAL -->
+    <div class="rsa-guidance-modal" id="endorsementGuidanceModal" hidden aria-hidden="true">
+        <div class="rsa-guidance-content endorsement-guidance-content">
+            <button class="rsa-guidance-close" onclick="closeEndorsementGuidanceModal()" type="button">×</button>
+            <h2>Endorsement Guidance</h2>
+            <p>Endorsement request raise karne ke liye ye step-by-step flow follow karein.</p>
+            <div class="endorsement-guidance-grid">
+                <article class="guidance-step-card">
+                    <span class="guidance-step-badge">Step 1</span>
+                    <h3>Policies</h3>
+                    <p>Bottom navigation se <strong>Policies</strong> open karein.</p>
+                    <div class="rsa-guidance-image-wrap">
+                        <img src="./guidance_images/endorsement_guidance_1.png" alt="Open Policies tab" class="rsa-guidance-image" />
+                    </div>
+                </article>
+                <article class="guidance-step-card">
+                    <span class="guidance-step-badge">Step 2</span>
+                    <h3>Select Policy</h3>
+                    <p>Required policy card par tap karke usko select karein.</p>
+                    <div class="rsa-guidance-image-wrap">
+                        <img src="./guidance_images/endorsement_guidance_2.png" alt="Select policy card" class="rsa-guidance-image" />
+                    </div>
+                </article>
+                <article class="guidance-step-card">
+                    <span class="guidance-step-badge">Step 3</span>
+                    <h3>Scroll Down</h3>
+                    <p>Page ko scroll down karke <strong>Get Help</strong> section tak jayen.</p>
+                    <div class="rsa-guidance-image-wrap">
+                        <img src="./guidance_images/endorsement_guidance_3.png" alt="Scroll down to Get Help" class="rsa-guidance-image" />
+                    </div>
+                </article>
+                <article class="guidance-step-card">
+                    <span class="guidance-step-badge">Step 4</span>
+                    <h3>Continue</h3>
+                    <p>Policy select karke <strong>Continue</strong> button par tap karein.</p>
+                    <div class="rsa-guidance-image-wrap">
+                        <img src="./guidance_images/endorsement_guidance_4.png" alt="Tap Continue after selecting policy" class="rsa-guidance-image" />
+                    </div>
+                </article>
+                <article class="guidance-step-card">
+                    <span class="guidance-step-badge">Step 5</span>
+                    <h3>Raise a Request</h3>
+                    <p><strong>Raise a Request</strong> button par tap karke next screen par jayen.</p>
+                    <div class="rsa-guidance-image-wrap">
+                        <img src="./guidance_images/endorsement_guidance_5.png" alt="Tap Raise a Request" class="rsa-guidance-image" />
+                    </div>
+                </article>
+                <article class="guidance-step-card">
+                    <span class="guidance-step-badge">Step 6</span>
+                    <h3>Changes Required in Policy Details</h3>
+                    <p><strong>Changes Required in Policy Details</strong> option ko choose karein.</p>
+                    <div class="rsa-guidance-image-wrap">
+                        <img src="./guidance_images/endorsement_guidance_6.png" alt="Select Changes Required in Policy Details and proceed" class="rsa-guidance-image" />
+                    </div>
+                </article>
+                <article class="guidance-step-card">
+                    <span class="guidance-step-badge">Step 7</span>
+                    <h3>Select &amp; Proceed</h3>
+                    <p>Required endorsement select karke <strong>Select &amp; Proceed</strong> par tap karein.</p>
+                    <div class="rsa-guidance-image-wrap">
+                        <img src="./guidance_images/endorsement_guidance_7.png" alt="Tap Select and Proceed for endorsement request" class="rsa-guidance-image" />
+                    </div>
+                </article>
             </div>
         </div>
     </div>
