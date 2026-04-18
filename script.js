@@ -21324,19 +21324,43 @@ function closeRSAGuidanceModal() {
     document.body.style.overflow = '';
 }
 
+function openEndorsementGuidanceModal() {
+    const modal = document.getElementById('endorsementGuidanceModal');
+    if (!modal) return;
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEndorsementGuidanceModal() {
+    const modal = document.getElementById('endorsementGuidanceModal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+}
+
 window.openRSAGuidanceModal = openRSAGuidanceModal;
 window.closeRSAGuidanceModal = closeRSAGuidanceModal;
+window.openEndorsementGuidanceModal = openEndorsementGuidanceModal;
+window.closeEndorsementGuidanceModal = closeEndorsementGuidanceModal;
 
 document.addEventListener('click', function (event) {
     const rsaGuidanceModal = document.getElementById('rsaGuidanceModal');
     if (rsaGuidanceModal && event.target === rsaGuidanceModal) {
         closeRSAGuidanceModal();
     }
+
+    const endorsementGuidanceModal = document.getElementById('endorsementGuidanceModal');
+    if (endorsementGuidanceModal && event.target === endorsementGuidanceModal) {
+        closeEndorsementGuidanceModal();
+    }
 });
 
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
         closeRSAGuidanceModal();
+        closeEndorsementGuidanceModal();
     }
 });
 
