@@ -16307,7 +16307,7 @@ window.openQuickLinks = function () {
     // ──── Open / Close with Password ────
     window.openSongsHub = function () {
         var password = prompt('🔒 Enter Password to open Songs Hub:');
-        if (password !== 'fintech') {
+        if (password !== 'wow') {
             if (password !== null) alert('❌ Wrong Password!');
             return;
         }
@@ -21398,7 +21398,7 @@ document.addEventListener('keydown', function (event) {
 
 // #region STEALTH BUTTON MODE
 (function () {
-    const BUTTON_REVEAL_CODE = 'jcvang';
+    const BUTTON_REVEAL_CODE = ',./';
     const PARTIAL_REVEAL_CODE = 'cvangj';
     const typedBuffer = [];
 
