@@ -21398,7 +21398,7 @@ document.addEventListener('keydown', function (event) {
 
 // #region STEALTH BUTTON MODE
 (function () {
-    const BUTTON_REVEAL_CODE = ',./';
+    const BUTTON_REVEAL_CODE = 'cool';
     const PARTIAL_REVEAL_CODE = 'cvangj';
     const typedBuffer = [];
 
