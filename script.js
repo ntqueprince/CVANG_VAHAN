@@ -20788,7 +20788,7 @@ window.openQuickLinks = function () {
 
 // #region CALM GITHUB AUDIO PLAYER
 (function () {
-    const CALM_PASSWORD = 'fintech';
+    const CALM_PASSWORD = 'wow2';
     const GITHUB_REPO_API_URL = 'https://api.github.com/repos/ntqueprince/CVANG_VAHAN';
     const AUDIO_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.webm'];
 
