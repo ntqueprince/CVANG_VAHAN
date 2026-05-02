@@ -6402,3 +6402,34 @@ body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
     visibility: visible !important;
     pointer-events: auto !important;
 }
+.carrom-coins-card {
+    border-radius: 14px;
+    border: 1px solid rgba(245, 158, 11, 0.24);
+    background: rgba(15, 23, 42, 0.36);
+    padding: 10px 12px;
+    margin: 8px 0;
+}
+
+.carrom-coins-summary {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #fff7ed;
+    font-weight: 800;
+    list-style: none;
+}
+
+.carrom-coins-summary::-webkit-details-marker {
+    display: none;
+}
+
+.carrom-coins-summary strong {
+    color: #fde68a;
+    white-space: nowrap;
+}
+
+.carrom-coins-card[open] .carrom-coins-head {
+    margin-top: 8px;
+}
