@@ -14554,13 +14554,16 @@ window.openQuickLinks = function () {
     // Links in order: chrome://flags first, then others, BMS dashboard last
     // Reversed order: chrome://flags (clipboard) → matrix → sheets → forms → textbook → CVANG → chat → BMS (last)
     const links = [
-        'https://matrixdashboard.policybazaar.com/admin/realtimedashboard',
-        'https://docs.google.com/spreadsheets/d/1wq1xc_L5DHRzYnHXeHc6SRaum8BBwWn5ntKbZafVHtk/edit?gid=0#gid=0',
-        'https://docs.google.com/forms/d/e/1FAIpQLScliXNbSsS85LhQiiFDkQXGBgJIHon2ByR9Wm0X9j4BUqedVg/formResponse',
-        'https://ntqueprince.github.io/textbook/',
-        'https://ntqueprince.github.io/CVANG_VAHAN/',
+        'https://bms.policybazaar.com/dashboardV3',
         'https://chatinternal.policybazaar.com/channel/6854fee0f93b60e3e7de14ca',
-        'https://bms.policybazaar.com/dashboardV3'
+        'https://ntqueprince.github.io/CVANG_VAHAN/',
+        'https://ntqueprince.github.io/textbook/',
+        'https://twinternal.policybazaar.com/panel/UpdateOwnership.aspx',
+        'https://docs.google.com/forms/d/e/1FAIpQLSc4d0d6mvWinEQj7F-qZzIZzfg_IWffTPMB9d517tiIGwj6kQ/viewform',
+        'https://docs.google.com/forms/d/e/1FAIpQLScMAFtPmR4C3GtqCCz2meIJessXmFePOlUhqb0jRFZnMcrUvA/viewform',
+        'https://docs.google.com/forms/d/e/1FAIpQLScliXNbSsS85LhQiiFDkQXGBgJIHon2ByR9Wm0X9j4BUqedVg/formResponse',
+        'https://pbconnect.policybazaar.com/home',
+        'https://www.pbwheels.com/'
     ];
 
     // Note: chrome://flags/ cannot be opened via window.open() due to browser security.
@@ -17655,7 +17658,7 @@ window.openQuickLinks = function () {
         ebony: { label: 'Ebony Team', color: '#0f172a', stroke: '#94a3b8' },
         queen: { label: 'Queen', color: '#dc2626', stroke: '#fca5a5' }
     };
-    const CARROM_POWER_DISTANCE = 260;
+    const CARROM_POWER_DISTANCE = 170;
     const carromState = {
         mode: 'host',
         roomSize: 2,
@@ -17768,8 +17771,13 @@ window.openQuickLinks = function () {
     }
 
     function getCarromGameMode(room) {
+        if (room?.gameMode === 'coinpoints') return 'coinpoints';
         if ((room?.format || carromState.roomSize) === 2) return 'duel';
-        return room?.gameMode === 'individual' ? 'individual' : 'team';
+        return room?.gameMode === 'coinpoints' ? 'coinpoints' : room?.gameMode === 'individual' ? 'individual' : 'team';
+    }
+
+    function isCarromPlayerPointsMode(gameMode) {
+        return gameMode === 'individual' || gameMode === 'coinpoints';
     }
 
     function getActiveCarromTeamTurnRequest(room) {
@@ -17782,23 +17790,27 @@ window.openQuickLinks = function () {
     }
 
     function setCarromGameMode(mode) {
-        carromState.gameMode = mode === 'individual' ? 'individual' : 'team';
-        document.getElementById('carromModeTeamBtn')?.classList.toggle('active', carromState.gameMode !== 'individual');
+        carromState.gameMode = mode === 'coinpoints' ? 'coinpoints' : mode === 'individual' ? 'individual' : 'team';
+        document.getElementById('carromModeTeamBtn')?.classList.toggle('active', carromState.gameMode === 'team');
         document.getElementById('carromModeIndividualBtn')?.classList.toggle('active', carromState.gameMode === 'individual');
+        document.getElementById('carromModeCoinPointsBtn')?.classList.toggle('active', carromState.gameMode === 'coinpoints');
     }
 
     function updateCarromModeVisibility() {
-        const showModeBlock = carromState.roomSize === 4;
-        document.getElementById('carromModeBlock')?.classList.toggle('hidden', !showModeBlock);
+        document.getElementById('carromModeBlock')?.classList.remove('hidden');
+        document.getElementById('carromModeIndividualBtn')?.classList.toggle('hidden', carromState.roomSize !== 4);
+        if (carromState.roomSize !== 4 && carromState.gameMode === 'individual') {
+            setCarromGameMode('team');
+        }
     }
 
     function getCarromSeatTargetLabel(room) {
-        return getCarromGameMode(room) === 'individual' ? 'Player' : 'Team';
+        return isCarromPlayerPointsMode(getCarromGameMode(room)) ? 'Player' : 'Team';
     }
 
     function getCarromControllingSeats(room) {
         if (!room || carromState.seatIndex == null) return [];
-        if (room.format === 2 || getCarromGameMode(room) === 'individual') {
+        if (room.format === 2 || isCarromPlayerPointsMode(getCarromGameMode(room))) {
             return [room.board?.turnSeat ?? 0];
         }
         const currentTurnSeat = room.board?.turnSeat ?? 0;
@@ -17941,7 +17953,7 @@ window.openQuickLinks = function () {
     }
 
     function buildInitialCarromBoard(format) {
-        const gameMode = format === 4 ? carromState.gameMode : 'duel';
+        const gameMode = carromState.gameMode === 'coinpoints' ? 'coinpoints' : (format === 4 ? carromState.gameMode : 'duel');
         return {
             format,
             gameMode,
@@ -17962,7 +17974,7 @@ window.openQuickLinks = function () {
             queenPendingOwnerSeat: null,
             queenPendingTeam: '',
             queenReturned: false,
-            resultText: `${format}-player ${gameMode === 'individual' ? 'individual' : gameMode === 'team' ? 'team' : 'duel'} room ready. Fill the seats and break the board.`,
+            resultText: `${format}-player ${gameMode === 'coinpoints' ? 'coin points' : gameMode === 'individual' ? 'individual' : gameMode === 'team' ? 'team' : 'duel'} room ready. Fill the seats and break the board.`,
             winnerTeam: '',
             winnerSeats: [],
             winnerLabel: ''
@@ -18202,7 +18214,7 @@ window.openQuickLinks = function () {
 
     function getCarromPowerFromDistance(distance) {
         const normalized = Math.max(0, distance / CARROM_POWER_DISTANCE);
-        const boosted = normalized + Math.max(0, normalized - 0.55) * 0.45;
+        const boosted = normalized + Math.max(0, normalized - 0.7) * 0.18;
         return clamp(boosted, 0, 1);
     }
 
@@ -18228,10 +18240,10 @@ window.openQuickLinks = function () {
     }
 
     function setCarromRoomSize(size) {
-        carromState.roomSize = size === 4 ? 4 : 2;
+        carromState.roomSize = 2;
         document.getElementById('carromFormat2Btn')?.classList.toggle('active', carromState.roomSize === 2);
-        document.getElementById('carromFormat4Btn')?.classList.toggle('active', carromState.roomSize === 4);
-        if (carromState.roomSize === 2) {
+        document.getElementById('carromFormat4Btn')?.classList.remove('active');
+        if (carromState.gameMode === 'individual') {
             setCarromGameMode('team');
         }
         updateCarromModeVisibility();
@@ -19151,6 +19163,12 @@ window.openQuickLinks = function () {
         return { pieces: nextPieces, restored };
     }
 
+    function restoreCarromStrikerPenaltyCoin(pieces) {
+        const blackFirst = restorePenaltyCoinToBoard(pieces, 'ebony');
+        if (blackFirst.restored) return blackFirst;
+        return restorePenaltyCoinToBoard(blackFirst.pieces, 'ivory');
+    }
+
     function getCarromIndividualWinners(playerScores) {
         const entries = Object.entries(playerScores || {}).map(([seat, score]) => ({
             seatIndex: Number(seat),
@@ -19174,7 +19192,7 @@ window.openQuickLinks = function () {
         if (!ownPocketed && !opponentPocketed && !queenPocketed && !simulation.strikerPocketed) {
             parts.push('found no pocket');
         } else {
-            if (getCarromGameMode(room) === 'individual') {
+            if (isCarromPlayerPointsMode(getCarromGameMode(room))) {
                 if (simulation.pocketed.length) parts.push(`scored ${simulation.pocketed.map(item => item.type).join(', ')}`);
             } else {
                 if (ownPocketed) parts.push(`banked ${ownPocketed} own coin${ownPocketed === 1 ? '' : 's'}`);
@@ -19248,14 +19266,18 @@ window.openQuickLinks = function () {
         const pendingQueenOwnerSeat = hadPendingQueen ? Number(room.board.queenPendingOwnerSeat) : null;
         const pendingQueenTeam = room.board?.queenPendingTeam || (pendingQueenOwnerSeat != null ? getCarromTeamForSeat(room.format, pendingQueenOwnerSeat) : '');
         const isPendingQueenCoverShot = pendingQueenOwnerSeat != null && pendingQueenOwnerSeat === shot.seatIndex;
-        const coverCoinPocketed = ownPocketed > 0;
-        const queenImmediateCounted = queenPocketed > 0 && normalRemainingAfterShot === 0 && !simulation.strikerPocketed;
+        const coinPointsMode = gameMode === 'coinpoints';
+        const playerPointsMode = isCarromPlayerPointsMode(gameMode);
+        const coverCoinPocketed = coinPointsMode ? normalPocketed > 0 : ownPocketed > 0;
+        const queenImmediateCounted = coinPointsMode
+            ? queenPocketed > 0 && !simulation.strikerPocketed
+            : queenPocketed > 0 && normalRemainingAfterShot === 0 && !simulation.strikerPocketed;
         const queenCoverSucceeded = isPendingQueenCoverShot && !simulation.strikerPocketed && (coverCoinPocketed || normalRemainingAfterShot === 0);
         const queenCounted = queenImmediateCounted || queenCoverSucceeded;
-        const queenNeedsCover = queenPocketed > 0 && !queenImmediateCounted && !simulation.strikerPocketed;
-        const queenCoverFailed = isPendingQueenCoverShot && !queenCoverSucceeded;
+        const queenNeedsCover = !coinPointsMode && queenPocketed > 0 && !queenImmediateCounted && !simulation.strikerPocketed;
+        const queenCoverFailed = !coinPointsMode && isPendingQueenCoverShot && !queenCoverSucceeded;
         const keepTurn = queenNeedsCover || (!simulation.strikerPocketed && (
-            gameMode === 'individual'
+            playerPointsMode
                 ? simulation.pocketed.some(item => item.type !== 'queen') || queenCounted
                 : (ownPocketed > 0 || queenCounted)
         ));
@@ -19271,7 +19293,7 @@ window.openQuickLinks = function () {
             3: Number(basePlayerScores[3]) || 0
         };
 
-        if (gameMode === 'individual') {
+        if (playerPointsMode) {
             simulation.pocketed.forEach(item => {
                 if (item.type === 'queen' && !queenCounted) return;
                 nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) + getCarromPointValue(item.type));
@@ -19283,8 +19305,8 @@ window.openQuickLinks = function () {
             nextScores[currentTeam] = Math.max(0, nextScores[currentTeam] + ownPocketed + (queenCounted ? 1 : 0) - (simulation.strikerPocketed ? 1 : 0));
             nextScores[opponentTeam] = Math.max(0, nextScores[opponentTeam] + opponentPocketed);
         }
-        if (simulation.strikerPocketed && gameMode === 'individual') {
-            nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) - 1);
+        if (simulation.strikerPocketed && playerPointsMode) {
+            nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) - (coinPointsMode ? 10 : 1));
         }
 
         let resolvedPieces = rawResolvedPieces;
@@ -19293,12 +19315,16 @@ window.openQuickLinks = function () {
         }
         let restoredPenaltyCoin = null;
         if (simulation.strikerPocketed) {
-            const penaltyRestore = restorePenaltyCoinToBoard(resolvedPieces, currentTeam);
+            const penaltyRestore = coinPointsMode
+                ? restoreCarromStrikerPenaltyCoin(resolvedPieces)
+                : restorePenaltyCoinToBoard(resolvedPieces, currentTeam);
             resolvedPieces = penaltyRestore.pieces;
             restoredPenaltyCoin = penaltyRestore.restored;
             if (restoredPenaltyCoin) {
-                if (gameMode === 'individual') {
-                    nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) - getCarromPointValue(restoredPenaltyCoin.type));
+                if (playerPointsMode) {
+                    if (!coinPointsMode) {
+                        nextPlayerScores[shot.seatIndex] = Math.max(0, (Number(nextPlayerScores[shot.seatIndex]) || 0) - getCarromPointValue(restoredPenaltyCoin.type));
+                    }
                 } else {
                     nextScores[currentTeam] = Math.max(0, nextScores[currentTeam] - 1);
                 }
@@ -19309,22 +19335,22 @@ window.openQuickLinks = function () {
         const nextQueenCovered = queenCounted || room.board?.queenCovered;
         const nextQueenPendingOwnerSeat = queenNeedsCover ? shot.seatIndex : null;
         const nextQueenPendingTeam = queenNeedsCover ? currentTeam : '';
-        const teamFinished = nextQueenCovered && gameMode !== 'individual' && remainingCoins.every(piece => piece.type !== currentTeam);
-        const allFinished = nextQueenCovered && resolvedPieces.every(piece => piece.pocketed);
-        const winnerTeam = gameMode === 'individual'
+        const teamFinished = nextQueenCovered && !playerPointsMode && remainingCoins.every(piece => piece.type !== currentTeam);
+        const allFinished = (coinPointsMode || nextQueenCovered) && resolvedPieces.every(piece => piece.pocketed);
+        const winnerTeam = playerPointsMode
             ? ''
             : (teamFinished
                 ? currentTeam
                 : (allFinished ? (nextScores.ivory === nextScores.ebony ? 'draw' : (nextScores.ivory > nextScores.ebony ? 'ivory' : 'ebony')) : ''));
-        const winnerSeats = gameMode === 'individual' && allFinished
+        const winnerSeats = playerPointsMode && allFinished
             ? getCarromIndividualWinners(nextPlayerScores)
             : (winnerTeam && winnerTeam !== 'draw'
                 ? getAllowedCarromSeats(room.format).filter(seatIndex => getCarromTeamForSeat(room.format, seatIndex) === winnerTeam)
                 : []);
-        const winnerLabel = gameMode === 'individual'
+        const winnerLabel = playerPointsMode
             ? (winnerSeats.length
                 ? `${winnerSeats.map(seatIndex => room.players?.[seatIndex]?.name || getSeatInfo(seatIndex).short).join(' + ')} wins`
-                : '')
+                : (allFinished ? 'Highest points wins' : ''))
             : winnerTeam === 'draw'
                 ? 'Board drawn'
                 : winnerTeam
@@ -19337,7 +19363,7 @@ window.openQuickLinks = function () {
                 : (winnerSeats.length ? turnSeat : (keepTurn ? turnSeat : getNextCarromTurnSeat(room, turnSeat)));
         let resultText = `${shot.playerName || 'Player'} finishes the shot. ${keepTurn ? `${getSeatInfo(turnSeat).short} keeps the board.` : `${getSeatInfo(nextTurnSeat).short} steps up next.`}`;
         if (winnerLabel) {
-            resultText = gameMode === 'individual'
+            resultText = playerPointsMode
                 ? `${winnerLabel}. Final points ${Object.entries(nextPlayerScores).filter(([, score]) => Number(score) > 0).map(([seat, score]) => `${room.players?.[seat]?.name || getSeatInfo(Number(seat)).short}: ${score}`).join(', ')}.`
                 : `${winnerLabel}. Final score ${nextScores.ivory}-${nextScores.ebony}.`;
         } else if (queenNeedsCover) {
@@ -19375,7 +19401,7 @@ window.openQuickLinks = function () {
         const brandFlash = scoredCoins > 0
             ? {
                 id: `${shot.id || 'carrom-shot'}:${resolvedAt}`,
-                text: 'SHIVANG',
+                text: shot.playerName || room.players?.[shot.seatIndex]?.name || 'Player',
                 hueSeed: Math.floor(Math.random() * 360),
                 createdAt: resolvedAt
             }
@@ -19451,13 +19477,13 @@ window.openQuickLinks = function () {
 
             if (!player) {
                 seatName.textContent = seatIndex === 0 ? 'Waiting for host' : 'Open seat';
-                seatMeta.textContent = `${gameMode === 'individual' ? 'Individual' : getTeamLabel(team)} • ${seat.meta}`;
+                seatMeta.textContent = `${gameMode === 'coinpoints' ? 'Coin Points' : gameMode === 'individual' ? 'Individual' : getTeamLabel(team)} • ${seat.meta}`;
                 continue;
             }
 
             seatName.textContent = player.name;
             const roleBits = [
-                gameMode === 'individual' ? seat.label : getTeamLabel(team),
+                isCarromPlayerPointsMode(gameMode) ? seat.label : getTeamLabel(team),
                 player.sessionId === room.hostSessionId ? 'Host' : 'Player'
             ];
             if (isLocalSeat) roleBits.push('You');
@@ -19476,7 +19502,7 @@ window.openQuickLinks = function () {
         const gameMode = getCarromGameMode(room);
         const activeTeam = room.status === 'active' ? getCarromTeamForSeat(room.format, room.board.turnSeat) : '';
         const pieces = room.board?.pieces || [];
-        const markup = gameMode === 'individual'
+        const markup = isCarromPlayerPointsMode(gameMode)
             ? getAllowedCarromSeats(room.format).map(seatIndex => {
                 const player = room.players?.[seatIndex];
                 const active = room.status === 'active' && room.board.turnSeat === seatIndex;
@@ -19546,51 +19572,51 @@ window.openQuickLinks = function () {
         const entries = getAllowedCarromSeats(room.format).map(seatIndex => {
             const player = room.players?.[seatIndex];
             const team = getCarromTeamForSeat(room.format, seatIndex);
-            const totalCoins = pieces.filter(piece => piece.type === team).length;
-            const pocketedCoins = pieces.filter(piece => piece.type === team && piece.pocketed).length;
-            const pendingCoins = Math.max(0, totalCoins - pocketedCoins);
+            const playerName = player?.name || getSeatInfo(seatIndex).label;
+            const points = Number(room.board?.playerScores?.[seatIndex]) || 0;
+            const ownCoinTypes = gameMode === 'coinpoints'
+                ? ['ivory', 'ebony', 'queen']
+                : [team];
+            const pocketedPieces = pieces.filter(piece => ownCoinTypes.includes(piece.type) && piece.pocketed);
+            const breakdown = {
+                ebony: pocketedPieces.filter(piece => piece.type === 'ebony').length,
+                ivory: pocketedPieces.filter(piece => piece.type === 'ivory').length,
+                queen: pocketedPieces.filter(piece => piece.type === 'queen').length
+            };
             return {
                 seatIndex,
-                title: player?.name || getSeatInfo(seatIndex).label,
-                subtitle: gameMode === 'individual' ? getSeatInfo(seatIndex).label : `${getTeamLabel(team)} coins`,
-                pocketedCoins,
-                pendingCoins
+                title: playerName,
+                points,
+                breakdown
             };
         });
 
         container.innerHTML = entries.map(entry => `
-            <div class="carrom-coins-card">
+            <details class="carrom-coins-card">
+                <summary class="carrom-coins-summary">
+                    <span>${escapeCarromHtml(entry.title)}</span>
+                    <strong>${entry.points} points</strong>
+                </summary>
                 <div class="carrom-coins-head">
                     <div>
-                        <div class="carrom-coins-name">${escapeCarromHtml(entry.title)}</div>
-                        <div class="carrom-coins-team">${escapeCarromHtml(entry.subtitle)}</div>
+                        <div class="carrom-coins-team">Black: ${entry.breakdown.ebony} | White/Red: ${entry.breakdown.ivory} | Queen: ${entry.breakdown.queen}</div>
                     </div>
                 </div>
-                <div class="carrom-coins-badges">
-                    <div class="carrom-coins-badge">
-                        <div class="carrom-coins-label">Pocketed</div>
-                        <div class="carrom-coins-value">${entry.pocketedCoins}</div>
-                    </div>
-                    <div class="carrom-coins-badge">
-                        <div class="carrom-coins-label">Pending</div>
-                        <div class="carrom-coins-value">${entry.pendingCoins}</div>
-                    </div>
-                </div>
-            </div>
+            </details>
         `).join('');
 
         const snapshot = JSON.stringify(entries.map(entry => ({
             seatIndex: entry.seatIndex,
-            pocketedCoins: entry.pocketedCoins,
-            pendingCoins: entry.pendingCoins
+            points: entry.points,
+            breakdown: entry.breakdown
         })));
         if (carromState.lastCoinsSnapshot && snapshot !== carromState.lastCoinsSnapshot) {
             const changedEntry = entries.find((entry, index) => {
                 const prev = JSON.parse(carromState.lastCoinsSnapshot)[index];
-                return prev && (prev.pocketedCoins !== entry.pocketedCoins || prev.pendingCoins !== entry.pendingCoins);
+                return prev && prev.points !== entry.points;
             }) || entries[0];
             if (changedEntry) {
-                showCarromCoinsToast(`${changedEntry.title}: pocketed ${changedEntry.pocketedCoins}, pending ${changedEntry.pendingCoins}`);
+                showCarromCoinsToast(`${changedEntry.title}: ${changedEntry.points} points`);
             }
         }
         carromState.lastCoinsSnapshot = snapshot;
@@ -19920,7 +19946,7 @@ window.openQuickLinks = function () {
         const previousRoom = carromState.roomData;
         carromState.roomData = room;
         if (room) {
-            carromState.gameMode = getCarromGameMode(room) === 'individual' ? 'individual' : 'team';
+            carromState.gameMode = getCarromGameMode(room);
             setCarromGameMode(carromState.gameMode);
         }
         carromState.seatIndex = getCarromSeatBySession(room, carromState.sessionId);
@@ -20000,7 +20026,7 @@ window.openQuickLinks = function () {
         if (roomCodeDisplay) roomCodeDisplay.textContent = room.code || '------';
         if (roomModeChip) {
             roomModeChip.textContent = room.status === 'active'
-                ? (isCarromPaused(room) ? 'Match Paused' : `${room.format}P ${gameMode === 'individual' ? 'Individual' : gameMode === 'team' ? 'Team' : 'Duel'} Live`)
+                ? (isCarromPaused(room) ? 'Match Paused' : `${room.format}P ${gameMode === 'coinpoints' ? 'Coin Points' : gameMode === 'individual' ? 'Individual' : gameMode === 'team' ? 'Team' : 'Duel'} Live`)
                 : room.status === 'finished'
                     ? 'Match Complete'
                     : (isCarromPaused(room) ? 'Room Paused' : pendingRequests.length ? 'Approval Queue' : `${occupied}/${room.format} Seats Filled`);
@@ -20022,11 +20048,13 @@ window.openQuickLinks = function () {
                 ? (room.board?.winnerLabel || 'Board settled')
                 : isCarromPaused(room)
                     ? (room.board?.pausedBy ? `Paused by ${room.board.pausedBy}` : 'Table paused')
-                    : (gameMode === 'individual' ? `${turnPlayer} on deck` : `${getTeamLabel(turnTeam)} on deck`);
+                    : (isCarromPlayerPointsMode(gameMode) ? `${turnPlayer} on deck` : `${getTeamLabel(turnTeam)} on deck`);
         }
         if (queenStatus) {
             if (queenPendingSeat != null) {
-                queenStatus.textContent = `Queen awaiting cover by ${queenPendingName}. Wrong-color coin se cover valid nahi hoga.`;
+                queenStatus.textContent = gameMode === 'coinpoints'
+                    ? `Queen awaiting cover by ${queenPendingName}. Any normal coin can cover it.`
+                    : `Queen awaiting cover by ${queenPendingName}. Wrong-color coin se cover valid nahi hoga.`;
                 queenStatus.classList.remove('hidden');
             } else {
                 queenStatus.textContent = 'Queen awaiting cover.';
@@ -20057,7 +20085,7 @@ window.openQuickLinks = function () {
                     ? 'Host declined your last join request. Send a fresh request when ready.'
                     : carromState.seatIndex == null
                         ? 'You are not seated in this room yet.'
-                        : `${localSeatLabel} • ${gameMode === 'individual' ? 'Individual mode' : getTeamLabel(localTeam)}${isLocalCarromHost(room) ? ' • Host controls enabled.' : ''}`;
+                        : `${localSeatLabel} • ${gameMode === 'coinpoints' ? 'Coin Points mode' : gameMode === 'individual' ? 'Individual mode' : getTeamLabel(localTeam)}${isLocalCarromHost(room) ? ' • Host controls enabled.' : ''}`;
         }
         if (hint) {
             if (room.status === 'finished') {
@@ -20156,6 +20184,7 @@ window.openQuickLinks = function () {
             setCarromNotice('Enter your host name before creating a room.');
             return;
         }
+        carromState.roomSize = 2;
         setCarromPlayerName(hostName);
 
         let code = generateCarromRoomCode();
@@ -20166,7 +20195,7 @@ window.openQuickLinks = function () {
         }
 
         const format = carromState.roomSize;
-        const gameMode = format === 4 ? carromState.gameMode : 'duel';
+        const gameMode = carromState.gameMode === 'coinpoints' ? 'coinpoints' : (format === 4 ? carromState.gameMode : 'duel');
         const roomPayload = {
             code,
             format,
@@ -20186,7 +20215,7 @@ window.openQuickLinks = function () {
             brandFlash: null,
             joinRequests: {},
             moveLog: [],
-            resultText: `${format}-player ${gameMode === 'individual' ? 'individual' : gameMode === 'team' ? 'team' : 'duel'} room created. Share the code and fill the table.`
+            resultText: `${format}-player ${gameMode === 'coinpoints' ? 'coin points' : gameMode === 'individual' ? 'individual' : gameMode === 'team' ? 'team' : 'duel'} room created. Share the code and fill the table.`
         };
 
         carromState.roomCode = code;
@@ -20587,7 +20616,7 @@ window.openQuickLinks = function () {
         }
         const room = carromState.roomData;
         const modeLabel = room.format === 4
-            ? (getCarromGameMode(room) === 'individual' ? 'Carrom code (4 players individual)' : 'Carrom code (4 players team)')
+            ? (getCarromGameMode(room) === 'coinpoints' ? 'Carrom code (4 players coin points)' : getCarromGameMode(room) === 'individual' ? 'Carrom code (4 players individual)' : 'Carrom code (4 players team)')
             : 'Carrom code (2 players)';
         try {
             const createdAt = Date.now();
@@ -20614,7 +20643,7 @@ window.openQuickLinks = function () {
         if (chatInput && carromState.roomCode && carromState.roomData) {
             const room = carromState.roomData;
             const modeLabel = room.format === 4
-                ? (getCarromGameMode(room) === 'individual' ? 'Carrom code (4 players individual)' : 'Carrom code (4 players team)')
+                ? (getCarromGameMode(room) === 'coinpoints' ? 'Carrom code (4 players coin points)' : getCarromGameMode(room) === 'individual' ? 'Carrom code (4 players individual)' : 'Carrom code (4 players team)')
                 : 'Carrom code (2 players)';
             chatInput.value = `${modeLabel}: ${carromState.roomCode} // ${room.players?.[0]?.name || 'Host'}`;
         }
@@ -20788,7 +20817,7 @@ window.openQuickLinks = function () {
 
 // #region CALM GITHUB AUDIO PLAYER
 (function () {
-    const CALM_PASSWORD = 'wow2';
+    const CALM_PASSWORD = 'ang';
     const GITHUB_REPO_API_URL = 'https://api.github.com/repos/ntqueprince/CVANG_VAHAN';
     const AUDIO_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.webm'];
 
@@ -21398,7 +21427,7 @@ document.addEventListener('keydown', function (event) {
 
 // #region STEALTH BUTTON MODE
 (function () {
-    const BUTTON_REVEAL_CODE = 'cool';
+    const BUTTON_REVEAL_CODE = 'shiv';
     const PARTIAL_REVEAL_CODE = 'cvangj';
     const typedBuffer = [];
 
