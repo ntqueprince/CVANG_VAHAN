@@ -14551,8 +14551,14 @@ window.openQuickLinks = function () {
         return;
     }
 
-    // Links in order: chrome://flags first, then others, BMS dashboard last
-    // Reversed order: chrome://flags (clipboard) → matrix → sheets → forms → textbook → CVANG → chat → BMS (last)
+    // chrome://flags - copy to clipboard first
+    try {
+        navigator.clipboard.writeText('chrome://flags/');
+        alert('✅ "chrome://flags/" copied to clipboard!\nPaste it in a new tab.\n\nAll other links will now open.');
+    } catch (e) {
+        prompt('⚠️ Copy this URL manually and paste in a new tab:', 'chrome://flags/');
+    }
+
     const links = [
         'https://bms.policybazaar.com/dashboardV3',
         'https://chatinternal.policybazaar.com/channel/6854fee0f93b60e3e7de14ca',
@@ -14565,15 +14571,6 @@ window.openQuickLinks = function () {
         'https://pbconnect.policybazaar.com/home',
         'https://www.pbwheels.com/'
     ];
-
-    // Note: chrome://flags/ cannot be opened via window.open() due to browser security.
-    // Copy it to clipboard so user can paste in address bar.
-    try {
-        navigator.clipboard.writeText('chrome://flags/');
-        alert('✅ "chrome://flags/" copied to clipboard!\nPaste it in a new tab.\n\nAll other links will now open.');
-    } catch (e) {
-        prompt('⚠️ Copy this URL manually and paste in a new tab:', 'chrome://flags/');
-    }
 
     // Open all links with slight delay to avoid popup blocker
     links.forEach((url, i) => {
@@ -21428,7 +21425,7 @@ document.addEventListener('keydown', function (event) {
 // #region STEALTH BUTTON MODE
 (function () {
     const BUTTON_REVEAL_CODE = 'shiv';
-    const PARTIAL_REVEAL_CODE = 'cvangj';
+    const PARTIAL_REVEAL_CODE = 'cvang';
     const typedBuffer = [];
 
     function revealAllButtons() {
