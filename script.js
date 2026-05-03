@@ -13629,6 +13629,15 @@ function getScLoginHrs(mins) {
     return 10;                  // >= 07:50
 }
 
+function getScPerformanceRating(score) {
+    if (score <= 61) return "C";
+    if (score <= 70) return "B";
+    if (score <= 81) return "B+";
+    if (score <= 86) return "A-";
+    if (score <= 91) return "A";
+    return "A+";
+}
+
 window.calculateScorecard = function () {
     let tenure = document.getElementById("scTenure").value;
 
@@ -13663,6 +13672,7 @@ window.calculateScorecard = function () {
     let ptLog = getScLoginHrs(loginMinTotal);
 
     let totalScore = ptCall + ptTic + ptAht + ptQual + ptAud + ptLate + ptLog;
+    let performanceRating = getScPerformanceRating(totalScore);
 
     document.getElementById("scorecardResult").innerHTML = `
         <p style="text-align:center; margin-bottom:10px;"><span class="colorful-text" style="font-size:0.9em;">Created by Shivang</span></p>
@@ -13674,7 +13684,10 @@ window.calculateScorecard = function () {
         <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Late Login:</span> <b>${ptLate} / 10</b></div>
         <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px dotted #ccc; margin-bottom:5px;"><span>Login Hour:</span> <b>${ptLog} / 10</b></div>
         
-        <p style="font-size: 1.3em; color: #0f766e; text-align:center; margin-top:15px;">🏆 Total Score: <b>${totalScore} / 100</b></p>
+        <div style="text-align:center; margin-top:15px;">
+            <p style="font-size: 1.3em; color: #0f766e; margin:0;">🏆 Total Score: <b>${totalScore} / 100</b></p>
+            <p style="display:inline-block; margin:8px 0 0; padding:6px 16px; border-radius:999px; background:#ede9fe; color:#6d28d9; font-size:1.15em; font-weight:700;">Rating: ${performanceRating}</p>
+        </div>
     `;
 };
 // Highlight "NO" cells in ADP table
