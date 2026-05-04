@@ -9093,12 +9093,12 @@ const endorsementData = [
         "InsurerRequirement": "KotakMultiple Mismatch (Reg no, chassis no & Engine no mismatch)",
         "Insurer": "Kotak",
         "Requirement": "Multiple Mismatch (Reg no, chassis no & Engine no mismatch)",
-        "Endorsement type": "Not Possible",
-        "Documents or any other requirement": "Not Possible",
-        "TAT": "Not Possible",
-        "Charges / Deduction": "Not Possible",
-        "Inspection": "Not Possible",
-        "Any Exception": "",
+        "Endorsement type": "Financial Endt",
+        "Documents or any other requirement": "Current Policy Copy (from BMS), RC copy, Vehicle Invoice Copy, KYC documents (PAN and Aadhaar)",
+        "TAT": "SRS / 10 Days",
+        "Charges / Deduction": "Maybe",
+        "Inspection": "Maybe",
+        "Any Exception": "Will raise the request and correction can be done post U/W Approval",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -11510,7 +11510,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "No",
-        "Any Exception": "Non brand New Car: 1.Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy). 2.SAOD policy cancellation: Alteranate bundle policy required 3.TP cancellation - Alternate (comprehensive/TP) should be from UIIC",
+        "Any Exception": "Non brand New Car: Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy). SAOD policy cancellation: Alteranate bundle policy required TP cancellation - Alternate (comprehensive/TP) should be from UIIC",
         "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________. I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy. I declare that the alternate policy no. ____________________ is an active policy.\""
     },
     {
