@@ -1431,7 +1431,7 @@ const endorsementData = [
         "Charges / Deduction": "Deduction",
         "Inspection": "",
         "Any Exception": "",
-        "Declaration format (if declaration required)": "Declaration Required: I/We hereby declare that Policy No. _____________________ for Vehicle No. _____________________, covering the period from _____________________ to _____________________, was purchased by me/us on _____________________. Due to ________________________________________________, I/we request the cancellation of the above-mentioned Policy No. _____________________. I/we further confirm that no claims have been made under this policy or any other policy related to the said vehicle till date. I/we also confirm that an alternate policy, Policy No. _____________________, valid from _____________________, issued by _______________________________, has been provided and is currently active."
+        "Declaration format (if declaration required)": "Declaration Required: I/We hereby declare that Policy No. _____________________ for Vehicle No. _____________________, covering the period from _____________________ to _____________________, was purchased by me/us on _____________________. Due to ________________________________________________, I/we request the cancellation of the above-mentioned Policy No. _____________________. I/we further confirm that no claims have been made under this policy or any other policy related to the said vehicle till date. I/we also confirm that an alternate policy, Policy No. _____________________, valid from _____________________, issued by _______________________________, has been provided and is currently active."
     },
     {
         "InsurerRequirement": "New India AssurancePost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
@@ -6790,7 +6790,7 @@ const endorsementData = [
         "Insurer": "Indusind",
         "Requirement": "Hypothecation Remove",
         "Endorsement type": "Non Financial Endt",
-        "Documents or any other requirement": "Customer Request Letter Endorsed RC Copy / NOC from Financier",
+        "Documents or any other requirement": "Customer Request Letter Endorsed RC Copy / NOC from Financier",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
@@ -6934,7 +6934,7 @@ const endorsementData = [
         "Insurer": "Indusind",
         "Requirement": "Communication Address",
         "Endorsement type": "Non Financial Endt",
-        "Documents or any other requirement": "Address Proof of insured",
+        "Documents or any other requirement": "Complete Address with pincode",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
@@ -11510,8 +11510,8 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
         "Inspection": "No",
-        "Any Exception": "Non brand New Car: Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy). SAOD policy cancellation: Alteranate bundle policy required TP cancellation - Alternate (comprehensive/TP) should be from UIIC",
-        "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________. I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy. I declare that the alternate policy no. ____________________ is an active policy.\""
+        "Any Exception": "Non brand New Car: 1.Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy). 2.SAOD policy cancellation: Alteranate bundle policy required 3.TP cancellation - Alternate (comprehensive/TP) should be from UIIC",
+        "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________. I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy. I declare that the alternate policy no. ____________________ is an active policy.\""
     },
     {
         "InsurerRequirement": "UnitedPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
