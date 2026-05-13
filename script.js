@@ -90,7 +90,7 @@ function isImageFile(file) {
 function getUploadErrorMessage(reason, fileName = '') {
     const nameText = fileName ? `\nFile: ${fileName}` : '';
     const details = reason ? `\nReason: ${reason}` : '';
-    return `Photo upload nahi ho paya.${nameText}${details}\n\nPlease check browser/system upload permission, internet connection, and try again.`;
+    return `Photo upload failed.${nameText}${details}\n\nPlease check your browser/system upload permission and internet connection. Please try again.`;
 }
 
 function showUploadErrorPopup(reason, fileName = '') {
@@ -201,7 +201,7 @@ function renderFilePreview() {
         try {
             img.src = URL.createObjectURL(file);
         } catch (error) {
-            reportUploadFailure('Browser/system selected photo ka preview allow nahi kar raha.', file.name);
+            reportUploadFailure('The browser or system did not allow the selected photo preview.', file.name);
             return;
         }
         img.alt = file.name;
@@ -251,7 +251,7 @@ document.getElementById('fileUpload').addEventListener('change', function () {
         pendingFiles = [];
         this.value = '';
         renderFilePreview();
-        reportUploadFailure('Browser/system ne selected photo access block kar diya.');
+        reportUploadFailure('The browser or system blocked access to the selected photo.');
     }
 });
 
@@ -577,7 +577,7 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
         formData.append('upload_preset', uploadPreset);
         formData.append('tags', tag);
     } catch (error) {
-        reportUploadFailure('Browser/system ne selected photo access block kar diya.', file?.name || '', statusText);
+        reportUploadFailure('The browser or system blocked access to the selected photo.', file?.name || '', statusText);
         if (onComplete) onComplete(false);
         return;
     }
@@ -609,14 +609,14 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
                 data = JSON.parse(xhr.responseText);
             } catch (error) {
                 progressAnimator.stop();
-                reportUploadFailure('Upload server ka response read nahi ho paya.', file.name, statusText);
+                reportUploadFailure('The upload server response could not be read.', file.name, statusText);
                 if (onComplete) onComplete(false);
                 return;
             }
 
             if (!data.secure_url) {
                 progressAnimator.stop();
-                reportUploadFailure('Upload complete hua, par image URL receive nahi hua.', file.name, statusText);
+                reportUploadFailure('Upload completed, but the image URL was not received.', file.name, statusText);
                 if (onComplete) onComplete(false);
                 return;
             }
@@ -660,7 +660,7 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
                     progressAnimator.stop();
                     uploadingImageUrls.delete(data.secure_url);
                     console.error("Firebase Push Error:", error);
-                    reportUploadFailure(error?.message || 'Firebase database me image save nahi ho payi.', file.name, statusText);
+                    reportUploadFailure(error?.message || 'The image could not be saved to the database.', file.name, statusText);
                     if (onComplete) onComplete(false);
                 });
         } else {
@@ -674,19 +674,19 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
     xhr.onerror = function () {
         progressAnimator.stop();
         console.error("Upload error occurred:", xhr.status);
-        reportUploadFailure('Network error ya browser/system policy ne upload request block kar di.', file.name, statusText);
+        reportUploadFailure('Network error or browser/system policy blocked the upload request.', file.name, statusText);
         if (onComplete) onComplete(false);
     };
 
     xhr.ontimeout = function () {
         progressAnimator.stop();
-        reportUploadFailure('Upload timeout ho gaya. Internet slow/block ho sakta hai.', file.name, statusText);
+        reportUploadFailure('The upload timed out. The internet connection may be slow or blocked.', file.name, statusText);
         if (onComplete) onComplete(false);
     };
 
     xhr.onabort = function () {
         progressAnimator.stop();
-        reportUploadFailure('Upload cancel ho gaya ya browser ne request abort kar di.', file.name, statusText);
+        reportUploadFailure('The upload was cancelled or the browser aborted the request.', file.name, statusText);
         if (onComplete) onComplete(false);
     };
 
@@ -695,7 +695,7 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
         xhr.send(formData);
     } catch (error) {
         progressAnimator.stop();
-        reportUploadFailure(error?.message || 'Browser/system ne photo upload start nahi hone diya.', file.name, statusText);
+        reportUploadFailure(error?.message || 'The browser or system did not allow the photo upload to start.', file.name, statusText);
         if (onComplete) onComplete(false);
     }
 }
