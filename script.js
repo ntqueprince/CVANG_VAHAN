@@ -46,6 +46,7 @@ document.addEventListener("paste", function (event) {
     const password = passwordInput?.value.trim() || "";
 
     let completedCount = 0;
+    let successCount = 0;
     const totalFiles = imageFiles.length;
 
     statusText.textContent = totalFiles > 1 ? `Uploading ${totalFiles} pasted images...` : 'Uploading pasted image...';
@@ -56,10 +57,15 @@ document.addEventListener("paste", function (event) {
             : `clipboard-image-${Date.now()}-${index + 1}.png`;
         const normalizedFile = new File([file], safeName, { type: file.type || 'image/png' });
 
-        uploadFile(normalizedFile, tag, password, progressBar, statusText, null, () => {
+        uploadFile(normalizedFile, tag, password, progressBar, statusText, null, (success) => {
             completedCount++;
+            if (success) successCount++;
             if (completedCount >= totalFiles) {
-                showMessage(`${totalFiles} pasted image(s) uploaded successfully!`, 'info');
+                if (successCount === totalFiles) {
+                    showMessage(`${totalFiles} pasted image(s) uploaded successfully!`, 'info');
+                } else if (successCount > 0) {
+                    showMessage(`${successCount}/${totalFiles} pasted image(s) uploaded. ${totalFiles - successCount} failed.`, 'error');
+                }
                 if (passwordInput) passwordInput.value = '';
             }
         });
@@ -74,6 +80,95 @@ let pendingFiles = []; // Files queued for upload with preview
 let hasCalculated = false;
 const uploadingImageUrls = new Set();
 const uploadingImageKeys = new Set();
+
+function isImageFile(file) {
+    if (!file) return false;
+    if (file.type && file.type.startsWith('image/')) return true;
+    return /\.(jpe?g|png|gif|webp|bmp|heic|heif)$/i.test(file.name || '');
+}
+
+function getUploadErrorMessage(reason, fileName = '') {
+    const nameText = fileName ? `\nFile: ${fileName}` : '';
+    const details = reason ? `\nReason: ${reason}` : '';
+    return `Photo upload nahi ho paya.${nameText}${details}\n\nPlease check browser/system upload permission, internet connection, and try again.`;
+}
+
+function showUploadErrorPopup(reason, fileName = '') {
+    const existingPopup = document.querySelector('.upload-error-popup');
+    if (existingPopup) existingPopup.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'upload-error-popup';
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.zIndex = '10000';
+    overlay.style.background = 'rgba(15, 23, 42, 0.55)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.padding = '18px';
+
+    const box = document.createElement('div');
+    box.style.width = 'min(420px, 100%)';
+    box.style.background = '#ffffff';
+    box.style.color = '#111827';
+    box.style.borderRadius = '8px';
+    box.style.boxShadow = '0 18px 40px rgba(0,0,0,0.28)';
+    box.style.padding = '22px';
+    box.style.fontFamily = 'Poppins, Arial, sans-serif';
+    box.style.textAlign = 'left';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Photo Upload Failed';
+    title.style.margin = '0 0 10px';
+    title.style.fontSize = '20px';
+    title.style.fontWeight = '700';
+    title.style.color = '#dc2626';
+
+    const message = document.createElement('p');
+    message.textContent = getUploadErrorMessage(reason, fileName);
+    message.style.margin = '0';
+    message.style.whiteSpace = 'pre-line';
+    message.style.lineHeight = '1.5';
+    message.style.fontSize = '14px';
+
+    const okButton = document.createElement('button');
+    okButton.type = 'button';
+    okButton.textContent = 'OK';
+    okButton.style.marginTop = '18px';
+    okButton.style.width = '100%';
+    okButton.style.padding = '10px 14px';
+    okButton.style.border = '0';
+    okButton.style.borderRadius = '6px';
+    okButton.style.background = '#dc2626';
+    okButton.style.color = '#ffffff';
+    okButton.style.fontWeight = '700';
+    okButton.style.cursor = 'pointer';
+    okButton.onclick = () => overlay.remove();
+
+    box.appendChild(title);
+    box.appendChild(message);
+    box.appendChild(okButton);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+}
+
+function reportUploadFailure(reason, fileName = '', statusText = null) {
+    const message = getUploadErrorMessage(reason, fileName);
+    if (statusText) statusText.textContent = 'Upload failed';
+    showMessage(message, 'error');
+    showUploadErrorPopup(reason, fileName);
+}
+
+function getCloudinaryErrorMessage(xhr) {
+    try {
+        const response = JSON.parse(xhr.responseText || '{}');
+        if (response?.error?.message) return response.error.message;
+    } catch (error) {
+        // Keep fallback below when response is not JSON.
+    }
+    return xhr.status ? `Server returned status ${xhr.status}` : 'Upload request failed';
+}
 
 // Toggle password visibility
 window.togglePasswordVisibility = function (inputId, btn) {
@@ -103,7 +198,12 @@ function renderFilePreview() {
         item.className = 'file-preview-item';
 
         const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
+        try {
+            img.src = URL.createObjectURL(file);
+        } catch (error) {
+            reportUploadFailure('Browser/system selected photo ka preview allow nahi kar raha.', file.name);
+            return;
+        }
         img.alt = file.name;
 
         const removeBtn = document.createElement('button');
@@ -133,8 +233,26 @@ function renderFilePreview() {
 
 // ✅ Listen for file input changes to show preview
 document.getElementById('fileUpload').addEventListener('change', function () {
-    pendingFiles = Array.from(this.files);
-    renderFilePreview();
+    try {
+        const selected = Array.from(this.files || []);
+        const invalidFiles = selected.filter(file => !isImageFile(file));
+        pendingFiles = selected.filter(isImageFile);
+
+        if (invalidFiles.length) {
+            reportUploadFailure('Only image files are allowed. Please select JPG, PNG, GIF, WebP, BMP, HEIC, or HEIF photos.', invalidFiles[0].name);
+        }
+
+        if (selected.length && !pendingFiles.length) {
+            this.value = '';
+        }
+
+        renderFilePreview();
+    } catch (error) {
+        pendingFiles = [];
+        this.value = '';
+        renderFilePreview();
+        reportUploadFailure('Browser/system ne selected photo access block kar diya.');
+    }
 });
 
 // Multiple Image Upload Function
@@ -149,7 +267,13 @@ window.uploadImage = function () {
 
     // Use pendingFiles instead of fileInput.files
     if (!pendingFiles.length) {
-        showMessage("Please select at least one file!", "error");
+        reportUploadFailure('Please select at least one photo before upload.');
+        return;
+    }
+
+    const invalidFiles = pendingFiles.filter(file => !isImageFile(file));
+    if (invalidFiles.length) {
+        reportUploadFailure('Only image files are allowed.', invalidFiles[0].name);
         return;
     }
 
@@ -169,16 +293,24 @@ window.uploadImage = function () {
 
     // ✅ Loop through all pending files
     let completedCount = 0;
+    let successCount = 0;
     const totalFiles = pendingFiles.length;
 
     pendingFiles.forEach((file) => {
-        uploadFile(file, tag, password, progressBar, statusText, null, () => {
+        uploadFile(file, tag, password, progressBar, statusText, null, (success) => {
             completedCount++;
+            if (success) successCount++;
             if (completedCount >= totalFiles) {
                 // Sab files complete hone par button wapas dikhao
                 uploadBtn.style.display = "inline-block";
-                showMessage(`${totalFiles} image(s) uploaded successfully!`, 'info');
-                document.getElementById('passwordInput').value = ''; // Clear password
+                if (successCount === totalFiles) {
+                    showMessage(`${totalFiles} image(s) uploaded successfully!`, 'info');
+                    document.getElementById('passwordInput').value = ''; // Clear password
+                } else if (successCount > 0) {
+                    showMessage(`${successCount}/${totalFiles} image(s) uploaded. ${totalFiles - successCount} failed.`, 'error');
+                } else {
+                    showMessage('Photo upload failed. Please try again.', 'error');
+                }
             }
         });
     });
@@ -259,21 +391,31 @@ window.submitTag = function () {
     const filesToUpload = selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
 
     if (filesToUpload.length === 0) {
-        showMessage("No files to upload!", "error");
+        reportUploadFailure('No files to upload. Please select a photo again.');
+        document.querySelector('.modal-content .upload-btn').style.display = 'inline-block';
+        document.querySelector('.modal-content .cancel-btn').style.display = 'inline-block';
         return;
     }
 
     let completedCount = 0;
+    let successCount = 0;
     const totalFiles = filesToUpload.length;
 
     filesToUpload.forEach((file) => {
-        uploadFile(file, tag, password, progressBar, statusText, modalProgress, () => {
+        uploadFile(file, tag, password, progressBar, statusText, modalProgress, (success) => {
             completedCount++;
+            if (success) successCount++;
             if (completedCount >= totalFiles) {
                 // Sab files upload ho gayi — ab modal band karo
                 setTimeout(() => {
                     closeModal();
-                    showMessage(`${totalFiles} image(s) uploaded successfully!`, 'info');
+                    if (successCount === totalFiles) {
+                        showMessage(`${totalFiles} image(s) uploaded successfully!`, 'info');
+                    } else if (successCount > 0) {
+                        showMessage(`${successCount}/${totalFiles} image(s) uploaded. ${totalFiles - successCount} failed.`, 'error');
+                    } else {
+                        showMessage('Photo upload failed. Please try again.', 'error');
+                    }
                 }, 800);
             }
         });
@@ -422,17 +564,30 @@ function waitForGalleryImageRendered({ imageUrl, imageKey }, timeoutMs = 12000) 
 }
 
 function uploadFile(file, tag, password, progressBar, statusText, modalProgress, onComplete) {
+    if (!isImageFile(file)) {
+        reportUploadFailure('Selected file is not a valid image.', file?.name || '', statusText);
+        if (onComplete) onComplete(false);
+        return;
+    }
+
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', uploadPreset);
-    formData.append('tags', tag);
+    try {
+        formData.append('file', file);
+        formData.append('upload_preset', uploadPreset);
+        formData.append('tags', tag);
+    } catch (error) {
+        reportUploadFailure('Browser/system ne selected photo access block kar diya.', file?.name || '', statusText);
+        if (onComplete) onComplete(false);
+        return;
+    }
 
     // Reset progress before starting
     const progressAnimator = createUploadProgressAnimator(progressBar, statusText, modalProgress);
     progressAnimator.moveTo(8, 'Preparing upload');
 
     const xhr = new XMLHttpRequest();
+    xhr.timeout = 60000;
 
     // Progress bar update for each file
     xhr.upload.onprogress = function (event) {
@@ -449,12 +604,20 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
     // Upload complete
     xhr.onload = function () {
         if (xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
+            let data = null;
+            try {
+                data = JSON.parse(xhr.responseText);
+            } catch (error) {
+                progressAnimator.stop();
+                reportUploadFailure('Upload server ka response read nahi ho paya.', file.name, statusText);
+                if (onComplete) onComplete(false);
+                return;
+            }
+
             if (!data.secure_url) {
                 progressAnimator.stop();
-                showMessage('Upload failed: No secure URL received', 'error');
-                statusText.textContent = 'Upload failed!';
-                if (onComplete) onComplete();
+                reportUploadFailure('Upload complete hua, par image URL receive nahi hua.', file.name, statusText);
+                if (onComplete) onComplete(false);
                 return;
             }
 
@@ -491,35 +654,50 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
                     statusText.textContent = didRender ? 'Complete' : 'Uploaded, preview loading';
                     const modalStatus = document.getElementById('modalStatus');
                     if (modalStatus) modalStatus.textContent = statusText.textContent;
-                    if (onComplete) onComplete();
+                    if (onComplete) onComplete(true);
                 })
                 .catch((error) => {
                     progressAnimator.stop();
                     uploadingImageUrls.delete(data.secure_url);
                     console.error("Firebase Push Error:", error);
-                    statusText.textContent = 'Upload failed: Firebase error';
-                    showMessage('Upload failed: Firebase error', 'error');
-                    if (onComplete) onComplete();
+                    reportUploadFailure(error?.message || 'Firebase database me image save nahi ho payi.', file.name, statusText);
+                    if (onComplete) onComplete(false);
                 });
         } else {
             progressAnimator.stop();
             console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
-            statusText.textContent = 'Upload failed!';
-            showMessage('Upload failed!', 'error');
-            if (onComplete) onComplete();
+            reportUploadFailure(getCloudinaryErrorMessage(xhr), file.name, statusText);
+            if (onComplete) onComplete(false);
         }
     };
 
     xhr.onerror = function () {
         progressAnimator.stop();
         console.error("Upload error occurred:", xhr.status);
-        statusText.textContent = 'Upload error!';
-        showMessage('Upload failed due to network error!', 'error');
-        if (onComplete) onComplete();
+        reportUploadFailure('Network error ya browser/system policy ne upload request block kar di.', file.name, statusText);
+        if (onComplete) onComplete(false);
     };
 
-    xhr.open('POST', url, true);
-    xhr.send(formData);
+    xhr.ontimeout = function () {
+        progressAnimator.stop();
+        reportUploadFailure('Upload timeout ho gaya. Internet slow/block ho sakta hai.', file.name, statusText);
+        if (onComplete) onComplete(false);
+    };
+
+    xhr.onabort = function () {
+        progressAnimator.stop();
+        reportUploadFailure('Upload cancel ho gaya ya browser ne request abort kar di.', file.name, statusText);
+        if (onComplete) onComplete(false);
+    };
+
+    try {
+        xhr.open('POST', url, true);
+        xhr.send(formData);
+    } catch (error) {
+        progressAnimator.stop();
+        reportUploadFailure(error?.message || 'Browser/system ne photo upload start nahi hone diya.', file.name, statusText);
+        if (onComplete) onComplete(false);
+    }
 }
 
 // Custom message box function (instead of alert)
@@ -14724,6 +14902,7 @@ window.openQuickLinks = function () {
         'https://ntqueprince.github.io/textbook/',
         'https://twinternal.policybazaar.com/panel/UpdateOwnership.aspx',
         'https://docs.google.com/forms/d/e/1FAIpQLSc4d0d6mvWinEQj7F-qZzIZzfg_IWffTPMB9d517tiIGwj6kQ/viewform',
+        'https://docs.google.com/forms/d/e/1FAIpQLSfjP44jAJnIEPBMq6wugjLBWthfQ3sYtiiMC8H-2-dnN20Qvg/viewform',
         'https://docs.google.com/forms/d/e/1FAIpQLScMAFtPmR4C3GtqCCz2meIJessXmFePOlUhqb0jRFZnMcrUvA/viewform',
         'https://docs.google.com/forms/d/e/1FAIpQLScliXNbSsS85LhQiiFDkQXGBgJIHon2ByR9Wm0X9j4BUqedVg/formResponse',
         'https://pbconnect.policybazaar.com/home',
