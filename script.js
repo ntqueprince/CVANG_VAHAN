@@ -72,6 +72,8 @@ let selectedFile = null;
 let selectedFiles = [];
 let pendingFiles = []; // Files queued for upload with preview
 let hasCalculated = false;
+const uploadingImageUrls = new Set();
+const uploadingImageKeys = new Set();
 
 // Toggle password visibility
 window.togglePasswordVisibility = function (inputId, btn) {
@@ -277,9 +279,147 @@ window.submitTag = function () {
         });
     });
 
-    selectedFiles = [];
-    selectedFile = null;
+selectedFiles = [];
+selectedFile = null;
 };
+
+function setUploadProgress(progressBar, statusText, modalProgress, percent, label = 'Uploading') {
+    const safePercent = Math.max(0, Math.min(100, Math.round(percent)));
+    const progressText = `${safePercent}%`;
+    progressBar.style.width = progressText;
+    progressBar.textContent = progressText;
+    statusText.textContent = `${label}... ${progressText}`;
+
+    if (modalProgress) {
+        modalProgress.style.width = progressText;
+        modalProgress.textContent = progressText;
+    }
+
+    const modalStatus = document.getElementById('modalStatus');
+    if (modalStatus) modalStatus.textContent = `${label}... ${progressText}`;
+}
+
+function createUploadProgressAnimator(progressBar, statusText, modalProgress) {
+    let currentPercent = 1;
+    let targetPercent = 1;
+    let currentLabel = 'Preparing upload';
+    let timerId = null;
+
+    const render = () => {
+        setUploadProgress(progressBar, statusText, modalProgress, currentPercent, currentLabel);
+    };
+
+    const step = () => {
+        if (currentPercent >= targetPercent) return;
+
+        const gap = targetPercent - currentPercent;
+        const increment = gap > 30 ? 2 : 1;
+        currentPercent = Math.min(targetPercent, currentPercent + increment);
+        render();
+    };
+
+    const start = () => {
+        if (timerId) return;
+        render();
+        timerId = setInterval(step, 90);
+    };
+
+    const moveTo = (percent, label = currentLabel) => {
+        currentLabel = label;
+        targetPercent = Math.max(targetPercent, Math.min(100, Math.round(percent)));
+        start();
+    };
+
+    const finish = (label = 'Complete') => {
+        currentLabel = label;
+        targetPercent = 100;
+        if (timerId) clearInterval(timerId);
+        timerId = setInterval(() => {
+            if (currentPercent >= 100) {
+                clearInterval(timerId);
+                timerId = null;
+                render();
+                return;
+            }
+
+            currentPercent = Math.min(100, currentPercent + 1);
+            render();
+        }, 45);
+    };
+
+    const stop = () => {
+        if (timerId) clearInterval(timerId);
+        timerId = null;
+    };
+
+    start();
+    return { moveTo, finish, stop };
+}
+
+function waitForGalleryImageRendered({ imageUrl, imageKey }, timeoutMs = 12000) {
+    return new Promise((resolve) => {
+        const gallery = document.getElementById('gallery');
+        if (!gallery) {
+            resolve(false);
+            return;
+        }
+
+        let settled = false;
+        let observer = null;
+        let timeoutId = null;
+
+        const finish = (didRender) => {
+            if (settled) return;
+            settled = true;
+            if (observer) observer.disconnect();
+            if (timeoutId) clearTimeout(timeoutId);
+            resolve(didRender);
+        };
+
+        const imageMatches = (img) => {
+            if (imageKey && img.closest(`[data-image-key="${imageKey}"]`)) {
+                return true;
+            }
+
+            const src = img.currentSrc || img.src || '';
+            return src === imageUrl || src.startsWith(imageUrl);
+        };
+
+        const resolveAfterPaint = () => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => finish(true));
+            });
+        };
+
+        const watchImage = (img) => {
+            if (img.complete && img.naturalWidth > 0) {
+                resolveAfterPaint();
+                return true;
+            }
+
+            img.addEventListener('load', resolveAfterPaint, { once: true });
+            img.addEventListener('error', () => finish(false), { once: true });
+            return false;
+        };
+
+        const scanGallery = () => {
+            const galleryImages = Array.from(gallery.querySelectorAll('.image-container img'));
+            const img = galleryImages.find(imageMatches) || galleryImages[0];
+            if (!img) return false;
+            return watchImage(img);
+        };
+
+        if (scanGallery()) return;
+
+        observer = new MutationObserver(scanGallery);
+        observer.observe(gallery, { childList: true, subtree: true });
+        timeoutId = setTimeout(() => {
+            const renderedImage = Array.from(gallery.querySelectorAll('.image-container img'))
+                .some(img => img.complete && img.naturalWidth > 0);
+            finish(renderedImage);
+        }, timeoutMs);
+    });
+}
 
 function uploadFile(file, tag, password, progressBar, statusText, modalProgress, onComplete) {
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
@@ -289,31 +429,20 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
     formData.append('tags', tag);
 
     // Reset progress before starting
-    progressBar.style.width = '0%';
-    progressBar.textContent = '0%';
-    statusText.textContent = 'Uploading...';
-    if (modalProgress) {
-        modalProgress.style.width = '0%';
-        modalProgress.textContent = '0%';
-    }
+    const progressAnimator = createUploadProgressAnimator(progressBar, statusText, modalProgress);
+    progressAnimator.moveTo(8, 'Preparing upload');
 
     const xhr = new XMLHttpRequest();
 
     // Progress bar update for each file
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
-            const percentComplete = Math.round((event.loaded / event.total) * 100);
-            progressBar.style.width = percentComplete + '%';
-            progressBar.textContent = percentComplete + '%';
-            statusText.textContent = `Uploading... ${percentComplete}%`;
-            // Modal progress bar bhi update karo agar open hai
-            if (modalProgress) {
-                modalProgress.style.width = percentComplete + '%';
-                modalProgress.textContent = percentComplete + '%';
+            const uploadPercent = (event.loaded / event.total) * 88;
+            if (event.loaded >= event.total) {
+                progressAnimator.moveTo(91, 'Processing image');
+            } else {
+                progressAnimator.moveTo(uploadPercent, 'Uploading');
             }
-            // Modal status text update
-            const modalStatus = document.getElementById('modalStatus');
-            if (modalStatus) modalStatus.textContent = `Uploading... ${percentComplete}%`;
         }
     };
 
@@ -322,6 +451,7 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
         if (xhr.status === 200) {
             const data = JSON.parse(xhr.responseText);
             if (!data.secure_url) {
+                progressAnimator.stop();
                 showMessage('Upload failed: No secure URL received', 'error');
                 statusText.textContent = 'Upload failed!';
                 if (onComplete) onComplete();
@@ -339,28 +469,40 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
                 imgObj.password = password;
             }
 
+            progressAnimator.moveTo(92, 'Processing image');
+            uploadingImageUrls.add(data.secure_url);
+
             // Save into Firebase
             push(imagesRef, imgObj)
-                .then(() => {
-                    progressBar.style.width = '100%';
-                    progressBar.textContent = '100%';
-                    statusText.textContent = '✅ Complete';
-                    if (modalProgress) {
-                        modalProgress.style.width = '100%';
-                        modalProgress.textContent = '100%';
-                    }
+                .then(async (newImageRef) => {
+                    const imageKey = newImageRef.key;
+                    if (imageKey) uploadingImageKeys.add(imageKey);
+                    progressAnimator.moveTo(96, 'Adding to gallery');
                     document.getElementById('fileUpload').value = '';
                     document.getElementById('tagInput').value = '';
-                    loadImages();
+                    const didRender = await waitForGalleryImageRendered({ imageUrl: data.secure_url, imageKey });
+                    uploadingImageUrls.delete(data.secure_url);
+                    if (imageKey) uploadingImageKeys.delete(imageKey);
+                    if (didRender) {
+                        progressAnimator.finish('Complete');
+                    } else {
+                        progressAnimator.moveTo(99, 'Preview loading');
+                    }
+                    statusText.textContent = didRender ? 'Complete' : 'Uploaded, preview loading';
+                    const modalStatus = document.getElementById('modalStatus');
+                    if (modalStatus) modalStatus.textContent = statusText.textContent;
                     if (onComplete) onComplete();
                 })
                 .catch((error) => {
+                    progressAnimator.stop();
+                    uploadingImageUrls.delete(data.secure_url);
                     console.error("Firebase Push Error:", error);
                     statusText.textContent = 'Upload failed: Firebase error';
                     showMessage('Upload failed: Firebase error', 'error');
                     if (onComplete) onComplete();
                 });
         } else {
+            progressAnimator.stop();
             console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
             statusText.textContent = 'Upload failed!';
             showMessage('Upload failed!', 'error');
@@ -369,6 +511,7 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
     };
 
     xhr.onerror = function () {
+        progressAnimator.stop();
         console.error("Upload error occurred:", xhr.status);
         statusText.textContent = 'Upload error!';
         showMessage('Upload failed due to network error!', 'error');
@@ -459,11 +602,13 @@ function loadImages() {
                     const isLocked = !!imgPassword;
                     const container = document.createElement('div');
                     container.className = 'image-container' + (isLocked ? ' image-locked' : '');
+                    container.dataset.imageKey = key;
 
                     const imgElement = document.createElement('img');
                     imgElement.src = url;
                     imgElement.alt = tag || 'Uploaded image';
-                    imgElement.loading = 'lazy';
+                    imgElement.loading = uploadingImageUrls.has(url) || uploadingImageKeys.has(key) ? 'eager' : 'lazy';
+                    imgElement.decoding = 'async';
                     imgElement.onerror = () => {
                         imgElement.src = `https://placehold.co/150x150/cccccc/333333?text=Image+Error`;
                         console.warn(`Failed to load image: ${url}`);
