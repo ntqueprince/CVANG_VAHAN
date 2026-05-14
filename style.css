@@ -6313,6 +6313,15 @@ body.stealth-buttons-hidden button[onclick="openCSATModal()"] {
     pointer-events: auto !important;
 }
 
+body.stealth-buttons-hidden #openChatBtn,
+body.stealth-buttons-hidden #chatCanvas,
+body.stealth-buttons-hidden #chatCanvas button,
+body.stealth-buttons-hidden #chatCanvas textarea {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
 body.stealth-buttons-hidden #csatModal button,
 body.stealth-buttons-hidden #csatModal select,
 body.stealth-buttons-hidden #csatModal input,
@@ -6402,6 +6411,7 @@ body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
     visibility: visible !important;
     pointer-events: auto !important;
 }
+
 .carrom-coins-card {
     border-radius: 14px;
     border: 1px solid rgba(245, 158, 11, 0.24);
