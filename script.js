@@ -1004,7 +1004,9 @@ document.getElementById('csatModal').addEventListener('click', function (event) 
 // #region 🔒 ENDORSEMENT PAGE
 // ENDORSEMENT Full-Page Functionality
 window.openEndorsementPage = function () {
-    document.getElementById('endorsementPage').style.display = 'block';
+    const endorsementPage = document.getElementById('endorsementPage');
+    endorsementPage.style.display = 'block';
+    endorsementPage.scrollTop = 0;
     setTimeout(() => {
         const endorsementContainer = document.querySelector('.endorsement-container');
         if (endorsementContainer) endorsementContainer.classList.add('active');
@@ -12707,6 +12709,8 @@ requirementDropdown.addEventListener("change", () => {
             outputBox.classList.remove("output-red");
         }
         outputBox.style.display = "block";
+        outputBox.scrollTop = 0;
+        document.getElementById("endorsementPage").scrollTop = 0;
         setTimeout(() => outputBox.classList.add("show"), 10);
     }
 });
