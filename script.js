@@ -11541,11 +11541,11 @@ const endorsementData = [
         "Insurer": "United",
         "Requirement": "Period of Insurance (POI)",
         "Endorsement type": "Non Financial Endt",
-        "Documents or any other requirement": "Unmasked Aadhaar Card or Driving License For SAOD: Both PYP OD and Bundled TP are required For Comprehensive Policy: Either a PYP Comprehensive policy or both PYP OD and Bundled TP are required",
+        "Documents or any other requirement": "Unmasked Aadhaar Card or Driving License  For SAOD: Both PYP OD and Bundled TP are required  For Comprehensive Policy: Either a PYP Comprehensive policy or both PYP OD and Bundled TP are required  For Brand New Vehicle: Not Possible",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "No",
         "Inspection": "No",
-        "Any Exception": "In TP, correction is only possible if previous year policy is also TP from United",
+        "Any Exception": "In TP, correction is only possible if previous year policy is also TP from United  For Brand New Vehicle: Not Possible",
         "Declaration format (if declaration required)": ""
     },
     {
@@ -11816,25 +11816,25 @@ const endorsementData = [
         "InsurerRequirement": "UnitedMultiple Mismatch (Reg no, chassis no & Engine no mismatch)",
         "Insurer": "United",
         "Requirement": "Multiple Mismatch (Reg no, chassis no & Engine no mismatch)",
-        "Endorsement type": "Not Possible",
-        "Documents or any other requirement": "Not Possible",
-        "TAT": "Not Possible",
-        "Charges / Deduction": "Not Possible",
-        "Inspection": "Not Possible",
-        "Any Exception": "",
-        "Declaration format (if declaration required)": ""
+        "Endorsement type": "Non Financial Endt",
+        "Documents or any other requirement": "Only For Brand New Car  After Policy Start Date (Undelivered Vehicles) -   *ODO meter up to 50 km - Inspection Required, cancelled invoice, a signed/stamped dealer letterhead confirming the vehicle is still in the stockyard/Showroom.  *ODO meter 51-100 km - Inspection Required, cancelled invoice, a signed/stamped dealer letterhead confirming the vehicle is still in the stockyard/Showroom, valid explanation from dealer on letter head for ODO more then 50 KM",
+        "TAT": "SRS / 10 Days",
+        "Charges / Deduction": "No",
+        "Inspection": "Yes",
+        "Any Exception": "Correction possible only if vehicle is not delivered",
+        "Declaration format (if declaration required)": "A signed/stamped dealer letterhead confirming the vehicle is still in the stockyard/Showroom, valid explanation from dealer on letter head for ODO more then 50 KM"
     },
     {
         "InsurerRequirement": "UnitedPost Issuance Cancellation",
         "Insurer": "United",
         "Requirement": "Post Issuance Cancellation",
         "Endorsement type": "",
-        "Documents or any other requirement": "For Non New Car - Alternate and Written Declaration from Customer (in the required format) For New Car -  1. Where policy has started - No cancellation will be done for UIIC where policies have started for brand new cases. UIIC will retain TP of 1 year and cancel policy remaining OD (pro rata/short period basis) 2. where policy has not started -  Cancelled invoice of non-delivered vehicle     - Dealer declaration of non-delivery with reason and date along with Vehicle Inspection (Need to show same day Newspaper in the video)",
+        "Documents or any other requirement": "For Non Brand New Car - Alternate policy and Written Declaration from Customer (in the required format)  For Brand New Car - Need to raise request within 72 hrs of policy issuance, Inspection Required, cancelled invoice, a signed/stamped dealer letterhead confirming the vehicle is still in the stockyard/Showroom.  1. Before policy starts - Cancelled with a minimum deduction of ₹118  2. After Policy Start Date (Undelivered Vehicles) -   *ODO meter up to 50 km - All documents mentioned above + Cancelled with a minimum deduction of ₹118.  *ODO meter 51-100 km - All documents mentioned above + valid explanation from dealer on letter head for ODO more then 50 KM - Cancelled with a minimum deduction of ₹118  *ODO meter over 100 km - All documents mentioned above + plus consent from the insured for a \"No Claim\" declaration and approval for the premium deductions (1 Year TP + Prorata OD premium will be retain by United)",
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Deduction",
-        "Inspection": "No",
-        "Any Exception": "Non brand New Car: Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy). SAOD policy cancellation: Alteranate bundle policy required TP cancellation - Alternate (comprehensive/TP) should be from UIIC",
-        "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________. I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy. I declare that the alternate policy no. ____________________ is an active policy.\""
+        "Inspection": "Yes",
+        "Any Exception": "Non brand New Car:  Comprehensive policies can only be cancelled by Comprehensive/TP policy (Alternate insurer applicable, with policy same start date & time or before UIIC policy).  SAOD policy cancellation: Alteranate bundle policy required  TP cancellation: Alternate (comprehensive/TP) should be from UIIC",
+        "Declaration format (if declaration required)": "I request for cancellation of policy no. _____________________.  I declare that my vehicle no: ___________ is not involved in any kind of TP Damage(Property/life) & no OD claim has been intimated under Policy No: _____________________ (of United India Insurance, purchased through policy bazaar )also i confirm that i will not take any claim under this policy & i will be liable for any third party claim within this policy.  I declare that the alternate policy no. ____________________ is an active policy.\""
     },
     {
         "InsurerRequirement": "UnitedPost Issuance Cancellation (Multiple Mismatch - Reg no, chassis no & Engine no mismatch",
