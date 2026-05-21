@@ -797,11 +797,10 @@ button:hover {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100dvh;
     background: linear-gradient(to right, #ffe6e6, #fff0e6, #ffffe6, #e6ffec, #e6e6ff, #f0e6ff, #ffe6f0);
     z-index: 1000;
-    padding: 0;
-    /* Removed padding to make it truly full-page */
+    padding: 32px 20px 40px;
     margin: 0;
     /* Ensure no margins */
     box-sizing: border-box;
@@ -822,14 +821,10 @@ button:hover {
     transform: scale(0.9);
     opacity: 0;
     position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    /* Center vertically */
 }
 
 .endorsement-container.active {
-    transform: scale(1) translateY(-50%);
-    /* Adjust transform to include centering */
+    transform: scale(1);
     opacity: 1;
 }
 
@@ -910,6 +905,7 @@ button:hover {
     padding: 15px;
     border-radius: 10px;
     margin-top: 15px;
+    overflow: visible;
     font-size: 1em;
     font-weight: 500;
     line-height: 1.6;
