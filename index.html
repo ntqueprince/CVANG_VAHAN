@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet" />
     <!-- Tailwind CSS CDN for Insurance Comparison Dashboard styles -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css?v=20260522-endorsement-natural-scroll">
+    <link rel="stylesheet" href="style.css?v=20260526-remarks-helper">
 </head>
 
 <body class="stealth-buttons-hidden">
@@ -65,6 +65,8 @@
             IB-SCORECARD</button>
         <button class="animated-btn bg-gradient-to-r from-sky-400 to-indigo-500"
             onclick="openCalmPlayer()">CALM</button>
+        <button class="animated-btn bg-gradient-to-r from-emerald-500 to-cyan-700" data-cvang-button="true"
+            onclick="openRemarksHelper()">Remarks Helper</button>
         <button class="secondary cov-btn" data-cvang-button="true" id="btnCompanyOwned">Company Owned Not
             Allowed</button>
     </div>
@@ -1307,7 +1309,7 @@
             if (firstSong) selectSong(firstSong);
         });
     </script>
-    <script type="module" src="script.js?v=20260522-endorsement-natural-scroll"></script>
+    <script type="module" src="script.js?v=20260526-remarks-helper"></script>
     <!-- Floating Chat Button -->
     <button id="openChatBtn"
         class="fixed bottom-4 right-4 w-14 h-14 rounded-full shadow-lg text-white text-2xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-110 transition z-[5000]"
@@ -2610,6 +2612,367 @@
         </div>
     </div>
     <audio id="calmAudioPlayer" preload="metadata"></audio>
+
+    <div id="remarksHelperPanel" class="remarks-helper-panel" aria-hidden="true">
+        <div class="remarks-helper-drag" id="remarksHelperDrag">
+            <span></span>
+            <div class="remarks-helper-window-actions">
+                <button type="button" title="Floating" onclick="openRemarksHelperFloating()">F</button>
+                <button type="button" title="Minimize" onclick="minimizeRemarksHelper()">-</button>
+                <button type="button" title="Close" onclick="closeRemarksHelper()">x</button>
+            </div>
+        </div>
+        <div class="remarks-helper-search">
+            <input id="remarksHelperInput" type="search" autocomplete="off" />
+            <button type="button" id="remarksHelperClear">Clear</button>
+        </div>
+        <div id="remarksHelperResults" class="remarks-helper-results"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-n" data-rh-resize="n"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-e" data-rh-resize="e"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-s" data-rh-resize="s"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-w" data-rh-resize="w"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-ne" data-rh-resize="ne"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-nw" data-rh-resize="nw"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-se" data-rh-resize="se"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-sw" data-rh-resize="sw"></div>
+    </div>
+    <button id="remarksHelperMini" class="remarks-helper-mini" type="button" onclick="openRemarksHelper()">Remarks</button>
+    <script>
+        (function () {
+            var remarks = [
+                { text: "correct stamping was not there", tags: "stamping stamp correct" },
+                { text: "cx put the call on hold, disclaimer given", tags: "hold disclaimer cx" },
+                { text: "cx not responding disclaimer given", tags: "not responding disclaimer no response" },
+                { text: "tech issue tat 24hr", tags: "tech technical issue tat 24hr" },
+                { text: "claim related query // claim transfer", tags: "claim transfer query" },
+                { text: "call got disconnected while transferring to claim due to call flow cannot ob", tags: "claim disconnected transfer call flow ob" },
+                { text: "asked to share bank statement on mail for refund, tat 24hr", tags: "refund bank statement mail tat 24hr" },
+                { text: "call has been transferred to sales for new policy", tags: "sales new policy transfer" },
+                { text: "OB>>feedback call, na", tags: "ob feedback na" },
+                { text: "call has been transferred to NSTP", tags: "nstp transfer" },
+                { text: "cx need tamil cb, tat shared", tags: "tamil cb callback tat" },
+                { text: "informed that policy is valid since no OT and no claim in last 12 month", tags: "policy valid ot claim 12 month ncb" },
+                { text: "asked to share kyc docs on WP, tat 24hr", tags: "kyc docs wp whatsapp tat 24hr" },
+                { text: "pre issuance name correction asked to share RC and KYC docs on WP, tat 24hr", tags: "pre issuance name correction rc kyc wp tat 24hr" },
+                { text: "asked to complete pf and kyc since cx don't have kyc pyp, asked to manage, cx agreed, tat shared", tags: "pf kyc pyp manage agreed tat" },
+                { text: "asked to complete pf and kyc, tat 24hr", tags: "pf kyc tat 24hr" },
+                { text: "asked to complete pf and kyc, link and tat shared", tags: "pf kyc link tat" },
+                { text: "cx getting NCB and OT related msg, as per cx confirmation NCB is correct since there is no OT and claim in last 12month", tags: "ncb ot message claim 12month" },
+                { text: "since cx getting vi msg to update odometer but informed it's not required", tags: "vi odometer msg not required" },
+                { text: "informed that since PYP already expired hence POI details informed, cx agreed", tags: "pyp expired poi agreed" }
+            ];
+
+            function normalize(value) {
+                return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+            }
+
+            function scoreRemark(remark, query) {
+                var q = normalize(query);
+                if (!q) return 1;
+                var text = normalize(remark.text);
+                var tags = normalize(remark.tags);
+                var haystack = text + " " + tags;
+                var words = q.split(" ").filter(Boolean);
+                var score = 0;
+                if (text.indexOf(q) !== -1) score += 80;
+                if (tags.indexOf(q) !== -1) score += 100;
+                words.forEach(function (word) {
+                    if (tags.split(" ").indexOf(word) !== -1) score += 45;
+                    if (text.split(" ").indexOf(word) !== -1) score += 35;
+                    if (haystack.indexOf(word) !== -1) score += 15;
+                });
+                return score;
+            }
+
+            function getMatches(query) {
+                return remarks
+                    .map(function (remark) {
+                        return { text: remark.text, tags: remark.tags, score: scoreRemark(remark, query) };
+                    })
+                    .filter(function (remark) { return remark.score > 0; })
+                    .sort(function (a, b) { return b.score - a.score || a.text.localeCompare(b.text); })
+                    .slice(0, 20);
+            }
+
+            function copyRemark(text, button) {
+                var done = navigator.clipboard && navigator.clipboard.writeText
+                    ? navigator.clipboard.writeText(text)
+                    : Promise.reject();
+                done.catch(function () {
+                    var temp = document.createElement("textarea");
+                    temp.value = text;
+                    temp.setAttribute("readonly", "");
+                    temp.style.position = "fixed";
+                    temp.style.left = "-9999px";
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand("copy");
+                    temp.remove();
+                }).finally(function () {
+                    document.querySelectorAll(".remarks-helper-card.copied").forEach(function (card) {
+                        card.classList.remove("copied");
+                    });
+                    if (button) {
+                        button.classList.add("copied");
+                        window.setTimeout(function () { button.classList.remove("copied"); }, 900);
+                    }
+                });
+            }
+
+            function renderRemarksHelper() {
+                var input = document.getElementById("remarksHelperInput");
+                var results = document.getElementById("remarksHelperResults");
+                if (!input || !results) return;
+                results.innerHTML = "";
+                getMatches(input.value).forEach(function (remark) {
+                    var button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "remarks-helper-card";
+                    button.textContent = remark.text;
+                    button.addEventListener("click", function () { copyRemark(remark.text, button); });
+                    results.appendChild(button);
+                });
+            }
+
+            function renderFloatingHelper(doc) {
+                var input = doc.getElementById("pipRemarksInput");
+                var results = doc.getElementById("pipRemarksResults");
+                if (!input || !results) return;
+                results.innerHTML = "";
+                getMatches(input.value).forEach(function (remark) {
+                    var button = doc.createElement("button");
+                    button.type = "button";
+                    button.className = "pip-remark-card";
+                    button.textContent = remark.text;
+                    button.addEventListener("click", function () {
+                        var done = doc.defaultView.navigator.clipboard && doc.defaultView.navigator.clipboard.writeText
+                            ? doc.defaultView.navigator.clipboard.writeText(remark.text)
+                            : navigator.clipboard.writeText(remark.text);
+                        done.finally(function () {
+                            doc.querySelectorAll(".pip-remark-card.copied").forEach(function (card) {
+                                card.classList.remove("copied");
+                            });
+                            button.classList.add("copied");
+                            doc.defaultView.setTimeout(function () { button.classList.remove("copied"); }, 900);
+                        });
+                    });
+                    results.appendChild(button);
+                });
+            }
+
+            function buildFloatingHelper(doc) {
+                doc.body.innerHTML = [
+                    '<div class="pip-shell">',
+                    '<div class="pip-search">',
+                    '<input id="pipRemarksInput" type="search" autocomplete="off" />',
+                    '<button id="pipRemarksClear" type="button">Clear</button>',
+                    '</div>',
+                    '<div id="pipRemarksResults" class="pip-results"></div>',
+                    '</div>'
+                ].join("");
+                var style = doc.createElement("style");
+                style.textContent = [
+                    '*{box-sizing:border-box}',
+                    'body{margin:0;background:#fff;font-family:Poppins,Arial,sans-serif;color:#111827}',
+                    '.pip-shell{height:100vh;display:flex;flex-direction:column;background:#fff}',
+                    '.pip-search{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;border-bottom:1px solid #d9deea;background:#f8fafc}',
+                    '.pip-search input{height:42px;border:1px solid #b9c2d2;border-radius:7px;padding:0 14px;font-size:16px;outline:none}',
+                    '.pip-search input:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.16)}',
+                    '.pip-search button{height:42px;border:1px solid #b9c2d2;border-radius:7px;background:#fff;padding:0 14px;font-weight:800;cursor:pointer}',
+                    '.pip-results{display:grid;gap:8px;padding:10px;overflow:auto}',
+                    '.pip-remark-card{width:100%;min-height:56px;border:1px solid #b9c2d2;border-radius:8px;background:#fff;padding:12px;text-align:left;font-size:16px;line-height:1.35;cursor:pointer}',
+                    '.pip-remark-card:hover,.pip-remark-card:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.14);outline:none}',
+                    '.pip-remark-card.copied{border-color:#0f766e;background:#ecfdf5}'
+                ].join("");
+                doc.head.appendChild(style);
+                var input = doc.getElementById("pipRemarksInput");
+                var clear = doc.getElementById("pipRemarksClear");
+                input.addEventListener("input", function () { renderFloatingHelper(doc); });
+                input.addEventListener("keydown", function (event) {
+                    if (event.key !== "Enter") return;
+                    var firstCard = doc.querySelector(".pip-remark-card");
+                    if (!firstCard) return;
+                    event.preventDefault();
+                    firstCard.click();
+                });
+                clear.addEventListener("click", function () {
+                    input.value = "";
+                    renderFloatingHelper(doc);
+                    input.focus();
+                });
+                renderFloatingHelper(doc);
+                input.focus();
+            }
+
+            window.openRemarksHelper = function () {
+                var panel = document.getElementById("remarksHelperPanel");
+                var input = document.getElementById("remarksHelperInput");
+                var mini = document.getElementById("remarksHelperMini");
+                if (!panel || !input) return;
+                panel.classList.add("active");
+                panel.setAttribute("aria-hidden", "false");
+                if (mini) mini.classList.remove("active");
+                renderRemarksHelper();
+                window.setTimeout(function () { input.focus(); }, 0);
+            };
+
+            window.closeRemarksHelper = function () {
+                var panel = document.getElementById("remarksHelperPanel");
+                var mini = document.getElementById("remarksHelperMini");
+                if (!panel) return;
+                panel.classList.remove("active");
+                panel.setAttribute("aria-hidden", "true");
+                if (mini) mini.classList.remove("active");
+            };
+
+            window.minimizeRemarksHelper = function () {
+                var panel = document.getElementById("remarksHelperPanel");
+                var mini = document.getElementById("remarksHelperMini");
+                if (!panel || !mini) return;
+                panel.classList.remove("active");
+                panel.setAttribute("aria-hidden", "true");
+                mini.classList.add("active");
+            };
+
+            window.openRemarksHelperFloating = async function () {
+                if ("documentPictureInPicture" in window) {
+                    var pipWindow = await window.documentPictureInPicture.requestWindow({
+                        width: 420,
+                        height: 620
+                    });
+                    pipWindow.document.title = "Remarks";
+                    buildFloatingHelper(pipWindow.document);
+                    return;
+                }
+                window.open("remarks-helper/index.html", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
+            };
+
+            function bindRemarksHelper() {
+                var input = document.getElementById("remarksHelperInput");
+                var clear = document.getElementById("remarksHelperClear");
+                var panel = document.getElementById("remarksHelperPanel");
+                var dragHandle = document.getElementById("remarksHelperDrag");
+                var resizeHandles = panel.querySelectorAll("[data-rh-resize]");
+                if (!input || !clear || !panel || !dragHandle || !resizeHandles.length || panel.dataset.bound === "true") return;
+                panel.dataset.bound = "true";
+
+                input.addEventListener("input", renderRemarksHelper);
+                input.addEventListener("keydown", function (event) {
+                    if (event.key !== "Enter") return;
+                    var firstCard = document.querySelector(".remarks-helper-card");
+                    if (!firstCard) return;
+                    event.preventDefault();
+                    firstCard.click();
+                });
+                clear.addEventListener("click", function () {
+                    input.value = "";
+                    renderRemarksHelper();
+                    input.focus();
+                });
+
+                var dragging = false;
+                var offsetX = 0;
+                var offsetY = 0;
+                var resizing = false;
+                var startX = 0;
+                var startY = 0;
+                var startWidth = 0;
+                var startHeight = 0;
+                var startLeft = 0;
+                var startTop = 0;
+                var resizeDir = "";
+
+                dragHandle.addEventListener("pointerdown", function (event) {
+                    if (event.target.closest("button")) return;
+                    var rect = panel.getBoundingClientRect();
+                    dragging = true;
+                    offsetX = event.clientX - rect.left;
+                    offsetY = event.clientY - rect.top;
+                    if (panel.setPointerCapture) panel.setPointerCapture(event.pointerId);
+                });
+
+                resizeHandles.forEach(function (handle) {
+                    handle.addEventListener("pointerdown", function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var rect = panel.getBoundingClientRect();
+                        resizing = true;
+                        resizeDir = handle.getAttribute("data-rh-resize") || "";
+                        startX = event.clientX;
+                        startY = event.clientY;
+                        startWidth = rect.width;
+                        startHeight = rect.height;
+                        startLeft = rect.left;
+                        startTop = rect.top;
+                        if (panel.setPointerCapture) panel.setPointerCapture(event.pointerId);
+                    });
+                });
+
+                panel.addEventListener("pointermove", function (event) {
+                    if (resizing) {
+                        var dx = event.clientX - startX;
+                        var dy = event.clientY - startY;
+                        var nextLeft = startLeft;
+                        var nextTop = startTop;
+                        var nextWidth = startWidth;
+                        var nextHeight = startHeight;
+                        var minWidth = 320;
+                        var minHeight = 220;
+
+                        if (resizeDir.indexOf("e") !== -1) nextWidth = startWidth + dx;
+                        if (resizeDir.indexOf("s") !== -1) nextHeight = startHeight + dy;
+                        if (resizeDir.indexOf("w") !== -1) {
+                            nextWidth = startWidth - dx;
+                            nextLeft = startLeft + dx;
+                        }
+                        if (resizeDir.indexOf("n") !== -1) {
+                            nextHeight = startHeight - dy;
+                            nextTop = startTop + dy;
+                        }
+
+                        if (nextWidth < minWidth) {
+                            if (resizeDir.indexOf("w") !== -1) nextLeft -= minWidth - nextWidth;
+                            nextWidth = minWidth;
+                        }
+                        if (nextHeight < minHeight) {
+                            if (resizeDir.indexOf("n") !== -1) nextTop -= minHeight - nextHeight;
+                            nextHeight = minHeight;
+                        }
+
+                        nextLeft = Math.max(8, Math.min(window.innerWidth - nextWidth - 8, nextLeft));
+                        nextTop = Math.max(8, Math.min(window.innerHeight - nextHeight - 8, nextTop));
+                        nextWidth = Math.min(nextWidth, window.innerWidth - nextLeft - 8);
+                        nextHeight = Math.min(nextHeight, window.innerHeight - nextTop - 8);
+
+                        panel.style.left = nextLeft + "px";
+                        panel.style.top = nextTop + "px";
+                        panel.style.right = "auto";
+                        panel.style.bottom = "auto";
+                        panel.style.width = nextWidth + "px";
+                        panel.style.height = nextHeight + "px";
+                        return;
+                    }
+                    if (dragging) {
+                        panel.style.left = Math.max(8, event.clientX - offsetX) + "px";
+                        panel.style.top = Math.max(8, event.clientY - offsetY) + "px";
+                        panel.style.right = "auto";
+                        panel.style.bottom = "auto";
+                    }
+                });
+                panel.addEventListener("pointerup", function () {
+                    dragging = false;
+                    resizing = false;
+                });
+                renderRemarksHelper();
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", bindRemarksHelper);
+            } else {
+                bindRemarksHelper();
+            }
+        })();
+    </script>
 </body>
 
 
