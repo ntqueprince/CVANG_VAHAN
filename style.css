@@ -6400,12 +6400,276 @@ body.stealth-buttons-hidden #calmMiniPlayer button {
     pointer-events: auto !important;
 }
 
+body.stealth-buttons-hidden #remarksHelperPanel,
+body.stealth-buttons-hidden #remarksHelperMini,
+body.stealth-buttons-hidden #remarksHelperPanel button,
+body.stealth-buttons-hidden #remarksHelperPanel input {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
 body.stealth-buttons-hidden button.stealth-button-revealed,
 body.stealth-buttons-hidden #companyUpdatesButton.stealth-button-revealed,
 body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+}
+
+.remarks-helper-panel {
+    position: fixed;
+    right: 88px;
+    bottom: 86px;
+    z-index: 7000;
+    width: min(520px, calc(100vw - 24px));
+    max-height: min(620px, calc(100vh - 120px));
+    display: none;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 8px;
+    box-shadow: 0 22px 55px rgba(15, 23, 42, 0.28);
+    text-align: left;
+    resize: both;
+}
+
+.remarks-helper-panel.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.remarks-helper-drag {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 0 12px;
+    background: #111827;
+    cursor: move;
+}
+
+.remarks-helper-drag span {
+    width: 36px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.remarks-helper-window-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.remarks-helper-window-actions button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.remarks-helper-window-actions button:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.remarks-helper-search {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    background: #f8fafc;
+}
+
+.remarks-helper-search input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 7px;
+    outline: none;
+    color: #111827;
+    background: #ffffff;
+    font-size: 16px;
+}
+
+.remarks-helper-search input:focus {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
+}
+
+.remarks-helper-search button {
+    min-width: 86px;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 7px;
+    background: #ffffff;
+    color: #111827;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.remarks-helper-search button:hover {
+    border-color: #0f766e;
+    background: #d9f3ef;
+}
+
+.remarks-helper-results {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.remarks-helper-card {
+    width: 100%;
+    min-height: 56px;
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 8px;
+    background: #ffffff;
+    color: #111827;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.remarks-helper-card:hover,
+.remarks-helper-card:focus {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    outline: none;
+}
+
+.remarks-helper-card.copied {
+    border-color: #0f766e;
+    background: #ecfdf5;
+}
+
+.remarks-helper-resize {
+    position: absolute;
+    z-index: 2;
+}
+
+.remarks-helper-resize-n {
+    top: 0;
+    left: 18px;
+    right: 18px;
+    height: 8px;
+    cursor: ns-resize;
+}
+
+.remarks-helper-resize-e {
+    top: 18px;
+    right: 0;
+    bottom: 18px;
+    width: 8px;
+    cursor: ew-resize;
+}
+
+.remarks-helper-resize-s {
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    height: 8px;
+    cursor: ns-resize;
+}
+
+.remarks-helper-resize-w {
+    top: 18px;
+    left: 0;
+    bottom: 18px;
+    width: 8px;
+    cursor: ew-resize;
+}
+
+.remarks-helper-resize-ne,
+.remarks-helper-resize-nw,
+.remarks-helper-resize-se,
+.remarks-helper-resize-sw {
+    width: 24px;
+    height: 24px;
+}
+
+.remarks-helper-resize-ne {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.remarks-helper-resize-nw {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.remarks-helper-resize-se {
+    right: 0;
+    bottom: 0;
+    cursor: nwse-resize;
+}
+
+.remarks-helper-resize-sw {
+    left: 0;
+    bottom: 0;
+    cursor: nesw-resize;
+}
+
+.remarks-helper-resize-se::after {
+    content: "";
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid rgba(15, 23, 42, 0.45);
+    border-bottom: 2px solid rgba(15, 23, 42, 0.45);
+}
+
+.remarks-helper-mini {
+    position: fixed;
+    right: 88px;
+    bottom: 86px;
+    z-index: 6999;
+    display: none;
+    min-width: 96px;
+    height: 40px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #10b981, #0e7490);
+    color: #ffffff;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28);
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.remarks-helper-mini.active {
+    display: block;
+}
+
+@media (max-width: 720px) {
+    .remarks-helper-panel {
+        right: 10px;
+        left: 10px;
+        bottom: 76px;
+        width: auto;
+    }
+
+    .remarks-helper-mini {
+        right: 12px;
+        bottom: 76px;
+    }
 }
 
 .carrom-coins-card {
