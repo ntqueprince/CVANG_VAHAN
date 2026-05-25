@@ -12646,12 +12646,12 @@ const endorsementData = [
         "InsurerRequirement": "CPA - LibertyPost Issuance Cancellation",
         "Insurer": "CPA - Liberty",
         "Requirement": "Post Issuance Cancellation",
-        "Endorsement type": "",
-        "Documents or any other requirement": "Endorsement form (will be provided by TL / ticketing team) & Consent via App/Email/Call - Remarks on BMS",
-        "TAT": "SRS / 10 Days",
-        "Charges / Deduction": "Deduction",
-        "Inspection": "No",
-        "Any Exception": "Provides freelook period of 15 Days from the policy start date, deductions are done post free look up period",
+        "Endorsement type": "Not Possible",
+        "Documents or any other requirement": "Not Possible",
+        "TAT": "Not Possible",
+        "Charges / Deduction": "Not Possible",
+        "Inspection": "Not Possible",
+        "Any Exception": "Not Possible",
         "Declaration format (if declaration required)": ""
     }
 ];
