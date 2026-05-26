@@ -2659,7 +2659,18 @@
                 { text: "asked to complete pf and kyc, link and tat shared", tags: "pf kyc link tat" },
                 { text: "cx getting NCB and OT related msg, as per cx confirmation NCB is correct since there is no OT and claim in last 12month", tags: "ncb ot message claim 12month" },
                 { text: "since cx getting vi msg to update odometer but informed it's not required", tags: "vi odometer msg not required" },
-                { text: "informed that since PYP already expired hence POI details informed, cx agreed", tags: "pyp expired poi agreed" }
+                { text: "informed that since PYP already expired hence POI details informed, cx agreed", tags: "pyp expired poi agreed" },
+                { text: "cx need sc, sent", tags: "sc sent" },
+                { text: "cx need CPA, link and tat shared", tags: "cpa link tat shared" },
+                { text: "informed that PAN is also required but cx not ready to share therefore asked to do form 60 hence link and tat shared", tags: "pan form 60 link tat shared" },
+                { text: "informed that policy issued and sent also", tags: "policy issued sent" },
+                { text: "renewal query, call has been transferred", tags: "renewal query call transferred transfer" },
+                { text: "nominee details does not matter as CPA not added", tags: "nominee cpa not added details" },
+                { text: "cx disconnected the call", tags: "disconnected call cx" },
+                { text: "vahan query, informed that it's SAOD", tags: "vahan query saod" },
+                { text: "renewal query, since team is not available to cb arranged, tat 24hr", tags: "renewal query team not available cb callback tat 24hr" },
+                { text: "cx don't have kyc docs, asked to wait 24hr", tags: "kyc docs wait 24hr" },
+                { text: "vahan query tat shared", tags: "vahan query tat shared" }
             ];
 
             function normalize(value) {
@@ -2761,32 +2772,60 @@
             }
 
             function buildFloatingHelper(doc) {
+                var expandedSize = { width: 420, height: 620 };
+                var collapsedSize = { width: 150, height: 78 };
+                function resizePip(size) {
+                    try {
+                        doc.defaultView.resizeTo(size.width, size.height);
+                    } catch (error) {
+                        // Some picture-in-picture windows ignore resize requests.
+                    }
+                }
+                function setCollapsed(collapsed) {
+                    doc.body.classList.toggle("pip-collapsed", collapsed);
+                    resizePip(collapsed ? collapsedSize : expandedSize);
+                    if (collapsed) {
+                        doc.getElementById("pipRestore").focus();
+                    } else {
+                        doc.getElementById("pipRemarksInput").focus();
+                    }
+                }
                 doc.body.innerHTML = [
                     '<div class="pip-shell">',
                     '<div class="pip-search">',
                     '<input id="pipRemarksInput" type="search" autocomplete="off" />',
                     '<button id="pipRemarksClear" type="button">Clear</button>',
+                    '<button id="pipHide" type="button">Hide</button>',
                     '</div>',
                     '<div id="pipRemarksResults" class="pip-results"></div>',
-                    '</div>'
+                    '</div>',
+                    '<button id="pipRestore" type="button">Remarks</button>'
                 ].join("");
                 var style = doc.createElement("style");
                 style.textContent = [
                     '*{box-sizing:border-box}',
                     'body{margin:0;background:#fff;font-family:Poppins,Arial,sans-serif;color:#111827}',
                     '.pip-shell{height:100vh;display:flex;flex-direction:column;background:#fff}',
-                    '.pip-search{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;border-bottom:1px solid #d9deea;background:#f8fafc}',
+                    '.pip-search{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:12px;border-bottom:1px solid #d9deea;background:#f8fafc}',
                     '.pip-search input{height:42px;border:1px solid #b9c2d2;border-radius:7px;padding:0 14px;font-size:16px;outline:none}',
                     '.pip-search input:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.16)}',
                     '.pip-search button{height:42px;border:1px solid #b9c2d2;border-radius:7px;background:#fff;padding:0 14px;font-weight:800;cursor:pointer}',
+                    '#pipHide,#pipRestore{border-color:#0f766e;background:#0f766e;color:#fff}',
+                    '#pipHide:hover,#pipRestore:hover{background:#0b5f59}',
+                    '#pipRestore{display:none;width:100%;min-height:46px;border:1px solid #0f766e;border-radius:7px;font-size:15px;font-weight:800;cursor:pointer}',
                     '.pip-results{display:grid;gap:8px;padding:10px;overflow:auto}',
                     '.pip-remark-card{width:100%;min-height:56px;border:1px solid #b9c2d2;border-radius:8px;background:#fff;padding:12px;text-align:left;font-size:16px;line-height:1.35;cursor:pointer}',
                     '.pip-remark-card:hover,.pip-remark-card:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.14);outline:none}',
-                    '.pip-remark-card.copied{border-color:#0f766e;background:#ecfdf5}'
+                    '.pip-remark-card.copied{border-color:#0f766e;background:#ecfdf5}',
+                    'body.pip-collapsed{min-height:0;overflow:hidden;background:transparent;padding:8px}',
+                    'body.pip-collapsed .pip-shell{display:none}',
+                    'body.pip-collapsed #pipRestore{display:block}'
                 ].join("");
                 doc.head.appendChild(style);
                 var input = doc.getElementById("pipRemarksInput");
                 var clear = doc.getElementById("pipRemarksClear");
+                var hide = doc.getElementById("pipHide");
+                var restore = doc.getElementById("pipRestore");
                 input.addEventListener("input", function () { renderFloatingHelper(doc); });
                 input.addEventListener("keydown", function (event) {
                     if (event.key !== "Enter") return;
@@ -2800,6 +2839,8 @@
                     renderFloatingHelper(doc);
                     input.focus();
                 });
+                hide.addEventListener("click", function () { setCollapsed(true); });
+                restore.addEventListener("click", function () { setCollapsed(false); });
                 renderFloatingHelper(doc);
                 input.focus();
             }
@@ -2844,7 +2885,7 @@
                     buildFloatingHelper(pipWindow.document);
                     return;
                 }
-                window.open("remarks-helper/index.html", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
+                window.open("remarks-helper/index.html?floating=1", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
             };
 
             function bindRemarksHelper() {
