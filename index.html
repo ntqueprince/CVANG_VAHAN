@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet" />
     <!-- Tailwind CSS CDN for Insurance Comparison Dashboard styles -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css?v=20260526-remarks-helper">
+    <link rel="stylesheet" href="style.css?v=20260527-calm-search">
 </head>
 
 <body class="stealth-buttons-hidden">
@@ -1309,7 +1309,7 @@
             if (firstSong) selectSong(firstSong);
         });
     </script>
-    <script type="module" src="script.js?v=20260526-remarks-helper"></script>
+    <script type="module" src="script.js?v=20260527-calm-search"></script>
     <!-- Floating Chat Button -->
     <button id="openChatBtn"
         class="fixed bottom-4 right-4 w-14 h-14 rounded-full shadow-lg text-white text-2xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-110 transition z-[5000]"
@@ -2543,7 +2543,6 @@
 
             <div class="calm-hero">
                 <div class="calm-hero-copy">
-                    <span class="calm-badge">GitHub Audio Shelf</span>
                     <h2>CALM</h2>
                     <button class="calm-refresh-btn" type="button" onclick="refreshCalmTracks()">↻ Refresh
                         Tracks</button>
@@ -2602,9 +2601,16 @@
             <div class="calm-playlist-card">
                 <div class="calm-list-header">
                     <div>
-                        <div class="calm-list-title">Uploaded Audio Files</div>
+                        <div class="calm-list-title">Songs</div>
                         <div class="calm-list-subtitle" id="calmListSubtitle">Loading tracks...</div>
                     </div>
+                </div>
+                <div class="calm-search-row">
+                    <span class="calm-search-icon">🔎</span>
+                    <input id="calmSearchInput" class="calm-search-input" type="search" autocomplete="off"
+                        placeholder="Search songs..." oninput="setCalmSearch(this.value)" />
+                    <button id="calmSearchClear" class="calm-search-clear" type="button" onclick="clearCalmSearch()"
+                        title="Clear search">×</button>
                 </div>
                 <div id="calmStatusMessage" class="calm-status-message">GitHub se playlist fetch ki ja rahi hai...</div>
                 <ul id="calmTrackList" class="calm-track-list"></ul>
