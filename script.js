@@ -571,133 +571,168 @@ function uploadFile(file, tag, password, progressBar, statusText, modalProgress,
     }
 
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-    const formData = new FormData();
-    try {
+    const maxAttempts = 3;
+    const retryDelays = [1200, 2500];
+
+    const createFormData = () => {
+        const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', uploadPreset);
         formData.append('tags', tag);
+        return formData;
+    };
+
+    let formData = null;
+    try {
+        formData = createFormData();
     } catch (error) {
         reportUploadFailure('The browser or system blocked access to the selected photo.', file?.name || '', statusText);
         if (onComplete) onComplete(false);
         return;
     }
 
-    // Reset progress before starting
     const progressAnimator = createUploadProgressAnimator(progressBar, statusText, modalProgress);
     progressAnimator.moveTo(8, 'Preparing upload');
 
-    const xhr = new XMLHttpRequest();
-    xhr.timeout = 60000;
+    const shouldRetryStatus = (status) => status === 0 || status === 408 || status === 429 || status >= 500;
 
-    // Progress bar update for each file
-    xhr.upload.onprogress = function (event) {
-        if (event.lengthComputable) {
-            const uploadPercent = (event.loaded / event.total) * 88;
-            if (event.loaded >= event.total) {
-                progressAnimator.moveTo(91, 'Processing image');
-            } else {
-                progressAnimator.moveTo(uploadPercent, 'Uploading');
-            }
-        }
-    };
-
-    // Upload complete
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            let data = null;
+    const retryUpload = (attempt, reason) => {
+        if (attempt >= maxAttempts) return false;
+        const nextAttempt = attempt + 1;
+        const delay = retryDelays[attempt - 1] || 2500;
+        console.warn(`Upload attempt ${attempt} failed. Retrying...`, reason || '');
+        progressAnimator.moveTo(Math.min(20 + attempt * 8, 45), `Retrying upload ${nextAttempt}/${maxAttempts}`);
+        setTimeout(() => {
             try {
-                data = JSON.parse(xhr.responseText);
+                formData = createFormData();
+                startUploadAttempt(nextAttempt);
             } catch (error) {
                 progressAnimator.stop();
-                reportUploadFailure('The upload server response could not be read.', file.name, statusText);
+                reportUploadFailure('The browser or system blocked access to the selected photo.', file?.name || '', statusText);
                 if (onComplete) onComplete(false);
-                return;
             }
+        }, delay);
+        return true;
+    };
 
-            if (!data.secure_url) {
-                progressAnimator.stop();
-                reportUploadFailure('Upload completed, but the image URL was not received.', file.name, statusText);
-                if (onComplete) onComplete(false);
-                return;
+    function startUploadAttempt(attempt) {
+        const xhr = new XMLHttpRequest();
+        xhr.timeout = attempt === 1 ? 60000 : 90000;
+
+        xhr.upload.onprogress = function (event) {
+            if (event.lengthComputable) {
+                const uploadPercent = Math.min(88, (event.loaded / event.total) * 88);
+                if (event.loaded >= event.total) {
+                    progressAnimator.moveTo(91, 'Processing image');
+                } else {
+                    progressAnimator.moveTo(uploadPercent, attempt > 1 ? `Uploading retry ${attempt}` : 'Uploading');
+                }
             }
+        };
 
-            const imgObj = {
-                url: data.secure_url,
-                tag: tag,
-                name: file.name,
-                timestamp: Date.now()
-            };
-            // Agar password set kiya hai to save karo
-            if (password) {
-                imgObj.password = password;
-            }
-
-            progressAnimator.moveTo(92, 'Processing image');
-            uploadingImageUrls.add(data.secure_url);
-
-            // Save into Firebase
-            push(imagesRef, imgObj)
-                .then(async (newImageRef) => {
-                    const imageKey = newImageRef.key;
-                    if (imageKey) uploadingImageKeys.add(imageKey);
-                    progressAnimator.moveTo(96, 'Adding to gallery');
-                    document.getElementById('fileUpload').value = '';
-                    document.getElementById('tagInput').value = '';
-                    const didRender = await waitForGalleryImageRendered({ imageUrl: data.secure_url, imageKey });
-                    uploadingImageUrls.delete(data.secure_url);
-                    if (imageKey) uploadingImageKeys.delete(imageKey);
-                    if (didRender) {
-                        progressAnimator.finish('Complete');
-                    } else {
-                        progressAnimator.moveTo(99, 'Preview loading');
-                    }
-                    statusText.textContent = didRender ? 'Complete' : 'Uploaded, preview loading';
-                    const modalStatus = document.getElementById('modalStatus');
-                    if (modalStatus) modalStatus.textContent = statusText.textContent;
-                    if (onComplete) onComplete(true);
-                })
-                .catch((error) => {
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                let data = null;
+                try {
+                    data = JSON.parse(xhr.responseText);
+                } catch (error) {
                     progressAnimator.stop();
-                    uploadingImageUrls.delete(data.secure_url);
-                    console.error("Firebase Push Error:", error);
-                    reportUploadFailure(error?.message || 'The image could not be saved to the database.', file.name, statusText);
+                    reportUploadFailure('The upload server response could not be read.', file.name, statusText);
                     if (onComplete) onComplete(false);
-                });
-        } else {
-            progressAnimator.stop();
+                    return;
+                }
+
+                if (!data.secure_url) {
+                    progressAnimator.stop();
+                    reportUploadFailure('Upload completed, but the image URL was not received.', file.name, statusText);
+                    if (onComplete) onComplete(false);
+                    return;
+                }
+
+                const imgObj = {
+                    url: data.secure_url,
+                    tag: tag,
+                    name: file.name,
+                    timestamp: Date.now()
+                };
+                if (password) {
+                    imgObj.password = password;
+                }
+
+                progressAnimator.moveTo(92, 'Processing image');
+                uploadingImageUrls.add(data.secure_url);
+
+                push(imagesRef, imgObj)
+                    .then(async (newImageRef) => {
+                        const imageKey = newImageRef.key;
+                        if (imageKey) uploadingImageKeys.add(imageKey);
+                        progressAnimator.moveTo(96, 'Adding to gallery');
+                        document.getElementById('fileUpload').value = '';
+                        document.getElementById('tagInput').value = '';
+                        const didRender = await waitForGalleryImageRendered({ imageUrl: data.secure_url, imageKey });
+                        uploadingImageUrls.delete(data.secure_url);
+                        if (imageKey) uploadingImageKeys.delete(imageKey);
+                        if (didRender) {
+                            progressAnimator.finish('Complete');
+                        } else {
+                            progressAnimator.moveTo(99, 'Preview loading');
+                        }
+                        statusText.textContent = didRender ? 'Complete' : 'Uploaded, preview loading';
+                        const modalStatus = document.getElementById('modalStatus');
+                        if (modalStatus) modalStatus.textContent = statusText.textContent;
+                        if (onComplete) onComplete(true);
+                    })
+                    .catch((error) => {
+                        progressAnimator.stop();
+                        uploadingImageUrls.delete(data.secure_url);
+                        console.error("Firebase Push Error:", error);
+                        reportUploadFailure(error?.message || 'The image could not be saved to the database.', file.name, statusText);
+                        if (onComplete) onComplete(false);
+                    });
+                return;
+            }
+
             console.error("Cloudinary Upload Failed:", xhr.status, xhr.responseText);
+            if (shouldRetryStatus(xhr.status) && retryUpload(attempt, xhr.status)) return;
+
+            progressAnimator.stop();
             reportUploadFailure(getCloudinaryErrorMessage(xhr), file.name, statusText);
             if (onComplete) onComplete(false);
+        };
+
+        xhr.onerror = function () {
+            console.error("Upload error occurred:", xhr.status);
+            if (retryUpload(attempt, 'network error')) return;
+            progressAnimator.stop();
+            reportUploadFailure('Network issue tha. Auto retry ke baad bhi upload nahi hua. Please try again.', file.name, statusText);
+            if (onComplete) onComplete(false);
+        };
+
+        xhr.ontimeout = function () {
+            if (retryUpload(attempt, 'timeout')) return;
+            progressAnimator.stop();
+            reportUploadFailure('Upload timed out. Auto retry ke baad bhi complete nahi hua.', file.name, statusText);
+            if (onComplete) onComplete(false);
+        };
+
+        xhr.onabort = function () {
+            progressAnimator.stop();
+            reportUploadFailure('The upload was cancelled or the browser aborted the request.', file.name, statusText);
+            if (onComplete) onComplete(false);
+        };
+
+        try {
+            xhr.open('POST', url, true);
+            xhr.send(formData);
+        } catch (error) {
+            if (retryUpload(attempt, error?.message)) return;
+            progressAnimator.stop();
+            reportUploadFailure(error?.message || 'The browser or system did not allow the photo upload to start.', file.name, statusText);
+            if (onComplete) onComplete(false);
         }
-    };
-
-    xhr.onerror = function () {
-        progressAnimator.stop();
-        console.error("Upload error occurred:", xhr.status);
-        reportUploadFailure('Network error or browser/system policy blocked the upload request.', file.name, statusText);
-        if (onComplete) onComplete(false);
-    };
-
-    xhr.ontimeout = function () {
-        progressAnimator.stop();
-        reportUploadFailure('The upload timed out. The internet connection may be slow or blocked.', file.name, statusText);
-        if (onComplete) onComplete(false);
-    };
-
-    xhr.onabort = function () {
-        progressAnimator.stop();
-        reportUploadFailure('The upload was cancelled or the browser aborted the request.', file.name, statusText);
-        if (onComplete) onComplete(false);
-    };
-
-    try {
-        xhr.open('POST', url, true);
-        xhr.send(formData);
-    } catch (error) {
-        progressAnimator.stop();
-        reportUploadFailure(error?.message || 'The browser or system did not allow the photo upload to start.', file.name, statusText);
-        if (onComplete) onComplete(false);
     }
+
+    startUploadAttempt(1);
 }
 
 // Custom message box function (instead of alert)
