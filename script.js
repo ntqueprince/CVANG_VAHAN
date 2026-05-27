@@ -21168,6 +21168,7 @@ window.openQuickLinks = function () {
     let calmAudioBound = false;
     let calmSeekDragging = false;
     let calmRepoDefaultBranch = '';
+    let calmSearchQuery = '';
 
     function formatTime(seconds) {
         if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
@@ -21189,6 +21190,21 @@ window.openQuickLinks = function () {
             .replace(/[_-]+/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
+    }
+
+    function normalizeCalmSearch(value) {
+        return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function getCalmFilteredEntries() {
+        const query = normalizeCalmSearch(calmSearchQuery);
+        return calmTracks
+            .map((track, index) => ({ track, index }))
+            .filter(({ track }) => {
+                if (!query) return true;
+                const haystack = normalizeCalmSearch(`${track.label} ${track.path} ${track.filename}`);
+                return haystack.includes(query);
+            });
     }
 
     function encodeGitHubPath(path) {
@@ -21288,27 +21304,44 @@ window.openQuickLinks = function () {
         const trackList = document.getElementById('calmTrackList');
         const subtitle = document.getElementById('calmListSubtitle');
         const status = document.getElementById('calmStatusMessage');
+        const searchInput = document.getElementById('calmSearchInput');
 
         if (!trackList) return;
         trackList.innerHTML = '';
+        if (searchInput && searchInput.value !== calmSearchQuery) searchInput.value = calmSearchQuery;
 
         if (!calmTracks.length) {
-            if (subtitle) subtitle.textContent = 'No uploaded audio files found';
+            if (subtitle) subtitle.textContent = 'No songs';
             if (status) {
-                status.textContent = 'Abhi koi uploaded audio file nahi mili.';
+                status.textContent = 'No songs found.';
                 status.classList.remove('hidden');
             }
             return;
         }
 
-        if (subtitle) subtitle.textContent = `${calmTracks.length} GitHub audio file(s) ready`;
+        const entries = getCalmFilteredEntries();
+        const hasSearch = !!normalizeCalmSearch(calmSearchQuery);
+        if (subtitle) {
+            subtitle.textContent = hasSearch
+                ? `${entries.length}/${calmTracks.length} songs`
+                : `${calmTracks.length} songs`;
+        }
+
+        if (!entries.length) {
+            if (status) {
+                status.textContent = 'No match.';
+                status.classList.remove('hidden');
+            }
+            return;
+        }
+
         if (status) status.classList.add('hidden');
 
-        calmTracks.forEach((track, index) => {
+        entries.forEach(({ track, index }, visibleIndex) => {
             const item = document.createElement('li');
             item.className = `calm-track-item${index === calmCurrentIndex ? ' active' : ''}`;
             item.innerHTML = `
-                <div class="calm-track-index">${index + 1}</div>
+                <div class="calm-track-index">${visibleIndex + 1}</div>
                 <div class="calm-track-copy">
                     <div class="calm-track-name">${track.label}</div>
                     <div class="calm-track-extra">${track.path}${track.sizeLabel ? ` • ${track.sizeLabel}` : ''}</div>
@@ -21326,10 +21359,10 @@ window.openQuickLinks = function () {
         const status = document.getElementById('calmStatusMessage');
         const subtitle = document.getElementById('calmListSubtitle');
         if (status) {
-            status.textContent = 'GitHub se uploaded audio files fetch ho rahe hain...';
+            status.textContent = 'Loading songs...';
             status.classList.remove('hidden');
         }
-        if (subtitle) subtitle.textContent = 'Loading tracks...';
+        if (subtitle) subtitle.textContent = 'Loading...';
 
         try {
             calmTracks = await getCalmRepoAudioFiles();
@@ -21337,13 +21370,13 @@ window.openQuickLinks = function () {
             renderCalmTracks();
 
             if (!calmTracks.length && status) {
-                status.textContent = 'Repo me abhi koi supported audio file nahi mili.';
+                status.textContent = 'No songs found.';
             }
         } catch (error) {
             console.error('CALM fetch error:', error);
-            if (subtitle) subtitle.textContent = 'Track loading failed';
+            if (subtitle) subtitle.textContent = 'Load failed';
             if (status) {
-                status.textContent = 'GitHub se tracks load nahi ho pa rahe. Thodi der baad refresh karke try karo.';
+                status.textContent = 'Songs load nahi ho pa rahe.';
                 status.classList.remove('hidden');
             }
         }
@@ -21461,12 +21494,26 @@ window.openQuickLinks = function () {
         playTrackAt(index);
     };
 
+    window.setCalmSearch = function (value) {
+        calmSearchQuery = value || '';
+        renderCalmTracks();
+    };
+
+    window.clearCalmSearch = function () {
+        calmSearchQuery = '';
+        const input = document.getElementById('calmSearchInput');
+        if (input) input.value = '';
+        renderCalmTracks();
+    };
+
     window.toggleCalmPlayPause = function () {
         const audio = getCalmAudio();
         if (!audio) return;
         if (!audio.src) {
-            if (calmTracks.length) {
-                window.playCalmTrack(calmCurrentIndex >= 0 ? calmCurrentIndex : 0);
+            const entries = getCalmFilteredEntries();
+            if (entries.length) {
+                const selectedEntry = entries.find((entry) => entry.index === calmCurrentIndex) || entries[0];
+                window.playCalmTrack(selectedEntry.index);
             }
             return;
         }
@@ -21479,26 +21526,36 @@ window.openQuickLinks = function () {
 
     window.prevCalmTrack = function () {
         if (!calmTracks.length) return;
-        if (calmShuffle && calmTracks.length > 1) {
-            let nextIndex = Math.floor(Math.random() * calmTracks.length);
-            while (nextIndex === calmCurrentIndex) nextIndex = Math.floor(Math.random() * calmTracks.length);
+        const entries = getCalmFilteredEntries();
+        if (!entries.length) return;
+        if (calmShuffle && entries.length > 1) {
+            let nextIndex = entries[Math.floor(Math.random() * entries.length)].index;
+            while (nextIndex === calmCurrentIndex) {
+                nextIndex = entries[Math.floor(Math.random() * entries.length)].index;
+            }
             playTrackAt(nextIndex);
             return;
         }
-        const nextIndex = calmCurrentIndex > 0 ? calmCurrentIndex - 1 : calmTracks.length - 1;
-        playTrackAt(nextIndex);
+        const activePosition = entries.findIndex((entry) => entry.index === calmCurrentIndex);
+        const nextEntry = activePosition > 0 ? entries[activePosition - 1] : entries[entries.length - 1];
+        playTrackAt(nextEntry.index);
     };
 
     window.nextCalmTrack = function () {
         if (!calmTracks.length) return;
-        if (calmShuffle && calmTracks.length > 1) {
-            let nextIndex = Math.floor(Math.random() * calmTracks.length);
-            while (nextIndex === calmCurrentIndex) nextIndex = Math.floor(Math.random() * calmTracks.length);
+        const entries = getCalmFilteredEntries();
+        if (!entries.length) return;
+        if (calmShuffle && entries.length > 1) {
+            let nextIndex = entries[Math.floor(Math.random() * entries.length)].index;
+            while (nextIndex === calmCurrentIndex) {
+                nextIndex = entries[Math.floor(Math.random() * entries.length)].index;
+            }
             playTrackAt(nextIndex);
             return;
         }
-        const nextIndex = calmCurrentIndex < calmTracks.length - 1 ? calmCurrentIndex + 1 : 0;
-        playTrackAt(nextIndex);
+        const activePosition = entries.findIndex((entry) => entry.index === calmCurrentIndex);
+        const nextEntry = activePosition >= 0 && activePosition < entries.length - 1 ? entries[activePosition + 1] : entries[0];
+        playTrackAt(nextEntry.index);
     };
 
     window.toggleCalmShuffle = function () {
