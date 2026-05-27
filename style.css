@@ -5920,6 +5920,58 @@ button:hover {
     gap: 12px;
 }
 
+.calm-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(244, 114, 182, 0.16);
+    border-radius: 16px;
+    background: rgba(255, 251, 253, 0.96);
+}
+
+.calm-search-icon {
+    color: #db2777;
+    font-size: 16px;
+    line-height: 1;
+    flex: 0 0 auto;
+}
+
+.calm-search-input {
+    min-width: 0;
+    width: 100%;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #7a123a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.calm-search-input::placeholder {
+    color: rgba(157, 23, 77, 0.55);
+}
+
+.calm-search-clear {
+    width: 28px !important;
+    height: 28px !important;
+    max-width: unset !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: rgba(251, 207, 232, 0.76) !important;
+    color: #9d174d !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
 .calm-progress-block {
     background: rgba(253, 242, 248, 0.95);
     border-radius: 16px;
