@@ -2676,7 +2676,24 @@
                 { text: "vahan query, informed that it's SAOD", tags: "vahan query saod" },
                 { text: "renewal query, since team is not available to cb arranged, tat 24hr", tags: "renewal query team not available cb callback tat 24hr" },
                 { text: "cx don't have kyc docs, asked to wait 24hr", tags: "kyc docs wait 24hr" },
-                { text: "vahan query tat shared", tags: "vahan query tat shared" }
+                { text: "vahan query tat shared", tags: "vahan query tat shared" },
+                { text: "RSA query, number given", tags: "rsa query number given" },
+                { text: "RSA query guided via app", tags: "rsa query app guided" },
+                { text: "RSA query, call has been transferred.", tags: "rsa query call transferred transfer" },
+                { text: "cx want to remove 0 from vehicle number, informed it's insurer format hence it won't impact at the time of claim and cx agreed.", tags: "vehicle number remove 0 insurer format claim agreed cx" },
+                { text: "change ownership to company, case shared, asked to share kyc docs on WP, sf, vi and tat shared.", tags: "change ownership company case kyc wp sf vi tat" },
+                { text: "vahan query already updated.", tags: "vahan query updated already" },
+                { text: "guided for vi and asked to wait 24hr for update.", tags: "vi guided wait 24hr update" },
+                { text: "since insurer not providing policy details to cx but informed that policy updated on vahan but for any complain asked to mail us cx don't want to raise and CPA info also given.", tags: "insurer policy details vahan complain mail cpa cx" },
+                { text: "due to some ad on's/additional coverage cx want to cancel this policy, asked to share alt policy, deduction and tat shared for refund.", tags: "cancel policy ad on additional coverage alt policy deduction tat refund" },
+                { text: "informed that it's comprehensive policy.", tags: "comprehensive policy informed" },
+                { text: "asked to pay sf and wait 24hr for next update.", tags: "sf pay wait 24hr update" },
+                { text: "OT case guide via my account sf, vi and tat shared.", tags: "ot case my account sf vi tat guide" },
+                { text: "name correction guided via my account sf, vi and tat shared.", tags: "name correction my account sf vi tat guided" },
+                { text: "address correction guide via my account sf, vi and tat shared.", tags: "address correction my account sf vi tat guide" },
+                { text: "cx paid but not updated yet on BMS tat 24hr shared.", tags: "paid bms not updated tat 24hr" },
+                { text: "mmv correction guided via my account sf, vi and tat shared.", tags: "mmv correction my account sf vi tat guided" },
+                { text: "cx wanted to take comprehensive policy so want to cancel this policy asked to share alt policy deduction and tat shared for refund.", tags: "comprehensive cancel policy alt policy deduction tat refund cx" }
             ];
 
             function normalize(value) {
@@ -2849,6 +2866,22 @@
                 restore.addEventListener("click", function () { setCollapsed(false); });
                 renderFloatingHelper(doc);
                 input.focus();
+
+                // Expose collapse handler globally on the window
+                var pipWin = doc.defaultView;
+                if (pipWin) {
+                    pipWin.collapseFloatingHelper = setCollapsed;
+
+                    // Collapse when user clicks in the parent window (main tab)
+                    if (window && window.document) {
+                        try {
+                            window.document.addEventListener("mousedown", function () {
+                                if (doc.body.classList.contains("pip-collapsed")) return;
+                                setCollapsed(true);
+                            });
+                        } catch (e) {}
+                    }
+                }
             }
 
             window.openRemarksHelper = function () {
@@ -2881,6 +2914,7 @@
                 mini.classList.add("active");
             };
 
+            window.remarksHelperFloatingWindow = null;
             window.openRemarksHelperFloating = async function () {
                 if ("documentPictureInPicture" in window) {
                     var pipWindow = await window.documentPictureInPicture.requestWindow({
@@ -2889,9 +2923,10 @@
                     });
                     pipWindow.document.title = "Remarks";
                     buildFloatingHelper(pipWindow.document);
+                    window.remarksHelperFloatingWindow = pipWindow;
                     return;
                 }
-                window.open("remarks-helper/index.html?floating=1", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
+                window.remarksHelperFloatingWindow = window.open("remarks-helper/index.html?floating=1", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
             };
 
             function bindRemarksHelper() {
@@ -3011,6 +3046,41 @@
                     resizing = false;
                 });
                 renderRemarksHelper();
+
+                // Close panel when clicking outside (capture phase to avoid stopPropagation issues)
+                document.addEventListener("mousedown", function (event) {
+                    if (panel.classList.contains("active")) {
+                        var mini = document.getElementById("remarksHelperMini");
+                        if (!panel.contains(event.target) && (!mini || !mini.contains(event.target))) {
+                            window.minimizeRemarksHelper();
+                        }
+                    }
+
+                    // Also collapse floating window when clicking outside
+                    var floatingWin = window.remarksHelperFloatingWindow;
+                    if (floatingWin && !floatingWin.closed) {
+                        var isToggleClick = event.target && (
+                            event.target.getAttribute("onclick") === "openRemarksHelperFloating()" ||
+                            event.target.id === "remarksHelperMini" ||
+                            event.target.closest("#remarksHelperPanel")
+                        );
+                        if (!isToggleClick) {
+                            if (floatingWin.collapseFloatingHelper) {
+                                try {
+                                    floatingWin.collapseFloatingHelper(true);
+                                } catch (e) {
+                                    console.warn("Could not collapse floating helper:", e);
+                                }
+                            }
+                        }
+                    }
+                }, true);
+
+                // Close panel when window loses focus (user clicks another window/tab)
+                window.addEventListener("blur", function () {
+                    if (!panel.classList.contains("active")) return;
+                    window.minimizeRemarksHelper();
+                });
             }
 
             if (document.readyState === "loading") {
