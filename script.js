@@ -7970,7 +7970,7 @@ const endorsementData = [
         "TAT": "SRS / 10 Days",
         "Charges / Deduction": "Yes",
         "Inspection": "Yes",
-        "Any Exception": "",
+        "Any Exception": "Inspection not required if RC transfer process has been initiated (From Transfer Date to 14 days).  Note :- This should be valid from RC transfer date and Insurer require RTO receipt to proceed this further.",
         "Declaration format (if declaration required)": "Kindly ask the customer to share below declaration on mail:  \"I certify that I have applied for the transfer of ownership in policy no. __________________ and there is no known or reported loss till date. I certify that the above facts are true to the best of my knowledge and if found false, I am liable for it and Insurer has the right to cancel the policy without any refund.\""
     },
     {
@@ -11386,11 +11386,11 @@ const endorsementData = [
         "Insurer": "TATA AIG",
         "Requirement": "Post Issuance Cancellation",
         "Endorsement type": "",
-        "Documents or any other requirement": "Alternate policy and Written consent from Customer",
+        "Documents or any other requirement": "If Policy period has not started: Only customer request (Alternate policy not required)  If policy period has started: Alternate policy and Written consent from Customer  SAOD policy cancellation: Only customer request (even if policy period has started, alternate policy not required)",
         "TAT": "SRS / 10 Days",
-        "Charges / Deduction": "Yes",
+        "Charges / Deduction": "Full refund (If policy has not started) Deductions (if policy period has started)",
         "Inspection": "No",
-        "Any Exception": "",
+        "Any Exception": "The request must be raised on WeCare before the policy start date with customer consent in order to process the cancellation without alternate",
         "Declaration format (if declaration required)": ""
     },
     {
