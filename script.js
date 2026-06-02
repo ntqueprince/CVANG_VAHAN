@@ -12729,14 +12729,25 @@ requirementDropdown.addEventListener("change", () => {
         d => d["Insurer"] === ins && d["Requirement"] === req
     );
     if (record) {
+        const checklistItems = [
+            ["Endorsement Type:", record["Endorsement type"]],
+            ["Documents Required:", record["Documents or any other requirement"]],
+            ["TAT:", record["TAT"]],
+            ["Charges/Deduction:", record["Charges / Deduction"]],
+            ["Inspection:", record["Inspection"]],
+            ["Exception:", record["Any Exception"]],
+            ["Declaration Format:", record["Declaration format (if declaration required)"]],
+            ["Keep endorsement and policy copy together:", ""]
+        ];
         outputBox.innerHTML = `
-            <div><span class="label">Endorsement Type:</span><span class="value">${record["Endorsement type"]}</span></div>
-            <div><span class="label">Documents Required:</span><span class="value">${record["Documents or any other requirement"]}</span></div>
-            <div><span class="label">TAT:</span><span class="value">${record["TAT"]}</span></div>
-            <div><span class="label">Charges/Deduction:</span><span class="value">${record["Charges / Deduction"]}</span></div>
-            <div><span class="label">Inspection:</span><span class="value">${record["Inspection"]}</span></div>
-            <div><span class="label">Exception:</span><span class="value">${record["Any Exception"]}</span></div>
-            <div><span class="label">Declaration Format:</span><span class="value">${record["Declaration format (if declaration required)"]}</span></div>
+            ${checklistItems.map(([label, value], index) => `
+                <label class="endorsement-check-row ${label.includes("Keep endorsement") ? "endorsement-reminder-row" : ""}">
+                    <input class="endorsement-check" type="checkbox" aria-label="${label} checked" data-check-index="${index}">
+                    <span class="endorsement-check-content">
+                        <span class="label">${label}</span><span class="value">${value || ""}</span>
+                    </span>
+                </label>
+            `).join("")}
           `;
         if (record["Endorsement type"].toLowerCase() === "not possible") {
             outputBox.classList.add("output-red");
