@@ -926,8 +926,52 @@ button:hover {
     border: 1px solid #f5c6cb;
 }
 
-.output div {
+.output div,
+.output .endorsement-check-row {
     margin-bottom: 8px;
+}
+
+.output .endorsement-check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.output .endorsement-check-row:last-child {
+    margin-bottom: 0;
+}
+
+.endorsement-check {
+    width: 18px;
+    height: 18px;
+    margin-top: 5px;
+    flex: 0 0 auto;
+    accent-color: #1565c0;
+    cursor: pointer;
+}
+
+.endorsement-check-content {
+    flex: 1;
+}
+
+.endorsement-check:checked+.endorsement-check-content {
+    opacity: 0.62;
+    text-decoration: line-through;
+}
+
+.output .endorsement-reminder-row .endorsement-check {
+    accent-color: #d32f2f;
+}
+
+.output .endorsement-reminder-row .label,
+.output .endorsement-reminder-row .value {
+    color: #d32f2f;
+    font-weight: 800;
 }
 
 .label {
