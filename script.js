@@ -14101,7 +14101,7 @@ window.openPBWheelsScript = function () {
 
 // Company lists for 2W and 4W
 const covCompanyLists = {
-    "2W": ["TATA", "SBI", "HDFC", "RSA", "ITGI (Iffco)", "Reliance", "SriRam", "USGI (Sompo)"],
+    "2W": ["SBI", "HDFC", "RSA", "ITGI (Iffco)", "Reliance", "SriRam", "USGI (Sompo)"],
     "4W": ["SBI", "HDFC", "RSA", "ITGI (Iffco)", "USGI (Sompo)"]
 };
 
