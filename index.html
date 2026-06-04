@@ -2702,7 +2702,17 @@
                 { text: "vi approved, asked to wait 24hr for update.", tags: "vi approved wait 24hr update" },
                 { text: "ZD query, informed that included.", tags: "zd zero depreciation query included" },
                 { text: "OT case but cx just want to renew policy with new owner details, call has been transferred to sales.", tags: "ot case renew policy new owner owner details sales transfer" },
-                { text: "tat shared for refund and call has been transferred to sales for new policy.", tags: "tat refund sales new policy call transferred transfer" }
+                { text: "tat shared for refund and call has been transferred to sales for new policy.", tags: "tat refund sales new policy call transferred transfer" },
+                { text: "cx want to add ZD, asked to mail us but cx disconnected the call while checking details and due to call flow unable to cb.", tags: "zd zero depreciation add mail disconnected checking details call flow cb callback" },
+                { text: "tat shared for excess refund.", tags: "excess refund tat shared" },
+                { text: "due to 2 ZD claims cx want to cancel this policy, asked to share alt policy deduction and tat shared for refund.", tags: "2 zd claim zero depreciation cancel policy alt policy deduction refund tat" },
+                { text: "cx don't have kyc docs, tat shared for refund.", tags: "kyc docs documents refund tat shared" },
+                { text: "cx need manual vi, raised and tat shared.", tags: "manual vi raised tat shared" },
+                { text: "informed that CPA is compulsory and separate premium is charged for CPA, cx agreed.", tags: "cpa compulsory separate premium agreed informed" },
+                { text: "asked to make vi, tat 24hr for next update.", tags: "make vi tat 24hr next update" },
+                { text: "cx called for renewal since team is not available so number given.", tags: "renewal team not available number given" },
+                { text: "cx called for claim since team is not available so number given.", tags: "claim team not available number given" },
+                { text: "informed that cx cannot download endts from app/website but can download from mail.", tags: "endts endorsement download app website mail informed" }
             ];
 
             function normalize(value) {
@@ -2713,16 +2723,16 @@
                 var q = normalize(query);
                 if (!q) return 1;
                 var text = normalize(remark.text);
-                var tags = normalize(remark.tags);
-                var haystack = text + " " + tags;
+                var textWords = text.split(" ").filter(Boolean);
                 var words = q.split(" ").filter(Boolean);
+                if (!words.every(function (word) {
+                    return textWords.some(function (textWord) { return textWord.indexOf(word) === 0; });
+                })) return 0;
                 var score = 0;
                 if (text.indexOf(q) !== -1) score += 80;
-                if (tags.indexOf(q) !== -1) score += 100;
                 words.forEach(function (word) {
-                    if (tags.split(" ").indexOf(word) !== -1) score += 45;
-                    if (text.split(" ").indexOf(word) !== -1) score += 35;
-                    if (haystack.indexOf(word) !== -1) score += 15;
+                    if (textWords.indexOf(word) !== -1) score += 35;
+                    if (textWords.some(function (textWord) { return textWord.indexOf(word) === 0; })) score += 15;
                 });
                 return score;
             }
