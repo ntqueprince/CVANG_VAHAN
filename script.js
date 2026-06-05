@@ -12729,6 +12729,7 @@ requirementDropdown.addEventListener("change", () => {
         d => d["Insurer"] === ins && d["Requirement"] === req
     );
     if (record) {
+        const hidePolicyCopyReminder = req.includes("Post Issuance Cancellation") || req === "M-Parivahan";
         const checklistItems = [
             ["Endorsement Type:", record["Endorsement type"]],
             ["Documents Required:", record["Documents or any other requirement"]],
@@ -12736,9 +12737,14 @@ requirementDropdown.addEventListener("change", () => {
             ["Charges/Deduction:", record["Charges / Deduction"]],
             ["Inspection:", record["Inspection"]],
             ["Exception:", record["Any Exception"]],
-            ["Declaration Format:", record["Declaration format (if declaration required)"]],
-            ["Keep endorsement and policy copy together:", ""]
+            ["Declaration Format:", record["Declaration format (if declaration required)"]]
         ];
+        if (!hidePolicyCopyReminder) {
+            checklistItems.push(["Keep endorsement and policy copy together:", ""]);
+        }
+        if (req.includes("Post Issuance Cancellation")) {
+            checklistItems.unshift(["claim confirmation", ""]);
+        }
         outputBox.innerHTML = `
             ${checklistItems.map(([label, value], index) => `
                 <label class="endorsement-check-row ${label.includes("Keep endorsement") ? "endorsement-reminder-row" : ""}">
