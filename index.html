@@ -2630,7 +2630,17 @@
         </div>
         <div class="remarks-helper-search">
             <input id="remarksHelperInput" type="search" autocomplete="off" />
+            <button type="button" id="remarksTicketToggle" class="remarks-helper-icon-button" title="Ticket remark" aria-label="Ticket remark">🎫</button>
             <button type="button" id="remarksHelperClear">Clear</button>
+        </div>
+        <div class="remarks-helper-template">
+            <div class="remarks-helper-template-inputs">
+                <input id="remarksTicketInput" type="text" autocomplete="off" placeholder="Ticket ID" aria-label="Ticket ID" />
+                <input id="remarksTatInput" type="text" autocomplete="off" placeholder="TAT / Date" aria-label="TAT date" />
+            </div>
+            <button type="button" id="remarksTatOutput" class="remarks-helper-template-output">
+                Fill Ticket ID and TAT to generate remark
+            </button>
         </div>
         <div id="remarksHelperResults" class="remarks-helper-results"></div>
         <div class="remarks-helper-resize remarks-helper-resize-n" data-rh-resize="n"></div>
@@ -2720,7 +2730,14 @@
                 { text: "VAS query, sent and info given.", tags: "vas query sent info given" },
                 { text: "cx got mail from insurer that incorrect NCB, asked share with us if endts required then process sf, vi and tat shared.", tags: "incorrect ncb insurer mail endts sf vi tat" },
                 { text: "asked to share pahechan id and share ss, tat 24hr.", tags: "pahechan id ss screenshot tat 24hr" },
-                { text: "informed that since pyp got expired therefore policy is going to be start after 3days.", tags: "pyp expired policy start 3days" }
+                { text: "informed that since pyp got expired therefore policy is going to be start after 3days.", tags: "pyp expired policy start 3days" },
+                { text: "asked to share declaration on mail, tat 24hr.", tags: "declaration mail tat 24hr" },
+                { text: "informed that nominee endts already requested and tat shared.", tags: "nominee endts already requested tat shared" },
+                { text: "PB9157040702///asked to wait till>>16 June 2026 for next update.", tags: "ticket pb9157040702 wait till 16 june 2026 next update" },
+                { text: "address correction, shared endts.", tags: "address correction shared endts" },
+                { text: "informed that need to login from registered mobile number to get details.", tags: "login registered mobile number details" },
+                { text: "asked to complete kyc, tat 24hr.", tags: "complete kyc tat 24hr" },
+                { text: "info given about POI, cx agreed.", tags: "poi info given cx agreed" }
             ];
 
             function normalize(value) {
@@ -2780,6 +2797,125 @@
                 });
             }
 
+            function normalizeTicketId(value) {
+                return String(value || "").trim().toUpperCase();
+            }
+
+            function formatTatDate(value) {
+                var raw = String(value || "").trim();
+                if (!raw) return "";
+                var monthNames = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                var monthMap = {
+                    jan: 0, january: 0,
+                    feb: 1, february: 1,
+                    mar: 2, march: 2,
+                    apr: 3, april: 3,
+                    may: 4,
+                    jun: 5, june: 5,
+                    jul: 6, july: 6,
+                    aug: 7, august: 7,
+                    sep: 8, sept: 8, september: 8,
+                    oct: 9, october: 9,
+                    nov: 10, november: 10,
+                    dec: 11, december: 11
+                };
+                var cleaned = raw.replace(/,/g, " ").replace(/\s+/g, " ").trim();
+                var parts = cleaned.split(/[\s./-]+/).filter(Boolean);
+                var day = 0;
+                var month = -1;
+                var year = 0;
+
+                if (parts.length >= 3) {
+                    var first = parts[0].toLowerCase();
+                    var second = parts[1].toLowerCase();
+                    if (monthMap[first] != null) {
+                        month = monthMap[first];
+                        day = parseInt(parts[1], 10);
+                        year = parseInt(parts[2], 10);
+                    } else if (monthMap[second] != null) {
+                        day = parseInt(parts[0], 10);
+                        month = monthMap[second];
+                        year = parseInt(parts[2], 10);
+                    } else if (/^\d{4}$/.test(parts[0])) {
+                        year = parseInt(parts[0], 10);
+                        month = parseInt(parts[1], 10) - 1;
+                        day = parseInt(parts[2], 10);
+                    } else {
+                        day = parseInt(parts[0], 10);
+                        month = parseInt(parts[1], 10) - 1;
+                        year = parseInt(parts[2], 10);
+                    }
+                }
+
+                if (year > 0 && year < 100) year += 2000;
+                if (!day || month < 0 || month > 11 || !year) return cleaned;
+                var date = new Date(year, month, day);
+                if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) return cleaned;
+                return day + " " + monthNames[month] + " " + year;
+            }
+
+            function buildTicketTatRemark(ticketId, tatDate) {
+                var ticket = normalizeTicketId(ticketId);
+                var tat = formatTatDate(tatDate);
+                if (!ticket || !tat) return "";
+                return ticket + "///asked to wait till>>" + tat + " for next update.";
+            }
+
+            function bindTicketTatTemplate(options) {
+                var doc = options.doc || document;
+                var ticketInput = doc.getElementById(options.ticketId);
+                var tatInput = doc.getElementById(options.tatId);
+                var output = doc.getElementById(options.outputId);
+                if (!ticketInput || !tatInput || !output) return;
+
+                function updateTemplate() {
+                    var remark = buildTicketTatRemark(ticketInput.value, tatInput.value);
+                    output.textContent = remark || "Fill Ticket ID and TAT to generate remark";
+                    output.disabled = !remark;
+                    output.classList.toggle("ready", !!remark);
+                    return remark;
+                }
+
+                function copyTemplate() {
+                    var remark = updateTemplate();
+                    if (!remark) {
+                        ticketInput.focus();
+                        return;
+                    }
+                    copyRemark(remark, output);
+                }
+
+                ticketInput.addEventListener("input", updateTemplate);
+                tatInput.addEventListener("input", updateTemplate);
+                ticketInput.addEventListener("keydown", function (event) {
+                    if (event.key !== "Enter") return;
+                    event.preventDefault();
+                    tatInput.focus();
+                });
+                tatInput.addEventListener("keydown", function (event) {
+                    if (event.key !== "Enter") return;
+                    event.preventDefault();
+                    copyTemplate();
+                });
+                output.addEventListener("click", copyTemplate);
+                updateTemplate();
+            }
+
+            function setTicketTemplateMode(doc, active) {
+                var panel = doc.getElementById("remarksHelperPanel") || doc.body;
+                var searchInput = doc.getElementById("remarksHelperInput") || doc.getElementById("pipRemarksInput");
+                var ticketInput = doc.getElementById("remarksTicketInput") || doc.getElementById("pipTicketInput");
+                panel.classList.toggle("ticket-mode", active);
+                if (active && ticketInput) {
+                    window.setTimeout(function () { ticketInput.focus(); }, 0);
+                } else if (searchInput) {
+                    window.setTimeout(function () { searchInput.focus(); }, 0);
+                }
+            }
+
             function renderRemarksHelper() {
                 var input = document.getElementById("remarksHelperInput");
                 var results = document.getElementById("remarksHelperResults");
@@ -2824,16 +2960,12 @@
             function buildFloatingHelper(doc) {
                 var expandedSize = { width: 420, height: 620 };
                 var collapsedSize = { width: 150, height: 78 };
-                function resizePip(size) {
-                    try {
-                        doc.defaultView.resizeTo(size.width, size.height);
-                    } catch (error) {
-                        // Some picture-in-picture windows ignore resize requests.
-                    }
-                }
                 function setCollapsed(collapsed) {
                     doc.body.classList.toggle("pip-collapsed", collapsed);
-                    resizePip(collapsed ? collapsedSize : expandedSize);
+                    try {
+                        var sz = collapsed ? collapsedSize : expandedSize;
+                        doc.defaultView.resizeTo(sz.width, sz.height);
+                    } catch (e) {}
                     if (collapsed) {
                         doc.getElementById("pipRestore").focus();
                     } else {
@@ -2844,8 +2976,16 @@
                     '<div class="pip-shell">',
                     '<div class="pip-search">',
                     '<input id="pipRemarksInput" type="search" autocomplete="off" />',
-                    '<button id="pipRemarksClear" type="button">Clear</button>',
                     '<button id="pipHide" type="button">Hide</button>',
+                    '<button id="pipRemarksClear" type="button">Clear</button>',
+                    '<button id="pipTicketToggle" class="pip-icon-button" type="button" title="Ticket remark" aria-label="Ticket remark">🎫</button>',
+                    '</div>',
+                    '<div class="pip-template">',
+                    '<div class="pip-template-inputs">',
+                    '<input id="pipTicketInput" type="text" autocomplete="off" placeholder="Ticket ID" aria-label="Ticket ID" />',
+                    '<input id="pipTatInput" type="text" autocomplete="off" placeholder="TAT / Date" aria-label="TAT date" />',
+                    '</div>',
+                    '<button id="pipTatOutput" class="pip-template-output" type="button">Fill Ticket ID and TAT to generate remark</button>',
                     '</div>',
                     '<div id="pipRemarksResults" class="pip-results"></div>',
                     '</div>',
@@ -2856,26 +2996,50 @@
                     '*{box-sizing:border-box}',
                     'body{margin:0;background:#fff;font-family:Poppins,Arial,sans-serif;color:#111827}',
                     '.pip-shell{height:100vh;display:flex;flex-direction:column;background:#fff}',
-                    '.pip-search{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:12px;border-bottom:1px solid #d9deea;background:#f8fafc}',
+                    '.pip-search{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;padding:12px;border-bottom:1px solid #d9deea;background:#f8fafc}',
                     '.pip-search input{height:42px;border:1px solid #b9c2d2;border-radius:7px;padding:0 14px;font-size:16px;outline:none}',
                     '.pip-search input:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.16)}',
                     '.pip-search button{height:42px;border:1px solid #b9c2d2;border-radius:7px;background:#fff;padding:0 14px;font-weight:800;cursor:pointer}',
+                    '.pip-icon-button{min-width:46px;font-size:20px;line-height:1;transition:background .2s,border-color .2s,color .2s}',
+                    'body.ticket-mode .pip-icon-button{background:#0f766e;border-color:#0f766e;color:#fff}',
                     '#pipHide,#pipRestore{border-color:#0f766e;background:#0f766e;color:#fff}',
                     '#pipHide:hover,#pipRestore:hover{background:#0b5f59}',
                     '#pipRestore{display:none;width:100%;min-height:46px;border:1px solid #0f766e;border-radius:7px;font-size:15px;font-weight:800;cursor:pointer}',
+                    '.pip-template{display:none;gap:8px;padding:10px 12px;border-bottom:1px solid #d9deea;background:#f1f5f9}',
+                    '.pip-template-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}',
+                    '.pip-template input{height:38px;border:1px solid #b9c2d2;border-radius:7px;padding:0 10px;font-size:14px;outline:none}',
+                    '.pip-template input:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.14)}',
+                    '.pip-template-output{width:100%;min-height:46px;border:1px solid #b9c2d2;border-radius:8px;background:#fff;padding:10px;text-align:left;font-size:14px;line-height:1.3;font-weight:700;color:#475569;cursor:pointer;overflow-wrap:anywhere}',
+                    '.pip-template-output:disabled{cursor:default}',
+                    '.pip-template-output.ready{border-color:#0f766e;color:#111827}',
+                    '.pip-template-output.ready:hover,.pip-template-output.ready:focus{box-shadow:0 0 0 3px rgba(15,118,110,.14);outline:none}',
+                    '.pip-template-output.copied{border-color:#0f766e;background:#ecfdf5}',
                     '.pip-results{display:grid;gap:8px;padding:10px;overflow:auto}',
                     '.pip-remark-card{width:100%;min-height:56px;border:1px solid #b9c2d2;border-radius:8px;background:#fff;padding:12px;text-align:left;font-size:16px;line-height:1.35;cursor:pointer}',
                     '.pip-remark-card:hover,.pip-remark-card:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.14);outline:none}',
                     '.pip-remark-card.copied{border-color:#0f766e;background:#ecfdf5}',
+                    'body.ticket-mode .pip-template{display:grid}',
+                    'body.ticket-mode .pip-results{display:none}',
+                    'body.ticket-mode #pipRemarksInput,body.ticket-mode #pipRemarksClear{display:none}',
                     'body.pip-collapsed{min-height:0;overflow:hidden;background:transparent;padding:8px}',
                     'body.pip-collapsed .pip-shell{display:none}',
                     'body.pip-collapsed #pipRestore{display:block}'
                 ].join("");
                 doc.head.appendChild(style);
                 var input = doc.getElementById("pipRemarksInput");
+                var ticketToggle = doc.getElementById("pipTicketToggle");
                 var clear = doc.getElementById("pipRemarksClear");
                 var hide = doc.getElementById("pipHide");
                 var restore = doc.getElementById("pipRestore");
+                
+                // Expose collapse handler globally on the window
+                var pipWin = doc.defaultView;
+                if (pipWin) {
+                    pipWin.collapseFloatingHelper = setCollapsed;
+
+                    // No automatic close/collapse on blur/mousedown requested
+                }
+
                 input.addEventListener("input", function () { renderFloatingHelper(doc); });
                 input.addEventListener("keydown", function (event) {
                     if (event.key !== "Enter") return;
@@ -2889,26 +3053,20 @@
                     renderFloatingHelper(doc);
                     input.focus();
                 });
+                ticketToggle.addEventListener("click", function () {
+                    setTicketTemplateMode(doc, !doc.body.classList.contains("ticket-mode"));
+                });
                 hide.addEventListener("click", function () { setCollapsed(true); });
+
                 restore.addEventListener("click", function () { setCollapsed(false); });
+                bindTicketTatTemplate({
+                    doc: doc,
+                    ticketId: "pipTicketInput",
+                    tatId: "pipTatInput",
+                    outputId: "pipTatOutput"
+                });
                 renderFloatingHelper(doc);
                 input.focus();
-
-                // Expose collapse handler globally on the window
-                var pipWin = doc.defaultView;
-                if (pipWin) {
-                    pipWin.collapseFloatingHelper = setCollapsed;
-
-                    // Collapse when user clicks in the parent window (main tab)
-                    if (window && window.document) {
-                        try {
-                            window.document.addEventListener("mousedown", function () {
-                                if (doc.body.classList.contains("pip-collapsed")) return;
-                                setCollapsed(true);
-                            });
-                        } catch (e) {}
-                    }
-                }
             }
 
             window.openRemarksHelper = function () {
@@ -2943,26 +3101,62 @@
 
             window.remarksHelperFloatingWindow = null;
             window.openRemarksHelperFloating = async function () {
+                var panel = document.getElementById("remarksHelperPanel");
+                var mini = document.getElementById("remarksHelperMini");
                 if ("documentPictureInPicture" in window) {
-                    var pipWindow = await window.documentPictureInPicture.requestWindow({
-                        width: 420,
-                        height: 620
-                    });
-                    pipWindow.document.title = "Remarks";
-                    buildFloatingHelper(pipWindow.document);
-                    window.remarksHelperFloatingWindow = pipWindow;
-                    return;
+                    try {
+                        var pipWindow = await window.documentPictureInPicture.requestWindow({
+                            width: 420,
+                            height: 620
+                        });
+                        pipWindow.document.title = "Remarks";
+                        buildFloatingHelper(pipWindow.document);
+                        window.remarksHelperFloatingWindow = pipWindow;
+
+                        // Minimize parent helper since we are now in PIP mode
+                        if (panel) {
+                            panel.classList.remove("active");
+                            panel.setAttribute("aria-hidden", "true");
+                        }
+                        if (mini) {
+                            mini.classList.remove("active");
+                        }
+
+                        // When PIP window is closed (by user or programmatically), restore the parent mini button
+                        pipWindow.addEventListener("pagehide", function () {
+                            var m = document.getElementById("remarksHelperMini");
+                            if (m) m.classList.add("active");
+                        });
+                        return;
+                    } catch (e) {
+                        console.error("Failed to open Document PiP:", e);
+                    }
                 }
-                window.remarksHelperFloatingWindow = window.open("remarks-helper/index.html?floating=1", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
+                var popup = window.open("remarks-helper/index.html?floating=1", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
+                window.remarksHelperFloatingWindow = popup;
+                if (popup) {
+                    if (panel) {
+                        panel.classList.remove("active");
+                        panel.setAttribute("aria-hidden", "true");
+                    }
+                    if (mini) {
+                        mini.classList.remove("active");
+                    }
+                    popup.addEventListener("pagehide", function () {
+                        var m = document.getElementById("remarksHelperMini");
+                        if (m) m.classList.add("active");
+                    });
+                }
             };
 
             function bindRemarksHelper() {
                 var input = document.getElementById("remarksHelperInput");
                 var clear = document.getElementById("remarksHelperClear");
+                var ticketToggle = document.getElementById("remarksTicketToggle");
                 var panel = document.getElementById("remarksHelperPanel");
                 var dragHandle = document.getElementById("remarksHelperDrag");
                 var resizeHandles = panel.querySelectorAll("[data-rh-resize]");
-                if (!input || !clear || !panel || !dragHandle || !resizeHandles.length || panel.dataset.bound === "true") return;
+                if (!input || !clear || !ticketToggle || !panel || !dragHandle || !resizeHandles.length || panel.dataset.bound === "true") return;
                 panel.dataset.bound = "true";
 
                 input.addEventListener("input", renderRemarksHelper);
@@ -2977,6 +3171,14 @@
                     input.value = "";
                     renderRemarksHelper();
                     input.focus();
+                });
+                ticketToggle.addEventListener("click", function () {
+                    setTicketTemplateMode(document, !panel.classList.contains("ticket-mode"));
+                });
+                bindTicketTatTemplate({
+                    ticketId: "remarksTicketInput",
+                    tatId: "remarksTatInput",
+                    outputId: "remarksTatOutput"
                 });
 
                 var dragging = false;
@@ -3083,24 +3285,7 @@
                         }
                     }
 
-                    // Also collapse floating window when clicking outside
-                    var floatingWin = window.remarksHelperFloatingWindow;
-                    if (floatingWin && !floatingWin.closed) {
-                        var isToggleClick = event.target && (
-                            event.target.getAttribute("onclick") === "openRemarksHelperFloating()" ||
-                            event.target.id === "remarksHelperMini" ||
-                            event.target.closest("#remarksHelperPanel")
-                        );
-                        if (!isToggleClick) {
-                            if (floatingWin.collapseFloatingHelper) {
-                                try {
-                                    floatingWin.collapseFloatingHelper(true);
-                                } catch (e) {
-                                    console.warn("Could not collapse floating helper:", e);
-                                }
-                            }
-                        }
-                    }
+
                 }, true);
 
                 // Close panel when window loses focus (user clicks another window/tab)
