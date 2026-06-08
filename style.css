@@ -6577,7 +6577,7 @@ body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
 
 .remarks-helper-search {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     gap: 10px;
     padding: 12px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.28);
@@ -6616,6 +6616,99 @@ body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
 .remarks-helper-search button:hover {
     border-color: #0f766e;
     background: #d9f3ef;
+}
+
+.remarks-helper-icon-button {
+    min-width: 46px;
+    font-size: 20px;
+    line-height: 1;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.remarks-helper-panel.ticket-mode .remarks-helper-icon-button {
+    background: #0f766e;
+    border-color: #0f766e;
+    color: #fff;
+}
+
+.remarks-helper-template {
+    display: none;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    background: #f1f5f9;
+}
+
+.remarks-helper-template-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.remarks-helper-template input {
+    width: 100%;
+    height: 38px;
+    padding: 0 10px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 7px;
+    outline: none;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+}
+
+.remarks-helper-template input:focus {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+
+.remarks-helper-template-output {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 8px;
+    background: #ffffff;
+    color: #475569;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.remarks-helper-template-output:disabled {
+    cursor: default;
+}
+
+.remarks-helper-template-output.ready {
+    border-color: #0f766e;
+    color: #111827;
+}
+
+.remarks-helper-template-output.ready:hover,
+.remarks-helper-template-output.ready:focus {
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    outline: none;
+}
+
+.remarks-helper-template-output.copied {
+    border-color: #0f766e;
+    background: #ecfdf5;
+}
+
+.remarks-helper-panel.ticket-mode .remarks-helper-template {
+    display: grid;
+}
+
+.remarks-helper-panel.ticket-mode .remarks-helper-results {
+    display: none;
+}
+
+.remarks-helper-panel.ticket-mode #remarksHelperInput,
+.remarks-helper-panel.ticket-mode #remarksHelperClear {
+    display: none;
 }
 
 .remarks-helper-results {
