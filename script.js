@@ -12690,6 +12690,7 @@ const endorsementData = [
         "Declaration format (if declaration required)": ""
     }
 ];
+
 // Populate insurer dropdown for Endorsement
 try {
     const insurers = [...new Set(endorsementData.map(d => d["Insurer"]))].sort();
@@ -12722,6 +12723,115 @@ insurerDropdown.addEventListener("change", () => {
 });
 
 // Handle requirement selection for endorsement
+function escapeEndorsementHtml(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+const defaultEndorsementFormatRule = {
+    plain: false,
+    markers: [
+        "For Non Brand New Car -",
+        "For Brand New Car -",
+        "1. Before policy starts -",
+        "2. After Policy Start Date (Undelivered Vehicles) -",
+        "*ODO meter up to 50 km -",
+        "*ODO meter 51-100 km -",
+        "*ODO meter over 100 km -",
+        "Non brand New Car:",
+        "SAOD policy cancellation:",
+        "TP cancellation:"
+    ]
+};
+
+// Special point rules: old Excel-to-JSON process same rakho; sirf tricky cases yahan add karo.
+// Key format: "Insurer|Requirement", then label name like "Documents Required:" or "Exception:".
+const endorsementFormatRules = {
+    "United|Post Issuance Cancellation": {
+        "Documents Required:": {
+            markers: [
+                "For Non Brand New Car -",
+                "For Brand New Car -",
+                "1. Before policy starts -",
+                "2. After Policy Start Date (Undelivered Vehicles) -",
+                "*ODO meter up to 50 km -",
+                "*ODO meter 51-100 km -",
+                "*ODO meter over 100 km -"
+            ]
+        },
+        "Exception:": {
+            markers: [
+                "Non brand New Car:",
+                "SAOD policy cancellation:",
+                "TP cancellation:"
+            ]
+        },
+        // Agar exact custom points chahiye ho, markers ke badle points use kar sakte ho:
+        // "Exception:": { points: ["Point 1", "Point 2", "* Sub point"] },
+        "Declaration Format:": {
+            plain: true
+        }
+    }
+};
+
+function getEndorsementFormatRule(record, label) {
+    if (label === "Declaration Format:") return { plain: true, markers: [] };
+
+    const ruleKey = `${record?.["Insurer"] || ""}|${record?.["Requirement"] || ""}`;
+    const specialRule = endorsementFormatRules[ruleKey]?.[label];
+    if (specialRule) {
+        return {
+            ...defaultEndorsementFormatRule,
+            ...specialRule
+        };
+    }
+
+    return defaultEndorsementFormatRule;
+}
+
+function renderEndorsementPointLines(lines) {
+    return `<span class="endorsement-formatted-value">
+        ${lines.map((line, lineIndex) => {
+            const isSubPoint = line.startsWith("*");
+            const isNumberedPoint = /^\d+\./.test(line);
+            const displayLine = isSubPoint
+                ? line.replace(/^\*/, "* ")
+                : isNumberedPoint
+                    ? line
+                    : `* ${line}`;
+            return `<span class="endorsement-formatted-line ${isSubPoint ? "endorsement-sub-point" : ""}" data-point-index="${lineIndex % 4}">${escapeEndorsementHtml(displayLine)}</span>`;
+        }).join("")}
+    </span>`;
+}
+
+function getFormattedEndorsementValue(value, label, record) {
+    const text = String(value || "").replace(/\s+/g, " ").trim();
+    if (!text) return "";
+    const rule = getEndorsementFormatRule(record, label);
+    if (rule.plain) return escapeEndorsementHtml(text);
+    if (Array.isArray(rule.points) && rule.points.length) {
+        return renderEndorsementPointLines(rule.points.map(point => String(point || "").trim()).filter(Boolean));
+    }
+
+    let formatted = text;
+    (rule.markers || []).forEach(marker => {
+        formatted = formatted.replaceAll(marker, `\n${marker}`);
+    });
+
+    const lines = formatted
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+    if (lines.length <= 1) return escapeEndorsementHtml(text);
+
+    return renderEndorsementPointLines(lines);
+}
+
 requirementDropdown.addEventListener("change", () => {
     const ins = insurerDropdown.value;
     const req = requirementDropdown.value;
@@ -12750,7 +12860,7 @@ requirementDropdown.addEventListener("change", () => {
                 <label class="endorsement-check-row ${label.includes("Keep endorsement") ? "endorsement-reminder-row" : ""}">
                     <input class="endorsement-check" type="checkbox" aria-label="${label} checked" data-check-index="${index}">
                     <span class="endorsement-check-content">
-                        <span class="label">${label}</span><span class="value">${value || ""}</span>
+                        <span class="label">${escapeEndorsementHtml(label)}</span><span class="value">${getFormattedEndorsementValue(value, label, record)}</span>
                     </span>
                 </label>
             `).join("")}
