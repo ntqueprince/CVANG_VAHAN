@@ -960,6 +960,8 @@ window.openCSATModal = function () {
     if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
     const rsaContactPage = document.getElementById('rsaContactPage');
     if (rsaContactPage) rsaContactPage.style.display = 'none';
+    const insurerWisePlanPage = document.getElementById('insurerWisePlanPage');
+    if (insurerWisePlanPage) insurerWisePlanPage.style.display = 'none';
     calculateCSAT();
 };
 
@@ -1058,6 +1060,8 @@ window.openEndorsementPage = function () {
     if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
     const rsaContactPage = document.getElementById('rsaContactPage');
     if (rsaContactPage) rsaContactPage.style.display = 'none';
+    const insurerWisePlanPage = document.getElementById('insurerWisePlanPage');
+    if (insurerWisePlanPage) insurerWisePlanPage.style.display = 'none';
 };
 
 window.closeEndorsementPage = function () {
@@ -1100,6 +1104,8 @@ window.openManualVIPage = function () {
     if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
     const rsaContactPage = document.getElementById('rsaContactPage');
     if (rsaContactPage) rsaContactPage.style.display = 'none';
+    const insurerWisePlanPage = document.getElementById('insurerWisePlanPage');
+    if (insurerWisePlanPage) insurerWisePlanPage.style.display = 'none';
 };
 
 window.closeManualVIPage = function () {
@@ -1169,6 +1175,8 @@ window.openClaimCountNSTPPage = function () {
     if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
     const rsaContactPage = document.getElementById('rsaContactPage');
     if (rsaContactPage) rsaContactPage.style.display = 'none';
+    const insurerWisePlanPage = document.getElementById('insurerWisePlanPage');
+    if (insurerWisePlanPage) insurerWisePlanPage.style.display = 'none';
     // Populate the table when the page is opened
     populateTable(insuranceData);
     // Re-apply sort/search listeners as content is dynamic
@@ -1209,6 +1217,8 @@ window.openInspectionWaiverPage = function () {
     if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
     const rsaContactPage = document.getElementById('rsaContactPage');
     if (rsaContactPage) rsaContactPage.style.display = 'none';
+    const insurerWisePlanPage = document.getElementById('insurerWisePlanPage');
+    if (insurerWisePlanPage) insurerWisePlanPage.style.display = 'none';
     // Add a small delay to ensure the page is fully rendered before populating
     setTimeout(() => {
         populateInspectionWaiverTable(inspectionWaiverData);
@@ -1247,6 +1257,8 @@ window.openRSAPage = function () {
     if (claimCountNSTPPage) claimCountNSTPPage.style.display = 'none';
     const inspectionWaiverPage = document.getElementById('inspectionWaiverPage');
     if (inspectionWaiverPage) inspectionWaiverPage.style.display = 'none';
+    const insurerWisePlanPage = document.getElementById('insurerWisePlanPage');
+    if (insurerWisePlanPage) insurerWisePlanPage.style.display = 'none';
     // Add a small delay to ensure the page is fully rendered before populating
     setTimeout(() => {
         populateRSATable(rsaContactData);
@@ -1267,6 +1279,630 @@ document.getElementById('rsaContactPage').addEventListener('click', function (ev
         closeRSAPage();
     }
 });
+
+// #endregion
+
+// #region 🔒 INSURER WISE PLAN PAGE
+// ============================================================
+//  INSURER WISE PLAN  –  Full Knowledge-Base Data + UI Logic
+// ============================================================
+
+const INSURER_PLAN_DATA = [
+    {
+        id: 'payd',
+        planName: 'Pay As You Drive (PAYD)',
+        planType: 'Usage Based',
+        icon: '🛣️',
+        iconBg: 'linear-gradient(135deg,#06b6d4,#0891b2)',
+        description: 'Usage-based insurance for low annual vehicle usage. OD coverage linked to KM slab, lower premium for low-running vehicles. TP & Total Loss cover remain active till expiry.',
+        keyFeatures: [
+            'OD coverage linked to selected KM slab',
+            'Lower premium for low-running vehicles',
+            'TP cover active till policy expiry',
+            'Total Loss cover active till policy expiry',
+            'KM restriction applies to OD coverage only'
+        ],
+        insurers: [
+            {
+                name: 'Reliance',
+                fresh: ['KYC Required', 'Odometer Inspection Required'],
+                renewal: ['No Documents', 'No Inspection', 'STP Issuance'],
+                breakIn: ['5 Days Waiver Available'],
+                withinWaiver: ['Odometer Upload'],
+                afterWaiver: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy (SAOD)']
+            },
+            {
+                name: 'USGI',
+                fresh: ['KYC', 'Odometer Inspection'],
+                renewal: ['KYC', 'Odometer Inspection'],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy']
+            },
+            {
+                name: 'Bajaj',
+                fresh: ['KYC', 'Odometer Reading Entry'],
+                renewal: ['KYC', 'Odometer Reading Entry'],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy']
+            },
+            {
+                name: 'Zuno',
+                fresh: ['KYC', 'Odometer Inspection'],
+                renewal: ['KYC', 'Odometer Inspection'],
+                breakIn: ['2 Days Waiver Available'],
+                afterWaiver: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy']
+            },
+            {
+                name: 'ICICI',
+                fresh: ['KYC', 'Odometer Entry'],
+                renewal: ['KYC', 'Odometer Entry'],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy']
+            },
+            {
+                name: 'Digit',
+                fresh: ['KYC', 'Odometer Entry'],
+                renewal: ['KYC', 'Odometer Entry'],
+                inspectionRules: [
+                    'No Inspection if NCB selected & KM slab below 10,000',
+                    'Inspection Required if NCB 20%+ & KM slab 10,000+'
+                ],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy']
+            },
+            {
+                name: 'Shriram',
+                fresh: ['KYC', 'Odometer Inspection'],
+                renewal: ['KYC', 'Odometer Inspection'],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy']
+            },
+            {
+                name: 'Cholamandalam',
+                fresh: ['KYC', 'Odometer Inspection'],
+                renewal: ['KYC', 'Odometer Inspection'],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy']
+            }
+        ]
+    },
+    {
+        id: 'good-driver',
+        planName: 'Good Driver Plan',
+        planType: 'Discount Plan',
+        icon: '🏆',
+        iconBg: 'linear-gradient(135deg,#f59e0b,#d97706)',
+        description: 'Same coverage as Comprehensive / SAOD with unlimited KM usage after issuance. Eligibility based on average yearly running.',
+        keyFeatures: [
+            'Same coverage as Comprehensive Policy / SAOD',
+            'Unlimited KM usage after issuance',
+            'Eligibility: Below 8K / 10K / 12K / 15K KM annually',
+            'QC Team verifies average yearly running'
+        ],
+        insurers: [
+            {
+                name: 'Tata AIG',
+                fresh: ['KYC', 'Odometer Inspection', 'QC Verification'],
+                renewal: ['KYC', 'Odometer Inspection', 'QC Verification'],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy', 'QC Approval']
+            },
+            {
+                name: 'Digit',
+                fresh: ['KYC', 'Odometer Inspection', 'QC Verification'],
+                renewal: ['KYC', 'Odometer Inspection', 'QC Verification'],
+                breakIn: ['KYC', 'Inspection', 'RC', 'Previous Policy', 'Bundle Policy', 'QC Approval']
+            }
+        ]
+    },
+    {
+        id: 'switch-on-off',
+        planName: 'Motor Switch ON / OFF',
+        planType: 'Flexible Plan',
+        icon: '🔘',
+        iconBg: 'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+        description: 'Switch OD cover ON/OFF anytime. Every continuous 24-hour OFF period earns 1 Bonus Day. Theft & other coverages remain active.',
+        keyFeatures: [
+            'Meter Cover Add-on Mandatory',
+            'OD Cover can be switched OFF / ON anytime',
+            'Every 24-hour OFF = 1 Bonus Day',
+            'Theft Cover remains active',
+            'Other applicable coverages remain active'
+        ],
+        insurers: [
+            {
+                name: 'Kotak',
+                fresh: ['Meter Cover Add-on Mandatory'],
+                renewal: ['Meter Cover Add-on Mandatory'],
+                breakIn: ['Standard Break-In process']
+            }
+        ]
+    },
+    {
+        id: 'special-inspection-discount',
+        planName: 'Special Inspection Discount Plan',
+        planType: 'Discount Plan',
+        icon: '🔍',
+        iconBg: 'linear-gradient(135deg,#10b981,#059669)',
+        description: 'Discounted premium with same coverage as Comprehensive / SAOD. Requires active existing policy and short odometer inspection upload.',
+        keyFeatures: [
+            'Discounted Premium',
+            'Same Coverage as Comprehensive / SAOD',
+            'Existing policy must be active',
+            'Short Odometer Inspection Upload required'
+        ],
+        insurers: [
+            { name: 'Bajaj', fresh: ['Short Odometer Inspection Upload'], renewal: ['Short Odometer Inspection Upload'], breakIn: ['Not Applicable \u2013 Active policy required'] },
+            { name: 'Cholamandalam', fresh: ['Short Odometer Inspection Upload'], renewal: ['Short Odometer Inspection Upload'], breakIn: ['Not Applicable \u2013 Active policy required'] },
+            { name: 'ICICI', fresh: ['Short Odometer Inspection Upload'], renewal: ['Short Odometer Inspection Upload'], breakIn: ['Not Applicable \u2013 Active policy required'] },
+            { name: 'Kotak', fresh: ['Short Odometer Inspection Upload'], renewal: ['Short Odometer Inspection Upload'], breakIn: ['Not Applicable \u2013 Active policy required'] },
+            { name: 'Magma', fresh: ['Short Odometer Inspection Upload'], renewal: ['Short Odometer Inspection Upload'], breakIn: ['Not Applicable \u2013 Active policy required'] },
+            { name: 'National', fresh: ['Short Odometer Inspection Upload'], renewal: ['Short Odometer Inspection Upload'], breakIn: ['Not Applicable \u2013 Active policy required'] }
+        ]
+    },
+    {
+        id: 'long-term-new',
+        planName: 'Long Term Plan (New Vehicle)',
+        planType: 'Long Term',
+        icon: '🆕',
+        iconBg: 'linear-gradient(135deg,#3b82f6,#2563eb)',
+        description: '3+3 plan for new vehicles \u2014 3 Year Third Party + 3 Year Own Damage. No yearly renewal hassle.',
+        keyFeatures: [
+            '3 Year Third Party coverage',
+            '3 Year Own Damage coverage',
+            'No yearly renewal hassle',
+            'Long-term protection'
+        ],
+        insurers: [
+            { name: 'Tata AIG', fresh: ['Standard New Vehicle Documentation'], renewal: ['N/A \u2013 3 Year Plan'], breakIn: ['N/A'] },
+            { name: 'Digit', fresh: ['Standard New Vehicle Documentation'], renewal: ['N/A \u2013 3 Year Plan'], breakIn: ['N/A'] },
+            { name: 'ICICI', fresh: ['Standard New Vehicle Documentation'], renewal: ['N/A \u2013 3 Year Plan'], breakIn: ['N/A'] },
+            { name: 'NIA', fresh: ['Standard New Vehicle Documentation'], renewal: ['N/A \u2013 3 Year Plan'], breakIn: ['N/A'] }
+        ]
+    },
+    {
+        id: 'long-term-old',
+        planName: 'Long Term Plan (Old Vehicle)',
+        planType: 'Long Term',
+        icon: '🔄',
+        iconBg: 'linear-gradient(135deg,#6366f1,#4f46e5)',
+        description: '3+3 plan for old vehicles \u2014 3 Year Third Party + 3 Year Own Damage. Long-term protection without annual renewal.',
+        keyFeatures: [
+            '3 Year Third Party coverage',
+            '3 Year Own Damage coverage',
+            'Long-term protection',
+            'No annual renewal'
+        ],
+        insurers: [
+            { name: 'Tata AIG', fresh: ['Standard Documentation'], renewal: ['N/A \u2013 3 Year Plan'], breakIn: ['N/A'] },
+            { name: 'Digit', fresh: ['Standard Documentation'], renewal: ['N/A \u2013 3 Year Plan'], breakIn: ['N/A'] },
+            { name: 'ICICI', fresh: ['Standard Documentation'], renewal: ['N/A \u2013 3 Year Plan'], breakIn: ['N/A'] }
+        ]
+    },
+    {
+        id: 'network-garage',
+        planName: 'Network Preferred Garage Plan',
+        planType: 'Network Plan',
+        icon: '🏪',
+        iconBg: 'linear-gradient(135deg,#ec4899,#db2777)',
+        description: 'Premium discount with comprehensive coverage. Co-pay applicable for non-network garage claims.',
+        keyFeatures: [
+            'Premium Discount',
+            'Same Comprehensive Coverage',
+            'Add-ons Available',
+            'Co-pay for Non-Network Garage claims'
+        ],
+        insurers: [
+            { name: 'Kotak', fresh: ['Standard Documentation'], renewal: ['Standard Documentation'], breakIn: ['Standard Break-In'], nonNetworkCopay: '\u20B95000 Co-pay', networkGarage: 'Nil', planIdentifier: 'Voluntary Deductible Protect' },
+            { name: 'Cholamandalam', fresh: ['Standard Documentation'], renewal: ['Standard Documentation'], breakIn: ['Standard Break-In'], nonNetworkCopay: '\u20B95000 Co-pay', planIdentifier: 'Clause 22A' },
+            { name: 'Bajaj', fresh: ['Standard Documentation'], renewal: ['Standard Documentation'], breakIn: ['Standard Break-In'], nonNetworkCopay: '\u20B95000 Co-pay' },
+            { name: 'Digit', fresh: ['Standard Documentation'], renewal: ['Standard Documentation'], breakIn: ['Standard Break-In'], nonNetworkCopay: 'As per policy conditions', planIdentifier: 'Voluntary Deductible Protect' },
+            { name: 'Reliance', fresh: ['Standard Documentation'], renewal: ['Standard Documentation'], breakIn: ['Standard Break-In'], nonNetworkCopay: '\u20B93000 Co-pay' }
+        ]
+    },
+    {
+        id: 'drive-assure',
+        planName: 'Drive Assure',
+        planType: 'Special Plan',
+        icon: '🛡️',
+        iconBg: 'linear-gradient(135deg,#ef4444,#dc2626)',
+        description: 'Discounted policy with Zero Depreciation for Break-In and Special Plan cases. \u20B91000 Co-pay applicable at all garages.',
+        keyFeatures: [
+            'For Break-In & Special Plan cases',
+            'Discounted Policy',
+            'Includes Zero Depreciation',
+            '\u20B91000 Co-pay applicable',
+            'All garages covered',
+            'Comprehensive + Zero Dep coverage'
+        ],
+        insurers: [
+            { name: 'Bajaj', fresh: ['Break-In / Special Plan Cases'], renewal: ['Break-In / Special Plan Cases'], breakIn: ['Eligible for Break-In cases'] }
+        ]
+    },
+    {
+        id: 'monthly-mode',
+        planName: 'Monthly Mode',
+        planType: 'Flexible Plan',
+        icon: '📅',
+        iconBg: 'linear-gradient(135deg,#14b8a6,#0d9488)',
+        description: 'Monthly SAOD with auto renewal every month. Valid till TP Expiry. Payment via Credit Card, Debit Card, or UPI Auto Mandate.',
+        keyFeatures: [
+            'Monthly SAOD',
+            'Auto Renewal Every Month',
+            'Valid till TP Expiry',
+            'Payment: Credit Card / Debit Card / UPI Auto Mandate',
+            'Parent Booking = First Month',
+            'Child Booking = Subsequent Renewals'
+        ],
+        insurers: [
+            { name: 'Reliance', fresh: ['Credit Card / Debit Card / UPI Auto Mandate'], renewal: ['Auto Renewal'], breakIn: ['N/A'] },
+            { name: 'ICICI', fresh: ['Information Not Available'], renewal: ['Information Not Available'], breakIn: ['Information Not Available'] }
+        ]
+    },
+    {
+        id: 'motor-protection',
+        planName: 'Motor Protection Cover',
+        planType: 'Add-on',
+        icon: '⚖️',
+        iconBg: 'linear-gradient(135deg,#78716c,#57534e)',
+        description: 'Legal Assistance Cover \u2014 Advocate assistance, court proceedings guidance, and accident-related legal support.',
+        keyFeatures: [
+            'Legal Assistance Cover',
+            'Advocate Assistance',
+            'Court Proceedings Guidance',
+            'Accident-related Legal Support',
+            'Helpline: 1800-300-30000 / 1800-103-3009'
+        ],
+        insurers: [
+            { name: 'Shriram', fresh: ['Standard Documentation'], renewal: ['Standard Documentation'], breakIn: ['Standard Break-In'] }
+        ]
+    },
+    {
+        id: 'eco-assure',
+        planName: 'Eco Assure',
+        planType: 'Eco Plan',
+        icon: '♻️',
+        iconBg: 'linear-gradient(135deg,#22c55e,#16a34a)',
+        description: 'Refurbished parts used in partial damage claims. Lower premium, no depreciation on repaired parts, preferred workshop benefits.',
+        keyFeatures: [
+            'Refurbished Parts in Partial Damage Claims',
+            'Lower Premium',
+            'No Depreciation on Repaired Parts',
+            'No File Charges in Eligible Repairs',
+            'Preferred Workshop Benefits',
+            'Limit: Up to IDV'
+        ],
+        insurers: [
+            { name: 'Bajaj', fresh: ['Standard Documentation'], renewal: ['Standard Documentation'], breakIn: ['Standard Break-In'] }
+        ]
+    },
+    {
+        id: 'super-saver',
+        planName: 'Super Saver Plan',
+        planType: 'Discount Plan',
+        icon: '💰',
+        iconBg: 'linear-gradient(135deg,#eab308,#ca8a04)',
+        description: 'Comprehensive policy with add-ons and \u20B95000 voluntary deductible. Lower premium. Not directly visible to customer \u2014 advisor must unlock.',
+        keyFeatures: [
+            'Comprehensive Policy',
+            'Add-ons Included',
+            '\u20B95000 Voluntary Deductible',
+            'Lower Premium',
+            'Not visible to customer directly',
+            'Advisor must unlock plan'
+        ],
+        insurers: [
+            { name: 'Digit', fresh: ['Advisor Unlock Required'], renewal: ['Advisor Unlock Required'], breakIn: ['Standard Break-In'] }
+        ]
+    }
+];
+
+// ---------- Color palette per insurer ----------
+const IWP_INSURER_COLORS = {
+    'Reliance': '#06b6d4',
+    'USGI': '#f97316',
+    'Bajaj': '#3b82f6',
+    'Zuno': '#a855f7',
+    'ICICI': '#ef4444',
+    'Digit': '#22c55e',
+    'Shriram': '#eab308',
+    'Cholamandalam': '#ec4899',
+    'Tata AIG': '#6366f1',
+    'Kotak': '#14b8a6',
+    'Magma': '#f472b6',
+    'National': '#0ea5e9',
+    'NIA': '#0ea5e9',
+    'default': '#7b2ff7'
+};
+
+function getInsurerColor(name) {
+    return IWP_INSURER_COLORS[name] || IWP_INSURER_COLORS['default'];
+}
+
+// ---------- State ----------
+let iwpSelectedPlans = new Set();
+
+// ---------- Open / Close ----------
+window.openInsurerWisePlanPage = function () {
+    const page = document.getElementById('insurerWisePlanPage');
+    page.style.display = 'block';
+    page.scrollTop = 0;
+    hideAllMainContent();
+
+    // Hide all other full-page views
+    const pages = ['csatModal', 'endorsementPage', 'manualVIPage', 'claimCountNSTPPage', 'inspectionWaiverPage', 'rsaContactPage'];
+    pages.forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    iwpSelectedPlans.clear();
+    iwpPopulateFilters();
+    iwpRender();
+    iwpSetupListeners();
+};
+
+window.closeInsurerWisePlanPage = function () {
+    const page = document.getElementById('insurerWisePlanPage');
+    if (page) page.style.display = 'none';
+    showAllMainContent();
+};
+
+// Close on background click
+document.getElementById('insurerWisePlanPage').addEventListener('click', function (event) {
+    if (event.target === this) {
+        closeInsurerWisePlanPage();
+    }
+});
+
+// ---------- Populate Filters ----------
+function iwpPopulateFilters() {
+    const insurerSet = new Set();
+    const typeSet = new Set();
+    INSURER_PLAN_DATA.forEach(function (plan) {
+        typeSet.add(plan.planType);
+        plan.insurers.forEach(function (ins) { insurerSet.add(ins.name); });
+    });
+
+    const insurerFilter = document.getElementById('insurerPlanInsurerFilter');
+    const typeFilter = document.getElementById('insurerPlanTypeFilter');
+
+    insurerFilter.innerHTML = '<option value="">All Insurers</option>';
+    Array.from(insurerSet).sort().forEach(function (name) {
+        insurerFilter.innerHTML += '<option value="' + name + '">' + name + '</option>';
+    });
+
+    typeFilter.innerHTML = '<option value="">All Plan Types</option>';
+    Array.from(typeSet).sort().forEach(function (type) {
+        typeFilter.innerHTML += '<option value="' + type + '">' + type + '</option>';
+    });
+}
+
+// ---------- Filter Logic ----------
+function iwpGetFilteredData() {
+    const searchVal = (document.getElementById('insurerPlanSearch').value || '').toLowerCase().trim();
+    const insurerVal = document.getElementById('insurerPlanInsurerFilter').value;
+    const typeVal = document.getElementById('insurerPlanTypeFilter').value;
+
+    return INSURER_PLAN_DATA.filter(function (plan) {
+        if (typeVal && plan.planType !== typeVal) return false;
+
+        if (insurerVal) {
+            var hasInsurer = plan.insurers.some(function (ins) { return ins.name === insurerVal; });
+            if (!hasInsurer) return false;
+        }
+
+        if (searchVal) {
+            var haystack = [
+                plan.planName,
+                plan.planType,
+                plan.description
+            ].concat(plan.keyFeatures)
+             .concat(plan.insurers.map(function (i) { return i.name; }))
+             .concat(plan.insurers.reduce(function (acc, i) {
+                 return acc.concat(i.fresh || []).concat(i.renewal || []).concat(i.breakIn || []);
+             }, []))
+             .join(' ').toLowerCase();
+            if (haystack.indexOf(searchVal) === -1) return false;
+        }
+
+        return true;
+    });
+}
+
+// ---------- Render Summary ----------
+function iwpRenderSummary(filteredData) {
+    var summaryEl = document.getElementById('insurerPlanSummary');
+    var totalPlans = filteredData.length;
+    var insurerNames = {};
+    filteredData.forEach(function (p) {
+        p.insurers.forEach(function (i) { insurerNames[i.name] = true; });
+    });
+    var totalInsurers = Object.keys(insurerNames).length;
+    var totalEntries = filteredData.reduce(function (sum, p) { return sum + p.insurers.length; }, 0);
+
+    summaryEl.innerHTML =
+        '<div class="iwp-stat"><div class="iwp-stat-value">' + totalPlans + '</div><div class="iwp-stat-label">Plans</div></div>' +
+        '<div class="iwp-stat"><div class="iwp-stat-value">' + totalInsurers + '</div><div class="iwp-stat-label">Insurers</div></div>' +
+        '<div class="iwp-stat"><div class="iwp-stat-value">' + totalEntries + '</div><div class="iwp-stat-label">Entries</div></div>';
+}
+
+// ---------- Render Selected Chips ----------
+function iwpRenderSelectedChips() {
+    var el = document.getElementById('insurerPlanSelected');
+    if (iwpSelectedPlans.size === 0) {
+        el.innerHTML = '';
+        return;
+    }
+    var html = '';
+    iwpSelectedPlans.forEach(function (id) {
+        var plan = INSURER_PLAN_DATA.find(function (p) { return p.id === id; });
+        var label = plan ? plan.icon + ' ' + plan.planName : id;
+        html += '<div class="iwp-sel-chip" onclick="iwpDeselectPlan(\'' + id + '\')">' + label + ' <span class="iwp-chip-x">\u2715</span></div>';
+    });
+    el.innerHTML = html;
+}
+
+window.iwpDeselectPlan = function (id) {
+    iwpSelectedPlans.delete(id);
+    iwpRenderSelectedChips();
+    var card = document.querySelector('.iwp-card[data-plan-id="' + id + '"]');
+    if (card) card.classList.remove('iwp-card-selected');
+};
+
+// ---------- Build Card HTML ----------
+function iwpBuildInsurerSection(insurer) {
+    var html = '<div class="iwp-section">' +
+        '<div class="iwp-section-title" style="color:' + getInsurerColor(insurer.name) + '; border-bottom: 2px solid ' + getInsurerColor(insurer.name) + '1a; padding-bottom: 2px; margin-bottom: 6px;">' + insurer.name + '</div>';
+
+    var sections = [
+        { label: 'Fresh', data: insurer.fresh, color: '#2e7d32', bg: '#e8f5e9' },
+        { label: 'Renewal', data: insurer.renewal, color: '#1565c0', bg: '#e3f2fd' },
+        { label: 'Inspection Rules', data: insurer.inspectionRules, color: '#37474f', bg: '#eceff1' },
+        { label: 'Break-In', data: insurer.breakIn, color: '#e65100', bg: '#fff3e0' },
+        { label: 'Within Waiver', data: insurer.withinWaiver, color: '#6a1b9a', bg: '#f3e5f5' },
+        { label: 'After Waiver', data: insurer.afterWaiver, color: '#c62828', bg: '#ffebee' }
+    ];
+
+    sections.forEach(function (sec) {
+        if (sec.data && sec.data.length > 0) {
+            html += '<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:' + sec.color + ';background:' + sec.bg + ';margin-top:6px;margin-bottom:3px;">' + sec.label + '</span>';
+            html += '<ul class="iwp-section-list">';
+            sec.data.forEach(function (item) { html += '<li>' + item + '</li>'; });
+            html += '</ul>';
+        }
+    });
+
+    if (insurer.nonNetworkCopay) {
+        html += '<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#c62828;background:#ffebee;margin-top:6px;margin-bottom:3px;">Non-Network Garage</span>';
+        html += '<ul class="iwp-section-list"><li>' + insurer.nonNetworkCopay + '</li></ul>';
+    }
+    if (insurer.networkGarage) {
+        html += '<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#00796b;background:#e0f2f1;margin-top:6px;margin-bottom:3px;">Network Garage</span>';
+        html += '<ul class="iwp-section-list"><li>' + insurer.networkGarage + '</li></ul>';
+    }
+    if (insurer.planIdentifier) {
+        html += '<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#303f9f;background:#e8eaf6;margin-top:6px;margin-bottom:3px;">Plan Identifier</span>';
+        html += '<ul class="iwp-section-list"><li>' + insurer.planIdentifier + '</li></ul>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function iwpBuildCard(plan, index) {
+    var insurerVal = document.getElementById('insurerPlanInsurerFilter').value;
+    var displayInsurers = insurerVal
+        ? plan.insurers.filter(function (i) { return i.name === insurerVal; })
+        : plan.insurers;
+
+    var insurerNamesList = displayInsurers.map(function (i) { return i.name; });
+    var isSelected = iwpSelectedPlans.has(plan.id);
+
+    var html = '<div class="iwp-card' + (isSelected ? ' iwp-card-selected' : '') + '" data-plan-id="' + plan.id + '" style="animation-delay:' + (index * 0.05) + 's">';
+
+    // Card Head
+    html += '<div class="iwp-card-head">' +
+        '<div class="iwp-card-icon" style="background:' + plan.iconBg + '">' + plan.icon + '</div>' +
+        '<div><div class="iwp-card-title">' + plan.planName + '</div>' +
+        '<div class="iwp-card-plantype">' + plan.planType + '</div></div></div>';
+
+    // Card Body
+    html += '<div class="iwp-card-body">';
+
+    // Insurer Tags
+    html += '<div class="iwp-tag-row">';
+    insurerNamesList.forEach(function (name) {
+        var c = getInsurerColor(name);
+        html += '<span class="iwp-tag iwp-tag-insurer" style="color:' + c + ';border-color:' + c + '33;background:' + c + '1a">' + name + '</span>';
+    });
+    html += '</div>';
+
+    // Description
+    html += '<p class="iwp-card-desc">' + plan.description + '</p>';
+
+    // Expandable Details
+    html += '<div class="iwp-card-details" id="iwpDetails_' + plan.id + '">';
+
+    // Key Features (Moved inside details)
+    html += '<div class="iwp-section" style="margin-top: 10px; margin-bottom: 14px;"><div class="iwp-section-title">Key Features</div><ul class="iwp-section-list">';
+    plan.keyFeatures.forEach(function (f) { html += '<li>' + f + '</li>'; });
+    html += '</ul></div>';
+
+    displayInsurers.forEach(function (ins) {
+        html += iwpBuildInsurerSection(ins);
+    });
+    html += '</div>';
+
+    html += '</div>'; // end card-body
+
+    // Toggle Button
+    html += '<button class="iwp-card-toggle" onclick="iwpToggleCard(\'' + plan.id + '\', event)">' +
+        '<span id="iwpToggleText_' + plan.id + '">\u25BC Show Details</span></button>';
+
+    html += '</div>';
+    return html;
+}
+
+// ---------- Toggle expand ----------
+window.iwpToggleCard = function (planId, event) {
+    event.stopPropagation();
+    var details = document.getElementById('iwpDetails_' + planId);
+    var toggleText = document.getElementById('iwpToggleText_' + planId);
+    if (details.classList.contains('iwp-open')) {
+        details.classList.remove('iwp-open');
+        toggleText.textContent = '\u25BC Show Details';
+    } else {
+        details.classList.add('iwp-open');
+        toggleText.textContent = '\u25B2 Hide Details';
+    }
+};
+
+// ---------- Main Render ----------
+function iwpRender() {
+    var filtered = iwpGetFilteredData();
+    var grid = document.getElementById('insurerPlanGrid');
+
+    iwpRenderSummary(filtered);
+    iwpRenderSelectedChips();
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '<div class="iwp-no-results"><span>\uD83D\uDD0D</span>No plans found matching your search.</div>';
+        return;
+    }
+
+    grid.innerHTML = filtered.map(function (plan, i) { return iwpBuildCard(plan, i); }).join('');
+
+    // Attach click-to-select on cards
+    grid.querySelectorAll('.iwp-card').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+            if (e.target.closest('.iwp-card-toggle')) return;
+            var id = this.dataset.planId;
+            if (iwpSelectedPlans.has(id)) {
+                iwpSelectedPlans.delete(id);
+                this.classList.remove('iwp-card-selected');
+            } else {
+                iwpSelectedPlans.add(id);
+                this.classList.add('iwp-card-selected');
+            }
+            iwpRenderSelectedChips();
+        });
+    });
+}
+
+// ---------- Event Listeners ----------
+var iwpListenersAttached = false;
+
+function iwpSetupListeners() {
+    if (iwpListenersAttached) return;
+    iwpListenersAttached = true;
+
+    var searchInput = document.getElementById('insurerPlanSearch');
+    var insurerFilter = document.getElementById('insurerPlanInsurerFilter');
+    var typeFilter = document.getElementById('insurerPlanTypeFilter');
+
+    var debounceTimer;
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () { iwpRender(); }, 200);
+    });
+
+    insurerFilter.addEventListener('change', function () { iwpRender(); });
+    typeFilter.addEventListener('change', function () { iwpRender(); });
+}
 
 // #endregion
 
@@ -12880,35 +13516,119 @@ requirementDropdown.addEventListener("change", () => {
 // Insurance Comparison Dashboard Data and Logic (from index (4).html)
 const insuranceData = [
     {
-        "insurer_name": "National",
+        "insurer_name": "RSGI",
         "video_approval": "At PB end",
-        "video_tat": "24 Hours",
+        "video_tat": "2 days",
         "short_partial": "Yes",
         "cng_kit_vi": "No",
         "artificial_low_lighting": "No",
         "scar_declaration": "Declaration Required within Video TAT",
-        "zd_claims_year": "ZD Plan: 2, ZD+: Unlimited",
+        "zd_claims_year": "Unlimited",
         "non_zd_claims_year": "Unlimited",
         "brand_new_3_3": "No",
         "old_3_3": "No",
-        "vas": "Yes"
+        "vas": "No"
     },
     {
-        "insurer_name": "New India Assurance",
+        "insurer_name": "SBI",
         "video_approval": "At PB end",
-        "video_tat": "24 Hours",
+        "video_tat": "2 days",
         "short_partial": "Yes",
         "cng_kit_vi": "No",
         "artificial_low_lighting": "No",
         "scar_declaration": "Declaration Required within Video TAT",
         "zd_claims_year": "2",
         "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "Yes",
+        "brand_new_3_3": "No",
         "old_3_3": "No",
         "vas": "No"
     },
     {
-        "insurer_name": "Oriental",
+        "insurer_name": "UNIVERSAL SOMPO",
+        "video_approval": "At U/W end",
+        "video_tat": "2 days",
+        "short_partial": "No",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Will Refer to Under Writer",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "FUTURE GENERALI",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "BAJAJ",
+        "video_approval": "At U/W end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Will Refer to Under Writer",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "RELIANCE",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "IFFCO",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "MAGMA",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (Scar on Driver Side we will not accept) within Video TAT",
+        "zd_claims_year": "Unlimited",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "Oriental Insurance",
         "video_approval": "At PB end",
         "video_tat": "24 Hours",
         "short_partial": "No",
@@ -12936,37 +13656,37 @@ const insuranceData = [
         "vas": "Yes"
     },
     {
-        "insurer_name": "Tata AIG",
+        "insurer_name": "NIA",
         "video_approval": "At PB end",
-        "video_tat": "2 days",
+        "video_tat": "24 Hours",
         "short_partial": "Yes",
-        "cng_kit_vi": "Yes",
+        "cng_kit_vi": "No",
         "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+        "scar_declaration": "Declaration Required within Video TAT",
         "zd_claims_year": "2",
         "non_zd_claims_year": "Unlimited",
         "brand_new_3_3": "Yes",
-        "old_3_3": "Yes",
+        "old_3_3": "No",
         "vas": "No"
     },
     {
-        "insurer_name": "ICICI Lombard",
+        "insurer_name": "NIA 3+3",
         "video_approval": "At PB end",
-        "video_tat": "2 days",
+        "video_tat": "24 Hours",
         "short_partial": "Yes",
         "cng_kit_vi": "No",
-        "artificial_low_lighting": "Yes",
+        "artificial_low_lighting": "No",
         "scar_declaration": "Declaration Required within Video TAT",
-        "zd_claims_year": "2<br>Unlimited for Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford",
+        "zd_claims_year": "Unlimited",
         "non_zd_claims_year": "Unlimited",
         "brand_new_3_3": "Yes",
-        "old_3_3": "Yes",
-        "vas": "Yes"
+        "old_3_3": "No",
+        "vas": "No"
     },
     {
-        "insurer_name": "Zuno General",
+        "insurer_name": "National Insurance",
         "video_approval": "At PB end",
-        "video_tat": "2 days",
+        "video_tat": "24 Hours",
         "short_partial": "Yes",
         "cng_kit_vi": "No",
         "artificial_low_lighting": "No",
@@ -12978,41 +13698,41 @@ const insuranceData = [
         "vas": "Yes"
     },
     {
-        "insurer_name": "Cholamandalam MS",
+        "insurer_name": "Shriram General",
         "video_approval": "At PB end",
         "video_tat": "2 days",
         "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (In Shriram format)+Address ID proof within Video TAT<br>Declaration required if Air Bag indicator is on at engine start",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "3",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Kotak General",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "2",
+        "non_zd_claims_year": "Unlimited but cashless is limited to 2",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Liberty Videocon",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "No",
         "cng_kit_vi": "No",
         "artificial_low_lighting": "No",
         "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-        "zd_claims_year": "2",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
-        "vas": "No"
-    },
-    {
-        "insurer_name": "Future Generali",
-        "video_approval": "At PB end",
-        "video_tat": "2 days",
-        "short_partial": "Yes",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required within Video TAT",
-        "zd_claims_year": "2",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
-        "vas": "No"
-    },
-    {
-        "insurer_name": "MAGMA",
-        "video_approval": "At PB end",
-        "video_tat": "2 days",
-        "short_partial": "Yes",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required (Scar on Driver Side we will not accept) within Video TAT",
         "zd_claims_year": "Unlimited",
         "non_zd_claims_year": "Unlimited",
         "brand_new_3_3": "No",
@@ -13034,7 +13754,7 @@ const insuranceData = [
         "vas": "No"
     },
     {
-        "insurer_name": "Kotak",
+        "insurer_name": "ZUNO",
         "video_approval": "At PB end",
         "video_tat": "2 days",
         "short_partial": "Yes",
@@ -13042,62 +13762,34 @@ const insuranceData = [
         "artificial_low_lighting": "No",
         "scar_declaration": "Declaration Required within Video TAT",
         "zd_claims_year": "2",
-        "non_zd_claims_year": "Unlimited, 2 Cashless",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "No",
+        "old_3_3": "No",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "Digit General",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited ZD claims only on brand-new cars. For a non-brand-new car, the claim count will be mentioned in the policy PDF.",
+        "non_zd_claims_year": "Unlimited",
         "brand_new_3_3": "Yes",
-        "old_3_3": "No",
-        "vas": "Yes"
-    },
-    {
-        "insurer_name": "SBI General",
-        "video_approval": "At PB end",
-        "video_tat": "2 days",
-        "short_partial": "Yes",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required within Video TAT",
-        "zd_claims_year": "2",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
+        "old_3_3": "Yes",
         "vas": "No"
     },
     {
-        "insurer_name": "Shriram",
+        "insurer_name": "Cholamandalam MS",
         "video_approval": "At PB end",
         "video_tat": "2 days",
         "short_partial": "Yes",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required (In Shriram format)+Address ID proof within Video TAT<br>Declaration required if Air Bag indicator is on at engine start",
-        "zd_claims_year": "Unlimited",
-        "non_zd_claims_year": "3",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
-        "vas": "Yes"
-    },
-    {
-        "insurer_name": "Iffco Tokio",
-        "video_approval": "At PB end",
-        "video_tat": "2 days",
-        "short_partial": "Yes",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required within Video TAT",
-        "zd_claims_year": "Unlimited",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
-        "vas": "No"
-    },
-    {
-        "insurer_name": "Liberty Videocon",
-        "video_approval": "At PB end",
-        "video_tat": "2 days",
-        "short_partial": "No",
         "cng_kit_vi": "No",
         "artificial_low_lighting": "No",
         "scar_declaration": "Will Not Accept Scar on WS/change insurer",
-        "zd_claims_year": "Unlimited",
+        "zd_claims_year": "2",
         "non_zd_claims_year": "Unlimited",
         "brand_new_3_3": "No",
         "old_3_3": "No",
@@ -13118,71 +13810,85 @@ const insuranceData = [
         "vas": "No"
     },
     {
-        "insurer_name": "Reliance",
+        "insurer_name": "ICICI Lombard",
         "video_approval": "At PB end",
         "video_tat": "2 days",
         "short_partial": "Yes",
         "cng_kit_vi": "No",
+        "artificial_low_lighting": "Yes",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "Unlimited ZD claim only to these makers: Maruti, Hyundai, Honda, Toyota, Kia, MG, Volvo, Ford. Rest of the makers have only 2 ZD claims.",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "ICICI 3+3",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "No",
+        "artificial_low_lighting": "Yes",
+        "scar_declaration": "Declaration Required within Video TAT",
+        "zd_claims_year": "6",
+        "non_zd_claims_year": "Unlimited",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
+        "vas": "Yes"
+    },
+    {
+        "insurer_name": "TATA AIG",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "Yes",
         "artificial_low_lighting": "No",
         "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
         "zd_claims_year": "2",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
-        "vas": "Yes"
-    },
-    {
-        "insurer_name": "Bajaj",
-        "video_approval": "At U/W end",
-        "video_tat": "2 days",
-        "short_partial": "Yes",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Will Refer to Under Writer",
-        "zd_claims_year": "2",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
-        "vas": "Yes"
-    },
-    {
-        "insurer_name": "Royal Sundaram",
-        "video_approval": "At PB end",
-        "video_tat": "2 days",
-        "short_partial": "Yes",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required within Video TAT",
-        "zd_claims_year": "Unlimited",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
+        "non_zd_claims_year": "99",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
         "vas": "No"
     },
     {
-        "insurer_name": "Universal Sompo",
-        "video_approval": "At U/W end",
-        "video_tat": "2 days",
-        "short_partial": "No",
-        "cng_kit_vi": "No",
-        "artificial_low_lighting": "No",
-        "scar_declaration": "Will Refer to Under Writer",
-        "zd_claims_year": "Unlimited",
-        "non_zd_claims_year": "Unlimited",
-        "brand_new_3_3": "No",
-        "old_3_3": "No",
-        "vas": "No"
-    },
-    {
-        "insurer_name": "Digit",
+        "insurer_name": "TATA AIG 3+3 Plan",
         "video_approval": "At PB end",
         "video_tat": "2 days",
         "short_partial": "Yes",
-        "cng_kit_vi": "No",
+        "cng_kit_vi": "Yes",
         "artificial_low_lighting": "No",
-        "scar_declaration": "Declaration Required within Video TAT",
-        "zd_claims_year": "Unlimited",
-        "non_zd_claims_year": "Unlimited",
+        "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+        "zd_claims_year": "5 ZD Claims Overall, Maximum 2 in a year",
+        "non_zd_claims_year": "99",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "TATA AIG 4+4 Plan",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "Yes",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+        "zd_claims_year": "7 ZD Claims Overall, Maximum 2 in a year",
+        "non_zd_claims_year": "99",
+        "brand_new_3_3": "Yes",
+        "old_3_3": "Yes",
+        "vas": "No"
+    },
+    {
+        "insurer_name": "TATA AIG 5+5 Plan",
+        "video_approval": "At PB end",
+        "video_tat": "2 days",
+        "short_partial": "Yes",
+        "cng_kit_vi": "Yes",
+        "artificial_low_lighting": "No",
+        "scar_declaration": "Declaration Required (with vehicle number) within Video TAT",
+        "zd_claims_year": "9 ZD Claims Overall, Maximum 2 in a year",
+        "non_zd_claims_year": "99",
         "brand_new_3_3": "Yes",
         "old_3_3": "Yes",
         "vas": "No"
@@ -14190,26 +14896,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-// ✅ PB Wheels Popup Control
-window.openPBWheelsScript = function () {
-    const popup = document.getElementById("pbPopup");
-    const closeBtn = document.getElementById("closePopupBtn");
-    if (!popup || !closeBtn) return;
 
-    // 🔹 Popup open karo
-    popup.classList.remove("hidden");
-
-    // 🔹 Close button par click karne se band ho
-    closeBtn.onclick = () => popup.classList.add("hidden");
-
-    // 🔹 Popup ke bahar click karne se bhi band ho
-    popup.addEventListener("click", (event) => {
-        // agar user ne background (black area) pe click kiya
-        if (event.target === popup) {
-            popup.classList.add("hidden");
-        }
-    });
-};
 
 // ========================================
 // Company Owned Vehicle (COV) Modal Logic
