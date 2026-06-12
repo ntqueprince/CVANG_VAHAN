@@ -988,6 +988,40 @@ button:hover {
     color: #263238;
 }
 
+.endorsement-formatted-value {
+    display: block;
+    margin-top: 4px;
+}
+
+.endorsement-formatted-line {
+    display: block;
+    margin: 5px 0;
+    padding: 5px 8px;
+    border-left: 3px solid #90caf9;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.34);
+    line-height: 1.45;
+}
+
+.endorsement-formatted-line[data-point-index="1"] {
+    border-left-color: #80cbc4;
+    background: rgba(224, 242, 241, 0.55);
+}
+
+.endorsement-formatted-line[data-point-index="2"] {
+    border-left-color: #ffcc80;
+    background: rgba(255, 243, 224, 0.58);
+}
+
+.endorsement-formatted-line[data-point-index="3"] {
+    border-left-color: #ce93d8;
+    background: rgba(243, 229, 245, 0.5);
+}
+
+.endorsement-sub-point {
+    padding-left: 18px;
+}
+
 .back-btn {
     background-color: #f44336;
     color: white;
