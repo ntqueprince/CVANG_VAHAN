@@ -30,6 +30,8 @@
             onclick="openEndorsementGuidanceModal()">Endorsement Guidance</button>
         <button class="animated-btn bg-gradient-to-r from-indigo-500 to-indigo-700" data-cvang-button="true"
             onclick="openClaimCountNSTPPage()">Claim_Count &amp; NSTP</button>
+        <button class="animated-btn bg-gradient-to-r from-slate-700 to-cyan-700" data-cvang-button="true"
+            onclick="openInsurerWisePlanPage()">Insurer Wise Plan</button>
         <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" data-cvang-button="true"
             onclick="openInspectionWaiverPage()">Inspection Waiver</button>
         <button class="animated-btn bg-gradient-to-r from-orange-500 to-orange-700" data-cvang-button="true"
@@ -46,8 +48,6 @@
             onclick="window.open('https://ntqueprince.github.io/mail/', '_blank')">TICKETING MAIL</button>
         <button class="animated-btn bg-gradient-to-r from-cyan-500 to-cyan-700"
             onclick="window.open('https://ntqueprince.github.io/resume/', '_blank')">Resume-Builder</button>
-        <button class="animated-btn bg-gradient-to-r from-yellow-500 to-yellow-700" onclick="openPBWheelsScript()">PB
-            Wheels - Script</button>
         <button class="animated-btn bg-gradient-to-r from-indigo-600 to-blue-800"
             onclick="window.open('https://ntqueprince.github.io/json_converter/', '_blank')">JSON-CHANGER</button>
         <button class="animated-btn bg-gradient-to-r from-violet-500 to-purple-700"
@@ -67,18 +67,11 @@
             onclick="openCalmPlayer()">CALM</button>
         <button class="animated-btn bg-gradient-to-r from-emerald-500 to-cyan-700" data-cvang-button="true"
             onclick="openRemarksHelper()">Remarks Helper</button>
+        <button class="animated-btn bg-gradient-to-r from-teal-500 to-indigo-600" data-cvang-button="true"
+            onclick="openTicketHelper()">Ticket Helper</button>
         <button class="secondary cov-btn" data-cvang-button="true" id="btnCompanyOwned">Company Owned Not
             Allowed</button>
     </div>
-    <!-- Renamed Manual VI button -->
-    <!-- New button for Claim_Count & NSTP -->
-    <!-- New button for Inspection Waiver -->
-    <!-- New button for RSA & Contact -->
-    <!-- "📷SHIVANG" header ko "Aaj Ki Baat" button se replace kiya gaya hai -->
-    <!-- REPLACED: Aaj Ki Baat button will now be the UPDATES button -->
-    <!-- New Notebook button added here -->
-
-    <!-- "UPDATES" button moved here, above the upload-section -->
     <div id="companyUpdatesButton">
         <span>UPDATES</span>
         <span id="latestUpdateSnippet"></span>
@@ -606,6 +599,39 @@
             </div>
         </div>
         <button class="back-btn" onclick="closeClaimCountNSTPPage()">Back to Main Page</button>
+    </div>
+    <!-- #endregion -->
+    <!-- #region INSURER WISE PLAN PAGE -->
+    <div class="insurer-wise-plan-page" id="insurerWisePlanPage">
+        <div class="insurer-plan-shell">
+            <div class="insurer-plan-topbar">
+                <div>
+                    <p class="insurer-plan-kicker">Plan Finder</p>
+                    <h1>Insurer Wise Plan</h1>
+                    <p class="insurer-plan-subtitle">Search, filter, and compare only the plans you need.</p>
+                </div>
+                <button class="back-btn insurer-plan-back" onclick="closeInsurerWisePlanPage()">Back to Main Page</button>
+            </div>
+
+            <div class="insurer-plan-controls">
+                <label class="insurer-plan-field">
+                    <span>Search</span>
+                    <input id="insurerPlanSearch" type="search" placeholder="Search plan, insurer, KYC, inspection..." />
+                </label>
+                <label class="insurer-plan-field">
+                    <span>Insurer</span>
+                    <select id="insurerPlanInsurerFilter"></select>
+                </label>
+                <label class="insurer-plan-field">
+                    <span>Plan Type</span>
+                    <select id="insurerPlanTypeFilter"></select>
+                </label>
+            </div>
+
+            <div class="insurer-plan-summary" id="insurerPlanSummary"></div>
+            <div class="insurer-plan-selected" id="insurerPlanSelected"></div>
+            <div class="insurer-plan-grid" id="insurerPlanGrid"></div>
+        </div>
     </div>
     <!-- #endregion -->
     <!-- #region 🔒 INSPECTION WAIVER PAGE -->
@@ -1488,92 +1514,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- 🌟 PB Wheels Popup -->
-    <div id="pbPopup" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 hidden">
-        <div
-            class="bg-white max-w-4xl w-11/12 md:w-3/4 rounded-2xl shadow-2xl relative p-8 overflow-y-auto max-h-[90vh] border border-indigo-200">
-
-            <!-- ❌ Close Button -->
-            <button id="closePopupBtn"
-                class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
-
-            <!-- 🏁 Title -->
-            <h2
-                class="text-3xl font-extrabold text-center bg-gradient-to-r from-indigo-600 to-blue-400 bg-clip-text text-transparent mb-6">
-                PB Wheels - Script
-            </h2>
-
-            <!-- 📘 ENGLISH SCRIPT -->
-            <div class="mb-8 text-gray-800 leading-relaxed space-y-4">
-                <h3 class="text-2xl font-bold text-indigo-700 border-b-2 border-indigo-300 inline-block mb-3">ENGLISH
-                    SCRIPT</h3>
-
-                <p><strong>Main Script:</strong></p>
-                <p>Sharing a quick offer that could help you save up to <span class="text-green-600 font-semibold">40%
-                        on your next car service</span> — may I take 30 seconds to explain?</p>
-                <p>We’re currently running a <span class="font-semibold text-indigo-700">special service program</span>
-                    with our partner garage network where you get a <strong>free car health check-up</strong>, and if
-                    you go ahead with servicing, we complete it within just <strong>60 minutes</strong> (excluding
-                    washing).</p>
-                <p>The best part — our customers are saving up to <span class="text-green-600 font-semibold">40%</span>
-                    compared to branded workshops with genuine parts, trained technicians, and complete warranty on
-                    service quality.</p>
-                <p><em>(Add Value Hook)</em> You also get updates at every step, and we even offer <strong>free pickup &
-                        drop</strong> for select services — so you don’t have to spend your day waiting at the garage.
-                </p>
-                <p class="text-indigo-600 font-semibold">(Closing CTA) Would you like me to schedule a call back with
-                    our garage servicing team?</p>
-                <p>Also, please help me with your last car service month and year, and if you remember your odometer
-                    reading, please share that too.</p>
-
-                <div class="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
-                    <p><strong>If customer says “No”:</strong></p>
-                    <p><em>Savings Hook (Money Angle)</em> — Understood, Sir/Ma’am. Just letting you know — most of our
-                        customers switched because they were spending 30–40% more at their old workshop for the same
-                        quality.</p>
-                    <p>The free car health check-up alone helps spot issues early and costs nothing — would you like me
-                        to just book that for you?</p>
-                </div>
-
-                <div class="bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-400">
-                    <p><strong>If customer says “No” again:</strong></p>
-                    <p>Totally fine, Sir/Ma’am. If you ever plan a service in the future, do keep our garage network in
-                        mind — we offer up to 40% savings and 1-hour quick service with a free car health check-up.</p>
-                    <p>You can reach us anytime on our toll-free number. Thank you for your time!</p>
-                </div>
-            </div>
-
-            <!-- 📙 HINDI SCRIPT -->
-            <div class="text-gray-800 leading-relaxed space-y-4">
-                <h3 class="text-2xl font-bold text-orange-700 border-b-2 border-orange-300 inline-block mb-3">HINDI
-                    SCRIPT</h3>
-
-                <p><strong>Main Script:</strong></p>
-                <p>“<span class="text-orange-600 font-semibold">नमस्कार!</span> हमारे पास आपके लिए एक <strong>विशेष
-                        ऑफर</strong> है। हमारे पार्टनर गैराज में आपको <strong>फ्री कार हेल्थ चेकअप</strong> मिलेगा, और
-                    अगर आप सर्विस कराते हैं, तो हम उसे सिर्फ <strong>1 घंटे</strong> में पूरा करेंगे।”</p>
-                <p>“हमारे ग्राहक <span class="text-green-600 font-semibold">30–40%</span> तक बचत कर रहे हैं। यहाँ आपको
-                    मिलेंगे <strong>genuine parts</strong>, <strong>trained technicians</strong>, और <strong>service
-                        warranty</strong>। साथ ही, <strong>free pickup & drop</strong> की सुविधा भी है।”</p>
-                <p>“क्या मैं आपके लिए <strong>callback</strong> शेड्यूल कर सकता हूँ?”</p>
-
-                <div class="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-400">
-                    <p><strong>अगर ग्राहक “ना” कहे:</strong></p>
-                    <p>“ठीक है सर/मैम। हमारे अधिकतर ग्राहक पहले 30–40% ज़्यादा खर्च कर रहे थे, इसलिए उन्होंने हमारी सेवा
-                        ली। फ्री कार हेल्थ चेकअप से हम आपकी कार की दिक्कतें पहले ही पता कर सकते हैं।”</p>
-                    <p>“क्या मैं आपके लिए यह बुक कर सकता हूँ?”</p>
-                </div>
-
-                <div class="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
-                    <p><strong>अगर ग्राहक फिर “ना” कहे:</strong></p>
-                    <p>“कोई बात नहीं सर/मैम। भविष्य में जब भी आपको सर्विस की ज़रूरत हो, हमारे गैराज नेटवर्क को याद रखें।
-                        हम 40% तक बचत और 1 घंटे की त्वरित सर्विस के साथ फ्री हेल्थ चेकअप ऑफर करते हैं।”</p>
-                    <p>“आप हमें कभी भी हमारे टोल-फ्री नंबर पर संपर्क कर सकते हैं। धन्यवाद!”</p>
-                </div>
-            </div>
-
         </div>
     </div>
     <!-- 🎮 Memory Card Game Modal -->
@@ -2653,6 +2593,85 @@
         <div class="remarks-helper-resize remarks-helper-resize-sw" data-rh-resize="sw"></div>
     </div>
     <button id="remarksHelperMini" class="remarks-helper-mini" type="button" onclick="openRemarksHelper()">Remarks</button>
+
+    <!-- #region 🔒 TICKET MAIL HELPER PANEL -->
+    <div id="ticketHelperPanel" class="ticket-helper-panel" aria-hidden="true">
+        <div class="remarks-helper-drag" id="ticketHelperDrag">
+            <span style="font-size: 11px; font-weight: bold; color: #fff; padding: 0 4px; display: inline-block;">🎫 Ticket Helper</span>
+            <div class="remarks-helper-window-actions">
+                <button type="button" title="Floating Window" onclick="openTicketHelperFloating()">F</button>
+                <button type="button" title="Minimize" onclick="minimizeTicketHelper()">-</button>
+                <button type="button" title="Close" onclick="closeTicketHelper()">x</button>
+            </div>
+        </div>
+        
+        <!-- Setup Mode Container -->
+        <div id="ticketHelperSetup" class="ticket-helper-setup-mode" style="display:block;">
+            <div style="padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-size: 12px; font-weight: bold; color: #37474f;">Ticket IDs (space, comma or newline separated):</label>
+                <textarea id="ticketHelperInputIds" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:6px; font-size:13px; font-family: monospace; outline:none; resize:none;" placeholder="PB9543985573, PB9550317472..."></textarea>
+                
+                <label style="font-size: 12px; font-weight: bold; color: #37474f;">Mail Message Template (use {ticket} for placeholder):</label>
+                <textarea id="ticketHelperInputMail" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:6px; font-size:13px; outline:none; resize:none;" placeholder="We would like to apprise you that the turnaround time for getting the changes done in your policy is 10 days."></textarea>
+                
+                <button type="button" id="ticketHelperSaveBtn" style="width: 100%; height: 38px; background: #0f766e; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s;">Start Processing</button>
+            </div>
+        </div>
+
+        <!-- Play Mode Container -->
+        <div id="ticketHelperPlay" class="ticket-helper-play-mode" style="display:none;">
+            <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <!-- Header Stats -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
+                    <span id="ticketHelperProgress" style="font-size: 13px; font-weight: bold; color: #475569;">Progress: 0 / 0</span>
+                    <div style="display: flex; gap: 4px;">
+                        <button type="button" id="ticketHelperPrevBtn" class="ticket-nav-btn">◀</button>
+                        <button type="button" id="ticketHelperNextBtn" class="ticket-nav-btn">▶</button>
+                        <button type="button" id="ticketHelperEditBtn" class="ticket-nav-btn" style="background:#e2e8f0; color:#334155; font-size: 12px;" title="Edit Setup">✏️ Edit</button>
+                    </div>
+                </div>
+
+                <!-- Ticket Card -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Current Ticket ID (Click to Copy & Advance):</span>
+                    <button type="button" id="ticketHelperActiveIdBtn" class="ticket-play-card" style="font-size: 18px; font-weight: 800; font-family: monospace; letter-spacing: 0.5px; text-align: center; color: #0f766e; border-color: #0f766e;">
+                        No Tickets Loaded
+                    </button>
+                </div>
+
+                <!-- Mail Card -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Mail Body (Click to Copy):</span>
+                    <button type="button" id="ticketHelperActiveMailBtn" class="ticket-play-card" style="font-size: 13px; text-align: left; height: auto; min-height: 80px; max-height: 140px; overflow-y: auto; display: block; font-weight: 500; color: #334155; white-space: normal; line-height: 1.4;">
+                        No Template Loaded
+                    </button>
+                </div>
+
+                <!-- Auto Advance Options -->
+                <div style="display: flex; gap: 12px; font-size: 11px; font-weight: 600; color: #475569; justify-content: center;">
+                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <input type="checkbox" id="ticketHelperAutoAdvanceTicket" checked style="cursor: pointer;" />
+                        Auto-Advance on Ticket
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <input type="checkbox" id="ticketHelperAutoAdvanceMail" style="cursor: pointer;" />
+                        Auto-Advance on Mail
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resize Handles -->
+        <div class="remarks-helper-resize remarks-helper-resize-n" data-th-resize="n"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-e" data-th-resize="e"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-s" data-th-resize="s"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-w" data-th-resize="w"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-ne" data-th-resize="ne"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-nw" data-th-resize="nw"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-se" data-th-resize="se"></div>
+        <div class="remarks-helper-resize remarks-helper-resize-sw" data-th-resize="sw"></div>
+    </div>
+    <button id="ticketHelperMini" class="ticket-helper-mini" type="button" onclick="openTicketHelper()">Tickets</button>
     <script>
         (function () {
             var remarks = [
@@ -3369,10 +3388,803 @@
                 });
             }
 
+            window.openRemarksHelperFloating = async function () {
+                var panel = document.getElementById("remarksHelperPanel");
+                var mini = document.getElementById("remarksHelperMini");
+                if ("documentPictureInPicture" in window) {
+                    try {
+                        var pipWindow = await window.documentPictureInPicture.requestWindow({
+                            width: 420,
+                            height: 620
+                        });
+                        pipWindow.document.title = "Remarks";
+                        buildFloatingHelper(pipWindow.document);
+                        window.remarksHelperFloatingWindow = pipWindow;
+
+                        // Minimize parent helper since we are now in PIP mode
+                        if (panel) {
+                            panel.classList.remove("active");
+                            panel.setAttribute("aria-hidden", "true");
+                        }
+                        if (mini) {
+                            mini.classList.remove("active");
+                        }
+
+                        // When PIP window is closed (by user or programmatically), restore the parent mini button
+                        pipWindow.addEventListener("pagehide", function () {
+                            var m = document.getElementById("remarksHelperMini");
+                            if (m) m.classList.add("active");
+                        });
+                        return;
+                    } catch (e) {
+                        console.error("Failed to open Document PiP:", e);
+                    }
+                }
+                var popup = window.open("remarks-helper/index.html?floating=1", "remarksHelperFloating", "popup=yes,width=420,height=620,left=80,top=80");
+                window.remarksHelperFloatingWindow = popup;
+                if (popup) {
+                    if (panel) {
+                        panel.classList.remove("active");
+                        panel.setAttribute("aria-hidden", "true");
+                    }
+                    if (mini) {
+                        mini.classList.remove("active");
+                    }
+                    popup.addEventListener("pagehide", function () {
+                        var m = document.getElementById("remarksHelperMini");
+                        if (m) m.classList.add("active");
+                    });
+                }
+            };
+
+            function bindRemarksHelper() {
+                var input = document.getElementById("remarksHelperInput");
+                var clear = document.getElementById("remarksHelperClear");
+                var ticketToggle = document.getElementById("remarksTicketToggle");
+                var panel = document.getElementById("remarksHelperPanel");
+                var dragHandle = document.getElementById("remarksHelperDrag");
+                var resizeHandles = panel.querySelectorAll("[data-rh-resize]");
+                if (!input || !clear || !ticketToggle || !panel || !dragHandle || !resizeHandles.length || panel.dataset.bound === "true") return;
+                panel.dataset.bound = "true";
+
+                input.addEventListener("input", renderRemarksHelper);
+                input.addEventListener("keydown", function (event) {
+                    if (event.key !== "Enter") return;
+                    var firstCard = document.querySelector(".remarks-helper-card");
+                    if (!firstCard) return;
+                    event.preventDefault();
+                    firstCard.click();
+                });
+                clear.addEventListener("click", function () {
+                    input.value = "";
+                    renderRemarksHelper();
+                    input.focus();
+                });
+                ticketToggle.addEventListener("click", function () {
+                    setTicketTemplateMode(document, !panel.classList.contains("ticket-mode"));
+                });
+                bindTicketTatTemplate({
+                    ticketId: "remarksTicketInput",
+                    tatId: "remarksTatInput",
+                    outputId: "remarksTatOutput"
+                });
+
+                var dragging = false;
+                var offsetX = 0;
+                var offsetY = 0;
+                var resizing = false;
+                var startX = 0;
+                var startY = 0;
+                var startWidth = 0;
+                var startHeight = 0;
+                var startLeft = 0;
+                var startTop = 0;
+                var resizeDir = "";
+
+                dragHandle.addEventListener("pointerdown", function (event) {
+                    if (event.target.closest("button")) return;
+                    var rect = panel.getBoundingClientRect();
+                    dragging = true;
+                    offsetX = event.clientX - rect.left;
+                    offsetY = event.clientY - rect.top;
+                    if (panel.setPointerCapture) panel.setPointerCapture(event.pointerId);
+                });
+
+                resizeHandles.forEach(function (handle) {
+                    handle.addEventListener("pointerdown", function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var rect = panel.getBoundingClientRect();
+                        resizing = true;
+                        resizeDir = handle.getAttribute("data-rh-resize") || "";
+                        startX = event.clientX;
+                        startY = event.clientY;
+                        startWidth = rect.width;
+                        startHeight = rect.height;
+                        startLeft = rect.left;
+                        startTop = rect.top;
+                        if (panel.setPointerCapture) panel.setPointerCapture(event.pointerId);
+                    });
+                });
+
+                panel.addEventListener("pointermove", function (event) {
+                    if (resizing) {
+                        var dx = event.clientX - startX;
+                        var dy = event.clientY - startY;
+                        var nextLeft = startLeft;
+                        var nextTop = startTop;
+                        var nextWidth = startWidth;
+                        var nextHeight = startHeight;
+                        var minWidth = 320;
+                        var minHeight = 220;
+
+                        if (resizeDir.indexOf("e") !== -1) nextWidth = startWidth + dx;
+                        if (resizeDir.indexOf("s") !== -1) nextHeight = startHeight + dy;
+                        if (resizeDir.indexOf("w") !== -1) {
+                            nextWidth = startWidth - dx;
+                            nextLeft = startLeft + dx;
+                        }
+                        if (resizeDir.indexOf("n") !== -1) {
+                            nextHeight = startHeight - dy;
+                            nextTop = startTop + dy;
+                        }
+
+                        if (nextWidth < minWidth) {
+                            if (resizeDir.indexOf("w") !== -1) nextLeft -= minWidth - nextWidth;
+                            nextWidth = minWidth;
+                        }
+                        if (nextHeight < minHeight) {
+                            if (resizeDir.indexOf("n") !== -1) nextTop -= minHeight - nextHeight;
+                            nextHeight = minHeight;
+                        }
+
+                        nextLeft = Math.max(8, Math.min(window.innerWidth - nextWidth - 8, nextLeft));
+                        nextTop = Math.max(8, Math.min(window.innerHeight - nextHeight - 8, nextTop));
+                        nextWidth = Math.min(nextWidth, window.innerWidth - nextLeft - 8);
+                        nextHeight = Math.min(nextHeight, window.innerHeight - nextTop - 8);
+
+                        panel.style.left = nextLeft + "px";
+                        panel.style.top = nextTop + "px";
+                        panel.style.right = "auto";
+                        panel.style.bottom = "auto";
+                        panel.style.width = nextWidth + "px";
+                        panel.style.height = nextHeight + "px";
+                        return;
+                    }
+                    if (dragging) {
+                        panel.style.left = Math.max(8, event.clientX - offsetX) + "px";
+                        panel.style.top = Math.max(8, event.clientY - offsetY) + "px";
+                        panel.style.right = "auto";
+                        panel.style.bottom = "auto";
+                    }
+                });
+                panel.addEventListener("pointerup", function () {
+                    dragging = false;
+                    resizing = false;
+                });
+                renderRemarksHelper();
+
+                // Close panel when clicking outside (capture phase to avoid stopPropagation issues)
+                document.addEventListener("mousedown", function (event) {
+                    if (panel.classList.contains("active")) {
+                        var mini = document.getElementById("remarksHelperMini");
+                        if (!panel.contains(event.target) && (!mini || !mini.contains(event.target))) {
+                            window.minimizeRemarksHelper();
+                        }
+                    }
+
+
+                }, true);
+
+                // Close panel when window loses focus (user clicks another window/tab)
+                window.addEventListener("blur", function () {
+                    if (!panel.classList.contains("active")) return;
+                    window.minimizeRemarksHelper();
+                });
+            }
+
             if (document.readyState === "loading") {
                 document.addEventListener("DOMContentLoaded", bindRemarksHelper);
             } else {
                 bindRemarksHelper();
+            }
+        })();
+
+        // =========================================================
+        // TICKET & MAIL HELPER JS LOGIC
+        // =========================================================
+        (function () {
+            window.ticketList = [];
+            window.mailTemplate = "";
+            window.currentTicketIndex = 0;
+            window.ticketHelperFloatingWindow = null;
+
+            function buildTicketHelperFloating(doc) {
+                var expandedSize = { width: 420, height: 440 };
+                var collapsedSize = { width: 160, height: 80 };
+                
+                function setCollapsed(collapsed) {
+                    doc.body.classList.toggle("pip-collapsed", collapsed);
+                    try {
+                        var sz = collapsed ? collapsedSize : expandedSize;
+                        doc.defaultView.resizeTo(sz.width, sz.height);
+                    } catch (e) {}
+                    if (collapsed) {
+                        doc.getElementById("pipRestore").focus();
+                    }
+                }
+
+                // Add Google Fonts Poppins link
+                var fontLink = doc.createElement("link");
+                fontLink.rel = "stylesheet";
+                fontLink.href = "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap";
+                doc.head.appendChild(fontLink);
+
+                doc.body.innerHTML = [
+                    '<div class="pip-shell">',
+                    '  <div class="pip-drag" style="background: #111827; color:#fff; padding:6px 12px; display:flex; justify-content:space-between; align-items:center; height:34px; user-select:none;">',
+                    '    <span style="font-size:12px; font-weight:bold;">🎫 Ticket Helper</span>',
+                    '    <button id="pipHide" type="button" style="height:22px; padding:0 8px; border:none; border-radius:4px; font-size:10px; font-weight:bold; background:#0f766e; color:#fff; cursor:pointer;">Collapse</button>',
+                    '  </div>',
+                    '  <div style="padding:12px; display:flex; flex-direction:column; gap:10px; flex:1; background:#fff;">',
+                    '    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">',
+                    '      <span id="pipProgress" style="font-size:13px; font-weight:bold; color:#475569;">Progress: 0 / 0</span>',
+                    '      <div style="display:flex; gap:4px;">',
+                    '        <button type="button" id="pipPrevBtn" class="ticket-nav-btn">◀</button>',
+                    '        <button type="button" id="pipNextBtn" class="ticket-nav-btn">▶</button>',
+                    '      </div>',
+                    '    </div>',
+                    '    <div style="display:flex; flex-direction:column; gap:4px;">',
+                    '      <span style="font-size:10px; font-weight:bold; text-transform:uppercase; color:#64748b; letter-spacing:0.5px;">Current Ticket ID (Click to Copy & Advance):</span>',
+                    '      <button type="button" id="pipActiveIdBtn" class="ticket-play-card" style="font-size:18px; font-weight:800; font-family:monospace; color:#0f766e; border-color:#0f766e; text-align:center;">No Tickets</button>',
+                    '    </div>',
+                    '    <div style="display:flex; flex-direction:column; gap:4px;">',
+                    '      <span style="font-size:10px; font-weight:bold; text-transform:uppercase; color:#64748b; letter-spacing:0.5px;">Mail Body (Click to Copy):</span>',
+                    '      <button type="button" id="pipActiveMailBtn" class="ticket-play-card" style="font-size:13px; text-align:left; min-height:80px; max-height:140px; overflow-y:auto; display:block; font-weight:500; color:#334155; white-space:normal; line-height:1.4;">No Template</button>',
+                    '    </div>',
+                    '    <div style="display:flex; gap:12px; font-size:11px; font-weight:600; color:#475569; justify-content:center; margin-top:4px; user-select:none;">',
+                    '      <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">',
+                    '        <input type="checkbox" id="pipAutoAdvanceTicket" checked style="cursor:pointer;" />',
+                    '        Auto-Advance on Ticket',
+                    '      </label>',
+                    '      <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">',
+                    '        <input type="checkbox" id="pipAutoAdvanceMail" style="cursor:pointer;" />',
+                    '        Auto-Advance on Mail',
+                    '      </label>',
+                    '    </div>',
+                    '  </div>',
+                    '</div>',
+                    '<button id="pipRestore" type="button" style="display:none; width:100%; height:46px; border:none; border-radius:6px; background:#0f766e; color:#fff; font-size:14px; font-weight:800; cursor:pointer;">🎫 Tickets</button>'
+                ].join("");
+
+                var style = doc.createElement("style");
+                style.textContent = [
+                    '*{box-sizing:border-box}',
+                    'body{margin:0;background:#fff;font-family:Poppins,Arial,sans-serif;color:#111827;overflow:hidden}',
+                    '.pip-shell{height:100vh;display:flex;flex-direction:column;background:#fff}',
+                    '.ticket-nav-btn{height:24px;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:4px;cursor:pointer;font-size:11px;font-weight:bold;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;transition:background .2s}',
+                    '.ticket-nav-btn:hover{background:#f1f5f9}',
+                    '.ticket-play-card{width:100%;border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:10px 12px;outline:none;cursor:pointer;transition:all .2s;text-align:left;overflow-wrap:anywhere}',
+                    '.ticket-play-card:hover{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.12)}',
+                    '.ticket-play-card.copied{border-color:#10b981!important;background:#ecfdf5!important;box-shadow:0 0 0 3px rgba(16,185,129,.12)!important}',
+                    'body.pip-collapsed{min-height:0;overflow:hidden;background:transparent;padding:8px}',
+                    'body.pip-collapsed .pip-shell{display:none}',
+                    'body.pip-collapsed #pipRestore{display:block}'
+                ].join("");
+                doc.head.appendChild(style);
+
+                var hide = doc.getElementById("pipHide");
+                var restore = doc.getElementById("pipRestore");
+                hide.addEventListener("click", function () { setCollapsed(true); });
+                restore.addEventListener("click", function () { setCollapsed(false); });
+
+                var pipWin = doc.defaultView;
+                if (pipWin) {
+                    pipWin.collapseTicketHelper = setCollapsed;
+                }
+            }
+
+            window.lastCopiedTicket = "";
+
+            function parseTickets(raw) {
+                return raw.split(/[\s,]+/)
+                    .map(function(t) { 
+                        return t.trim().replace(/^["']|["']$/g, "").trim(); 
+                    })
+                    .filter(function(t) { 
+                        return t.length > 0; 
+                    });
+            }
+
+            window.renderTicketHelper = function () {
+                var ticket = window.ticketList[window.currentTicketIndex] || "";
+                var targetMailTicket = window.lastCopiedTicket || ticket || "";
+                var mail = window.mailTemplate;
+                if (targetMailTicket) {
+                    mail = mail.replaceAll("{ticket}", targetMailTicket);
+                }
+                
+                var total = window.ticketList.length;
+                var currentDisplayIndex = total > 0 ? (window.currentTicketIndex + 1) : 0;
+                var progressText = "Progress: " + currentDisplayIndex + " / " + total;
+
+                // Update parent UI
+                var activeIdBtn = document.getElementById("ticketHelperActiveIdBtn");
+                var activeMailBtn = document.getElementById("ticketHelperActiveMailBtn");
+                var progressEl = document.getElementById("ticketHelperProgress");
+
+                if (activeIdBtn) activeIdBtn.textContent = ticket || "No Tickets Loaded";
+                if (activeMailBtn) activeMailBtn.textContent = mail || "No Template Loaded";
+                if (progressEl) progressEl.textContent = progressText;
+
+                // Update PiP window UI if open
+                if (window.ticketHelperFloatingWindow && !window.ticketHelperFloatingWindow.closed) {
+                    var pipDoc = window.ticketHelperFloatingWindow.document;
+                    var pipActiveIdBtn = pipDoc.getElementById("pipActiveIdBtn");
+                    var pipActiveMailBtn = pipDoc.getElementById("pipActiveMailBtn");
+                    var pipProgressEl = pipDoc.getElementById("pipProgress");
+
+                    if (pipActiveIdBtn) pipActiveIdBtn.textContent = ticket || "No Tickets";
+                    if (pipActiveMailBtn) pipActiveMailBtn.textContent = mail || "No Template";
+                    if (pipProgressEl) pipProgressEl.textContent = progressText;
+                }
+            };
+
+            function loadSavedTicketData() {
+                var savedIds = localStorage.getItem("ticketHelperIds") || "";
+                var savedMail = localStorage.getItem("ticketHelperMail") || "";
+                
+                document.getElementById("ticketHelperInputIds").value = savedIds;
+                document.getElementById("ticketHelperInputMail").value = savedMail;
+                
+                if (savedIds && savedMail) {
+                    window.ticketList = parseTickets(savedIds);
+                    window.mailTemplate = savedMail;
+                    window.currentTicketIndex = 0;
+                    window.lastCopiedTicket = window.ticketList[0] || "";
+                    
+                    document.getElementById("ticketHelperSetup").style.display = "none";
+                    document.getElementById("ticketHelperPlay").style.display = "block";
+                    window.renderTicketHelper();
+                }
+            }
+
+            window.saveAndStartTicketHelper = function () {
+                var rawIds = document.getElementById("ticketHelperInputIds").value || "";
+                var rawMail = document.getElementById("ticketHelperInputMail").value || "";
+                
+                window.ticketList = parseTickets(rawIds);
+                window.mailTemplate = rawMail;
+                window.currentTicketIndex = 0;
+                window.lastCopiedTicket = window.ticketList[0] || "";
+
+                if (window.ticketList.length === 0) {
+                    alert("Please enter at least one Ticket ID!");
+                    return;
+                }
+
+                localStorage.setItem("ticketHelperIds", rawIds);
+                localStorage.setItem("ticketHelperMail", rawMail);
+
+                document.getElementById("ticketHelperSetup").style.display = "none";
+                document.getElementById("ticketHelperPlay").style.display = "block";
+                
+                window.renderTicketHelper();
+            };
+
+            window.editTicketHelperSetup = function () {
+                document.getElementById("ticketHelperSetup").style.display = "block";
+                document.getElementById("ticketHelperPlay").style.display = "none";
+            };
+
+            window.copyTicketHelperText = function (text, isTicketId) {
+                if (!text) return;
+                
+                var done = navigator.clipboard && navigator.clipboard.writeText
+                    ? navigator.clipboard.writeText(text)
+                    : Promise.reject();
+                
+                function handleSuccess() {
+                    var targetId = isTicketId ? "ActiveIdBtn" : "ActiveMailBtn";
+                    
+                    // Highlight parent
+                    var parentBtn = document.getElementById("ticketHelper" + targetId);
+                    if (parentBtn) {
+                        parentBtn.classList.add("copied");
+                        setTimeout(function () {
+                            parentBtn.classList.remove("copied");
+                        }, 700);
+                    }
+
+                    // Highlight PiP
+                    if (window.ticketHelperFloatingWindow && !window.ticketHelperFloatingWindow.closed) {
+                        var pipDoc = window.ticketHelperFloatingWindow.document;
+                        var pipBtn = pipDoc.getElementById("pip" + targetId);
+                        if (pipBtn) {
+                            pipBtn.classList.add("copied");
+                            setTimeout(function () {
+                                pipBtn.classList.remove("copied");
+                            }, 700);
+                        }
+                    }
+
+                    // If they copy the active ticket ID, update lastCopiedTicket and re-render
+                    if (isTicketId) {
+                        window.lastCopiedTicket = text;
+                        window.renderTicketHelper();
+                    }
+
+                    // Auto-advance
+                    var autoTicket = document.getElementById("ticketHelperAutoAdvanceTicket").checked;
+                    var autoMail = document.getElementById("ticketHelperAutoAdvanceMail").checked;
+                    
+                    if (isTicketId && autoTicket) {
+                        setTimeout(function () { window.navTicketHelper(1, false); }, 150);
+                    } else if (!isTicketId && autoMail) {
+                        setTimeout(function () { window.navTicketHelper(1, false); }, 150);
+                    }
+                }
+
+                done.then(handleSuccess).catch(function () {
+                    var activeDoc = document;
+                    if (window.ticketHelperFloatingWindow && !window.ticketHelperFloatingWindow.closed) {
+                        activeDoc = window.ticketHelperFloatingWindow.document;
+                    }
+                    var temp = activeDoc.createElement("textarea");
+                    temp.value = text;
+                    temp.setAttribute("readonly", "");
+                    temp.style.position = "fixed";
+                    temp.style.left = "-9999px";
+                    activeDoc.body.appendChild(temp);
+                    temp.select();
+                    try {
+                        activeDoc.execCommand("copy");
+                        handleSuccess();
+                    } catch (err) {
+                        console.error("Fallback copy failed:", err);
+                    }
+                    temp.remove();
+                });
+            };
+
+            window.navTicketHelper = function (direction, isManual) {
+                var nextIndex = window.currentTicketIndex + direction;
+                if (nextIndex >= 0 && nextIndex < window.ticketList.length) {
+                    window.currentTicketIndex = nextIndex;
+                    if (isManual) {
+                        window.lastCopiedTicket = window.ticketList[nextIndex];
+                    }
+                    window.renderTicketHelper();
+                } else if (nextIndex >= window.ticketList.length && window.ticketList.length > 0) {
+                    alert("All tickets processed! Resetting to first ticket.");
+                    window.currentTicketIndex = 0;
+                    if (isManual) {
+                        window.lastCopiedTicket = window.ticketList[0];
+                    }
+                    window.renderTicketHelper();
+                }
+            };
+
+            window.openTicketHelper = function () {
+                var panel = document.getElementById("ticketHelperPanel");
+                var mini = document.getElementById("ticketHelperMini");
+                if (panel) {
+                    panel.classList.add("active");
+                    panel.setAttribute("aria-hidden", "false");
+                }
+                if (mini) mini.classList.remove("active");
+            };
+
+            window.closeTicketHelper = function () {
+                var panel = document.getElementById("ticketHelperPanel");
+                var mini = document.getElementById("ticketHelperMini");
+                if (panel) {
+                    panel.classList.remove("active");
+                    panel.setAttribute("aria-hidden", "true");
+                }
+                if (mini) mini.classList.remove("active");
+            };
+
+            window.minimizeTicketHelper = function () {
+                var panel = document.getElementById("ticketHelperPanel");
+                var mini = document.getElementById("ticketHelperMini");
+                if (panel) {
+                    panel.classList.remove("active");
+                    panel.setAttribute("aria-hidden", "true");
+                }
+                if (mini) mini.classList.add("active");
+            };
+
+            window.openTicketHelperFloating = async function () {
+                var panel = document.getElementById("ticketHelperPanel");
+                var mini = document.getElementById("ticketHelperMini");
+                
+                if ("documentPictureInPicture" in window) {
+                    try {
+                        var pipWindow = await window.documentPictureInPicture.requestWindow({
+                            width: 420,
+                            height: 380
+                        });
+                        
+                        pipWindow.document.title = "Ticket Helper";
+                        buildTicketHelperFloating(pipWindow.document);
+                        window.ticketHelperFloatingWindow = pipWindow;
+
+                        var pipDoc = pipWindow.document;
+                        pipDoc.getElementById("pipPrevBtn").addEventListener("click", function () {
+                            window.navTicketHelper(-1, true);
+                        });
+                        pipDoc.getElementById("pipNextBtn").addEventListener("click", function () {
+                            window.navTicketHelper(1, true);
+                        });
+
+                        pipDoc.getElementById("pipActiveIdBtn").addEventListener("click", function () {
+                            var ticket = window.ticketList[window.currentTicketIndex] || "";
+                            window.copyTicketHelperText(ticket, true);
+                        });
+                        pipDoc.getElementById("pipActiveMailBtn").addEventListener("click", function () {
+                            var ticket = window.ticketList[window.currentTicketIndex] || "";
+                            var mail = window.mailTemplate;
+                            if (ticket) {
+                                mail = mail.replaceAll("{ticket}", ticket);
+                            }
+                            window.copyTicketHelperText(mail, false);
+                        });
+
+                        var pipAutoTicket = pipDoc.getElementById("pipAutoAdvanceTicket");
+                        var pipAutoMail = pipDoc.getElementById("pipAutoAdvanceMail");
+                        var parentAutoTicket = document.getElementById("ticketHelperAutoAdvanceTicket");
+                        var parentAutoMail = document.getElementById("ticketHelperAutoAdvanceMail");
+
+                        pipAutoTicket.checked = parentAutoTicket.checked;
+                        pipAutoMail.checked = parentAutoMail.checked;
+
+                        pipAutoTicket.addEventListener("change", function () { parentAutoTicket.checked = pipAutoTicket.checked; });
+                        pipAutoMail.addEventListener("change", function () { parentAutoMail.checked = pipAutoMail.checked; });
+
+                        if (panel) {
+                            panel.classList.remove("active");
+                            panel.setAttribute("aria-hidden", "true");
+                        }
+                        if (mini) mini.classList.remove("active");
+
+                        pipWindow.addEventListener("pagehide", function () {
+                            var m = document.getElementById("ticketHelperMini");
+                            if (m) m.classList.add("active");
+                        });
+
+                        window.renderTicketHelper();
+                        return;
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                // Fallback Window Popup
+                var popup = window.open("", "ticketHelperFloating", "popup=yes,width=420,height=380,left=120,top=120");
+                window.ticketHelperFloatingWindow = popup;
+                if (popup) {
+                    buildTicketHelperFloating(popup.document);
+                    
+                    var pipDoc = popup.document;
+                    pipDoc.getElementById("pipPrevBtn").addEventListener("click", function () {
+                        window.navTicketHelper(-1, true);
+                    });
+                    pipDoc.getElementById("pipNextBtn").addEventListener("click", function () {
+                        window.navTicketHelper(1, true);
+                    });
+
+                    pipDoc.getElementById("pipActiveIdBtn").addEventListener("click", function () {
+                        var ticket = window.ticketList[window.currentTicketIndex] || "";
+                        window.copyTicketHelperText(ticket, true);
+                    });
+                    pipDoc.getElementById("pipActiveMailBtn").addEventListener("click", function () {
+                        var ticket = window.ticketList[window.currentTicketIndex] || "";
+                        var mail = window.mailTemplate;
+                        if (ticket) {
+                            mail = mail.replaceAll("{ticket}", ticket);
+                        }
+                        window.copyTicketHelperText(mail, false);
+                    });
+
+                    var pipAutoTicket = pipDoc.getElementById("pipAutoAdvanceTicket");
+                    var pipAutoMail = pipDoc.getElementById("pipAutoAdvanceMail");
+                    var parentAutoTicket = document.getElementById("ticketHelperAutoAdvanceTicket");
+                    var parentAutoMail = document.getElementById("ticketHelperAutoAdvanceMail");
+
+                    pipAutoTicket.checked = parentAutoTicket.checked;
+                    pipAutoMail.checked = parentAutoMail.checked;
+
+                    pipAutoTicket.addEventListener("change", function () { parentAutoTicket.checked = pipAutoTicket.checked; });
+                    pipAutoMail.addEventListener("change", function () { parentAutoMail.checked = pipAutoMail.checked; });
+
+                    if (panel) {
+                        panel.classList.remove("active");
+                        panel.setAttribute("aria-hidden", "true");
+                    }
+                    if (mini) mini.classList.remove("active");
+
+                    popup.addEventListener("pagehide", function () {
+                        var m = document.getElementById("ticketHelperMini");
+                        if (m) m.classList.add("active");
+                    });
+
+                    window.renderTicketHelper();
+                }
+            };
+
+            function bindTicketHelper() {
+                var panel = document.getElementById("ticketHelperPanel");
+                var dragHandle = document.getElementById("ticketHelperDrag");
+                var resizeHandles = panel.querySelectorAll("[data-th-resize]");
+                if (!panel || !dragHandle || !resizeHandles.length || panel.dataset.bound === "true") return;
+                panel.dataset.bound = "true";
+
+                var dragging = false;
+                var offsetX = 0;
+                var offsetY = 0;
+                var resizing = false;
+                var startX = 0;
+                var startY = 0;
+                var startWidth = 0;
+                var startHeight = 0;
+                var startLeft = 0;
+                var startTop = 0;
+                var resizeDir = "";
+
+                dragHandle.addEventListener("pointerdown", function (event) {
+                    if (event.target.closest("button")) return;
+                    var rect = panel.getBoundingClientRect();
+                    dragging = true;
+                    offsetX = event.clientX - rect.left;
+                    offsetY = event.clientY - rect.top;
+                    if (panel.setPointerCapture) panel.setPointerCapture(event.pointerId);
+                });
+
+                resizeHandles.forEach(function (handle) {
+                    handle.addEventListener("pointerdown", function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var rect = panel.getBoundingClientRect();
+                        resizing = true;
+                        resizeDir = handle.getAttribute("data-th-resize") || "";
+                        startX = event.clientX;
+                        startY = event.clientY;
+                        startWidth = rect.width;
+                        startHeight = rect.height;
+                        startLeft = rect.left;
+                        startTop = rect.top;
+                        if (panel.setPointerCapture) panel.setPointerCapture(event.pointerId);
+                    });
+                });
+
+                panel.addEventListener("pointermove", function (event) {
+                    if (resizing) {
+                        var dx = event.clientX - startX;
+                        var dy = event.clientY - startY;
+                        var nextLeft = startLeft;
+                        var nextTop = startTop;
+                        var nextWidth = startWidth;
+                        var nextHeight = startHeight;
+                        var minWidth = 320;
+                        var minHeight = 220;
+
+                        if (resizeDir.indexOf("e") !== -1) nextWidth = startWidth + dx;
+                        if (resizeDir.indexOf("s") !== -1) nextHeight = startHeight + dy;
+                        if (resizeDir.indexOf("w") !== -1) {
+                            nextWidth = startWidth - dx;
+                            nextLeft = startLeft + dx;
+                        }
+                        if (resizeDir.indexOf("n") !== -1) {
+                            nextHeight = startHeight - dy;
+                            nextTop = startTop + dy;
+                        }
+
+                        if (nextWidth < minWidth) {
+                            if (resizeDir.indexOf("w") !== -1) nextLeft -= minWidth - nextWidth;
+                            nextWidth = minWidth;
+                        }
+                        if (nextHeight < minHeight) {
+                            if (resizeDir.indexOf("n") !== -1) nextTop -= minHeight - nextHeight;
+                            nextHeight = minHeight;
+                        }
+
+                        nextLeft = Math.max(8, Math.min(window.innerWidth - nextWidth - 8, nextLeft));
+                        nextTop = Math.max(8, Math.min(window.innerHeight - nextHeight - 8, nextTop));
+                        nextWidth = Math.min(nextWidth, window.innerWidth - nextLeft - 8);
+                        nextHeight = Math.min(nextHeight, window.innerHeight - nextTop - 8);
+
+                        panel.style.left = nextLeft + "px";
+                        panel.style.top = nextTop + "px";
+                        panel.style.right = "auto";
+                        panel.style.bottom = "auto";
+                        panel.style.width = nextWidth + "px";
+                        panel.style.height = nextHeight + "px";
+                        return;
+                    }
+                    if (dragging) {
+                        panel.style.left = Math.max(8, event.clientX - offsetX) + "px";
+                        panel.style.top = Math.max(8, event.clientY - offsetY) + "px";
+                        panel.style.right = "auto";
+                        panel.style.bottom = "auto";
+                    }
+                });
+
+                panel.addEventListener("pointerup", function () {
+                    dragging = false;
+                    resizing = false;
+                });
+
+                document.addEventListener("mousedown", function (event) {
+                    if (panel.classList.contains("active")) {
+                        var mini = document.getElementById("ticketHelperMini");
+                        if (!panel.contains(event.target) && (!mini || !mini.contains(event.target))) {
+                            window.minimizeTicketHelper();
+                        }
+                    }
+                }, true);
+
+                window.addEventListener("blur", function () {
+                    if (!panel.classList.contains("active")) return;
+                    window.minimizeTicketHelper();
+                });
+            }
+
+            function setupTicketHelperControls() {
+                var saveBtn = document.getElementById("ticketHelperSaveBtn");
+                var editBtn = document.getElementById("ticketHelperEditBtn");
+                var prevBtn = document.getElementById("ticketHelperPrevBtn");
+                var nextBtn = document.getElementById("ticketHelperNextBtn");
+                var activeIdBtn = document.getElementById("ticketHelperActiveIdBtn");
+                var activeMailBtn = document.getElementById("ticketHelperActiveMailBtn");
+
+                if (saveBtn) saveBtn.addEventListener("click", window.saveAndStartTicketHelper);
+                if (editBtn) editBtn.addEventListener("click", window.editTicketHelperSetup);
+                if (prevBtn) prevBtn.addEventListener("click", function () { window.navTicketHelper(-1, true); });
+                if (nextBtn) nextBtn.addEventListener("click", function () { window.navTicketHelper(1, true); });
+                
+                if (activeIdBtn) activeIdBtn.addEventListener("click", function () {
+                    var ticket = window.ticketList[window.currentTicketIndex] || "";
+                    window.copyTicketHelperText(ticket, true);
+                });
+                
+                if (activeMailBtn) activeMailBtn.addEventListener("click", function () {
+                    var ticket = window.ticketList[window.currentTicketIndex] || "";
+                    var mail = window.mailTemplate;
+                    if (ticket) {
+                        mail = mail.replaceAll("{ticket}", ticket);
+                    }
+                    window.copyTicketHelperText(mail, false);
+                });
+
+                var parentAutoTicket = document.getElementById("ticketHelperAutoAdvanceTicket");
+                var parentAutoMail = document.getElementById("ticketHelperAutoAdvanceMail");
+
+                if (parentAutoTicket) {
+                    parentAutoTicket.addEventListener("change", function () {
+                        if (window.ticketHelperFloatingWindow && !window.ticketHelperFloatingWindow.closed) {
+                            var p = window.ticketHelperFloatingWindow.document.getElementById("pipAutoAdvanceTicket");
+                            if (p) p.checked = parentAutoTicket.checked;
+                        }
+                    });
+                }
+                if (parentAutoMail) {
+                    parentAutoMail.addEventListener("change", function () {
+                        if (window.ticketHelperFloatingWindow && !window.ticketHelperFloatingWindow.closed) {
+                            var p = window.ticketHelperFloatingWindow.document.getElementById("pipAutoAdvanceMail");
+                            if (p) p.checked = parentAutoMail.checked;
+                        }
+                    });
+                }
+
+                bindTicketHelper();
+                loadSavedTicketData();
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", setupTicketHelperControls);
+            } else {
+                setupTicketHelperControls();
             }
         })();
     </script>
