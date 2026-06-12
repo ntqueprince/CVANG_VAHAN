@@ -161,7 +161,7 @@ button:hover {
     text-align: center;
 }
 
-/* ✅ Extra support for small screen (mobile) */
+/* âœ… Extra support for small screen (mobile) */
 @media (max-width: 600px) {
     .download-btn {
         font-size: 16px;
@@ -1204,7 +1204,7 @@ button:hover {
 }
 
 .claim-count-nstp-page .sort-icon::after {
-    content: '↕';
+    content: '\2195';
     margin-left: 5px;
     display: inline-block;
     color: white;
@@ -1212,13 +1212,13 @@ button:hover {
 }
 
 .claim-count-nstp-page .sort-asc::after {
-    content: '↑';
+    content: '\2191';
     color: white;
     /* Ensure icon is white */
 }
 
 .claim-count-nstp-page .sort-desc::after {
-    content: '↓';
+    content: '\2193';
     color: white;
     /* Ensure icon is white */
 }
@@ -2262,10 +2262,10 @@ button:hover {
     white-space: normal;
     position: relative;
     padding-right: 24px;
-    /* ❌ button ke liye jagah */
+    /* âŒ button ke liye jagah */
 }
 
-/* ❌ Delete button ke position aur size fix karna */
+/* âŒ Delete button ke position aur size fix karna */
 #chatMessages .group button {
     position: absolute;
     top: 4px;
@@ -2296,7 +2296,7 @@ button:hover {
     white-space: normal;
     position: relative;
     padding: 10px 24px 10px 10px;
-    /* right me jagah ❌ button ke liye */
+    /* right me jagah âŒ button ke liye */
     border-radius: 8px;
     display: inline-block;
 }
@@ -2870,7 +2870,7 @@ button:hover {
 }
 
 /* ========================================
-   🎮 Memory Card Game Styles
+   ðŸŽ® Memory Card Game Styles
    ======================================== */
 
 .memory-game-overlay {
@@ -3221,7 +3221,7 @@ button:hover {
 }
 
 /* ========================================
-   🎮 Game Hub & Mini Games Styles
+   ðŸŽ® Game Hub & Mini Games Styles
    ======================================== */
 
 .game-hub-container {
@@ -5181,7 +5181,7 @@ button:hover {
 }
 
 /* ============================================= */
-/* 🎵 SONGS HUB - Premium Rotating Carousel     */
+/* ðŸŽµ SONGS HUB - Premium Rotating Carousel     */
 /* ============================================= */
 .songs-hub-overlay {
     display: none;
@@ -6921,6 +6921,201 @@ body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
     display: none;
 }
 
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    outline: none;
+}
+
+.remarks-helper-template-output.copied {
+    border-color: #0f766e;
+    background: #ecfdf5;
+}
+
+.remarks-helper-panel.ticket-mode .remarks-helper-template {
+    display: grid;
+}
+
+.remarks-helper-panel.ticket-mode .remarks-helper-results {
+    display: none;
+}
+
+.remarks-helper-panel.ticket-mode #remarksHelperInput,
+.remarks-helper-panel.ticket-mode #remarksHelperClear {
+    display: none;
+}
+
+.remarks-helper-results {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.remarks-helper-card {
+    width: 100%;
+    min-height: 56px;
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 8px;
+    background: #ffffff;
+    color: #111827;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.remarks-helper-card:hover,
+.remarks-helper-card:focus {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    outline: none;
+}
+
+.remarks-helper-card.copied {
+    border-color: #0f766e;
+    background: #ecfdf5;
+}
+
+.remarks-helper-resize {
+    position: absolute;
+    z-index: 2;
+}
+
+.remarks-helper-resize-n {
+    top: 0;
+    left: 18px;
+    right: 18px;
+    height: 8px;
+    cursor: ns-resize;
+}
+
+.remarks-helper-resize-e {
+    top: 18px;
+    right: 0;
+    bottom: 18px;
+    width: 8px;
+    cursor: ew-resize;
+}
+
+.remarks-helper-resize-s {
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    height: 8px;
+    cursor: ns-resize;
+}
+
+.remarks-helper-resize-w {
+    top: 18px;
+    left: 0;
+    bottom: 18px;
+    width: 8px;
+    cursor: ew-resize;
+}
+
+.remarks-helper-resize-ne,
+.remarks-helper-resize-nw,
+.remarks-helper-resize-se,
+.remarks-helper-resize-sw {
+    width: 24px;
+    height: 24px;
+}
+
+.remarks-helper-resize-ne {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.remarks-helper-resize-nw {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.remarks-helper-resize-se {
+    right: 0;
+    bottom: 0;
+    cursor: nwse-resize;
+}
+
+.remarks-helper-resize-sw {
+    left: 0;
+    bottom: 0;
+    cursor: nesw-resize;
+}
+
+.remarks-helper-resize-se::after {
+    content: "";
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid rgba(15, 23, 42, 0.45);
+    border-bottom: 2px solid rgba(15, 23, 42, 0.45);
+}
+
+.remarks-helper-mini {
+    position: fixed;
+    right: 88px;
+    bottom: 86px;
+    z-index: 6999;
+    display: none;
+    min-width: 96px;
+    height: 40px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #10b981, #0e7490);
+    color: #ffffff;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28);
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.remarks-helper-mini.active {
+    display: block;
+}
+
+@media (max-width: 720px) {
+    .remarks-helper-panel {
+        right: 10px;
+        left: 10px;
+        bottom: 76px;
+        width: auto;
+    }
+
+    .remarks-helper-mini {
+        right: 12px;
+        bottom: 76px;
+    }
+}
+
+.carrom-coins-card {
+    border-radius: 14px;
+    border: 1px solid rgba(245, 158, 11, 0.24);
+    background: rgba(15, 23, 42, 0.36);
+    padding: 10px 12px;
+    margin: 8px 0;
+}
+
+.carrom-coins-summary {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #fff7ed;
+    font-weight: 800;
+    list-style: none;
+}
+
+.carrom-coins-summary::-webkit-details-marker {
+    display: none;
+}
+
 .carrom-coins-summary strong {
     color: #fde68a;
     white-space: nowrap;
@@ -6929,3 +7124,552 @@ body.stealth-buttons-hidden #notebookButton.stealth-button-revealed {
 .carrom-coins-card[open] .carrom-coins-head {
     margin-top: 8px;
 }
+
+/* =========================================================
+   INSURER WISE PLAN PAGE â€” Light & Simple
+   ========================================================= */
+
+.insurer-wise-plan-page {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f5f0ff 100%);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    text-align: left;
+}
+
+.insurer-plan-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+}
+
+/* --- Topbar --- */
+.insurer-plan-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.insurer-plan-topbar h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a237e;
+    line-height: 1.2;
+}
+
+.insurer-plan-kicker {
+    margin: 0 0 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #5c6bc0;
+}
+
+.insurer-plan-subtitle {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #78909c;
+    font-weight: 400;
+}
+
+.insurer-plan-back {
+    flex-shrink: 0;
+    padding: 9px 20px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    background: #3f51b5 !important;
+    color: #fff !important;
+    border: none !important;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(63, 81, 181, 0.25);
+    transition: all 0.2s ease;
+    width: auto !important;
+    max-width: unset !important;
+}
+
+.insurer-plan-back:hover {
+    background: #303f9f !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(63, 81, 181, 0.35);
+}
+
+/* --- Controls --- */
+.insurer-plan-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.insurer-plan-field {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.insurer-plan-field span {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #78909c;
+}
+
+.insurer-plan-field input,
+.insurer-plan-field select {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid #cfd8dc !important;
+    background: #fff !important;
+    color: #263238 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    margin: 0 !important;
+}
+
+.insurer-plan-field input::placeholder {
+    color: #b0bec5;
+}
+
+.insurer-plan-field input:focus,
+.insurer-plan-field select:focus {
+    border-color: #3f51b5 !important;
+    box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.12) !important;
+}
+
+.insurer-plan-field select option {
+    background: #fff;
+    color: #263238;
+}
+
+/* --- Summary Bar --- */
+.insurer-plan-summary {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.iwp-stat {
+    flex: 1 1 120px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.iwp-stat-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #3f51b5;
+}
+
+.iwp-stat-label {
+    font-size: 10px;
+    color: #90a4ae;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-top: 2px;
+}
+
+/* --- Selected Chips --- */
+.insurer-plan-selected {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    min-height: 0;
+}
+
+.iwp-sel-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    background: #3f51b5;
+    cursor: pointer;
+    transition: all 0.2s;
+    animation: iwpChipIn 0.25s ease;
+}
+
+@keyframes iwpChipIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.iwp-sel-chip:hover {
+    background: #5c6bc0;
+}
+
+.iwp-sel-chip .iwp-chip-x {
+    font-size: 13px;
+    font-weight: 800;
+    opacity: 0.7;
+}
+
+/* --- Card Grid --- */
+.insurer-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+}
+
+.iwp-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    animation: iwpCardIn 0.3s ease both;
+}
+
+@keyframes iwpCardIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.iwp-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.iwp-card.iwp-card-selected {
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2), 0 4px 16px rgba(63, 81, 181, 0.1);
+}
+
+.iwp-card-head {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.iwp-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.iwp-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a237e;
+    line-height: 1.25;
+}
+
+.iwp-card-plantype {
+    font-size: 11px;
+    font-weight: 600;
+    color: #90a4ae;
+    margin-top: 1px;
+}
+
+.iwp-card-body {
+    padding: 12px 16px 14px;
+}
+
+.iwp-card-desc {
+    font-size: 13px;
+    color: #546e7a;
+    line-height: 1.55;
+    margin: 0 0 10px;
+}
+
+/* --- Tags --- */
+.iwp-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.iwp-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.iwp-tag-insurer {
+    background: #e8eaf6;
+    color: #3949ab;
+    border: 1px solid #c5cae9;
+}
+
+.iwp-tag-fresh { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+.iwp-tag-renewal { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+.iwp-tag-breakin { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
+.iwp-tag-waiver { background: #fffde7; color: #f57f17; border: 1px solid #fff9c4; }
+
+/* --- Sections inside card --- */
+.iwp-section {
+    margin-top: 8px;
+}
+
+.iwp-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #37474f;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 0 0 4px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.iwp-section-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.iwp-section-list li {
+    font-size: 13px;
+    color: #455a64;
+    padding: 3px 0 3px 14px;
+    position: relative;
+    line-height: 1.45;
+}
+
+.iwp-section-list li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    color: #3f51b5;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+/* --- Toggle --- */
+.iwp-card-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #90a4ae;
+    cursor: pointer;
+    transition: color 0.2s;
+    user-select: none;
+    background: #fafafa;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    width: 100%;
+    text-align: center;
+}
+
+.iwp-card-toggle:hover {
+    color: #3f51b5;
+    background: #f5f5f5 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.iwp-card-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
+
+.iwp-card-details.iwp-open {
+    max-height: 2000px;
+}
+
+/* --- No Results --- */
+.iwp-no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px 20px;
+    color: #b0bec5;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.iwp-no-results span {
+    display: block;
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .insurer-plan-shell {
+        padding: 14px 10px 50px;
+    }
+
+    .insurer-plan-topbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .insurer-plan-topbar h1 {
+        font-size: 20px;
+    }
+
+    .insurer-plan-controls {
+        flex-direction: column;
+    }
+
+    .insurer-plan-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .iwp-stat {
+        flex: 1 1 80px;
+        padding: 8px 10px;
+    }
+
+    .iwp-stat-value {
+        font-size: 18px;
+    }
+}
+
+/* =========================================================
+   TICKET & MAIL HELPER PANEL
+   ========================================================= */
+
+.ticket-helper-panel {
+    position: fixed;
+    right: 88px;
+    bottom: 86px;
+    z-index: 7000;
+    width: min(420px, calc(100vw - 24px));
+    max-height: min(500px, calc(100vh - 120px));
+    display: none;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 8px;
+    box-shadow: 0 22px 55px rgba(15, 23, 42, 0.28);
+    text-align: left;
+    resize: both;
+}
+
+.ticket-helper-panel.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-helper-mini {
+    position: fixed;
+    right: 194px;
+    bottom: 86px;
+    z-index: 6999;
+    display: none;
+    min-width: 96px;
+    height: 40px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0284c7, #0f766e);
+    color: #ffffff;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28);
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.ticket-helper-mini.active {
+    display: block;
+}
+
+@media (max-width: 720px) {
+    .ticket-helper-panel {
+        right: 10px;
+        left: 10px;
+        bottom: 76px;
+        width: auto;
+    }
+    .ticket-helper-mini {
+        right: 118px;
+        bottom: 76px;
+    }
+}
+
+.ticket-nav-btn {
+    width: auto;
+    height: 26px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.ticket-nav-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.ticket-play-card {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px 12px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: text;
+}
+
+.ticket-play-card:hover {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.ticket-play-card.copied {
+    border-color: #10b981 !important;
+    background: #ecfdf5 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12) !important;
+}
+
+
